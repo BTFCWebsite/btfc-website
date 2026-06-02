@@ -115,7 +115,7 @@ export default function ShopPage() {
       url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-stadium-scarf-010211",
       image: "https://www.batemanssports.co.uk/cdn/shop/files/BTFC_Scarf.png?v=1754309800&width=533",
     },
-    {
+   {
   name: "Managers Olimpiada Pants",
   price: "£29.50",
   brand: "Joma",
