@@ -53,6 +53,13 @@ export default function ShopPage() {
       image: "https://www.batemanssports.co.uk/cdn/shop/files/1722692095_019967_BLACK_3.jpg?v=1730903660&width=533",
     },
     {
+  name: "Managers Olimpiada Pants",
+  price: "£29.50",
+  brand: "Joma",
+  url: "https://www.batemanssports.co.uk/products/joma-brimscombe-thrupp-fc-managers-olimpiada-pants-black-black-019972",
+  image: "https://www.batemanssports.co.uk/cdn/shop/files/1722692313_019972_BLACK_3.jpg?v=1730903663&width=533",
+},
+    {
       name: "Players Hobby II Polo Shirt",
       price: "£25.00",
       brand: "Joma",
@@ -149,13 +156,6 @@ export default function ShopPage() {
   brand: "Batemans Sports",
   url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-striped-fan-bobble-hat",
   image: "/crest.png",
-},
-{
-  name: "Managers Olimpiada Pants",
-  price: "£29.50",
-  brand: "Joma",
-  url: "https://www.batemanssports.co.uk/products/joma-brimscombe-thrupp-fc-managers-olimpiada-pants-black-black-019972",
-  image: "https://www.batemanssports.co.uk/cdn/shop/files/1722692313_019972_BLACK_3.jpg?v=1730903663&width=533",
 },
 {
   name: "Managers Urban V Gilet",
