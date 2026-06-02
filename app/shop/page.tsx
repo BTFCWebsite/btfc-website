@@ -119,7 +119,7 @@ export default function ShopPage() {
       name: "Managers Olimpiada Pants",
       price: "£29.50",
       brand: "Joma",
-      url: "https://www.batemanssports.co.uk/products/joma-brimscombe-thrupp-fc-managers-olimpiada-pants-black-black-019972?_pos=15&_sid=2e4f3c1a5&_ss=r",
+      url: "https://www.batemanssports.co.uk/products/joma-brimscombe-thrupp-fc-managers-olimpiada-pants-black-royal-black-royal-019972?_pos=16&_sid=3563da282&_ss=r",
       image:
         "https://www.batemanssports.co.uk/cdn/shop/files/1722692313_019972_BLACK_3.jpg?v=1730903663&width=533",
     },
