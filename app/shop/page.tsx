@@ -115,6 +115,55 @@ export default function ShopPage() {
       url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-stadium-scarf-010211",
       image: "https://www.batemanssports.co.uk/cdn/shop/files/BTFC_Scarf.png?v=1754309800&width=533",
     },
+    {
+  name: "Managers Olimpiada Pants",
+  price: "£29.50",
+  brand: "Joma",
+  url: "https://www.batemanssports.co.uk/products/joma-brimscombe-thrupp-fc-managers-olimpiada-pants-black-black-019972",
+  image: "https://www.batemanssports.co.uk/cdn/shop/files/1722692313_019972_BLACK_3.jpg?v=1730903663&width=533",
+},
+{
+  name: "Managers Urban V Gilet",
+  price: "£49.00",
+  brand: "Joma",
+  url: "https://www.batemanssports.co.uk/products/joma-brimscombe-thrupp-fc-managers-urban-v-gilet-black-black-019973",
+  image: "https://www.batemanssports.co.uk/cdn/shop/files/1723123966_019973_BLACK_1.jpg?v=1730903679&width=533",
+},
+{
+  name: "Beanie Hat",
+  price: "£8.00",
+  brand: "Batemans Sports",
+  url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-beanie-hat",
+  image: "https://www.batemanssports.co.uk/cdn/shop/files/bh044f_navy.jpg?v=1754309688&width=533",
+},
+{
+  name: "Snowstar Bobble Hat",
+  price: "£10.00",
+  brand: "Batemans Sports",
+  url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-snowstar-bobble-hat",
+  image: "https://www.batemanssports.co.uk/cdn/shop/files/b450_navywhite.jpg?v=1754309715&width=533",
+},
+{
+  name: "Snapback Trucker Cap",
+  price: "£10.00",
+  brand: "Batemans Sports",
+  url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-snapback-trucker-cap",
+  image: "https://www.batemanssports.co.uk/cdn/shop/files/b640_navywhite.jpg?v=1754309744&width=533",
+},
+{
+  name: "Ultimate 5-Panel Cap",
+  price: "£10.00",
+  brand: "Batemans Sports",
+  url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-ultimate-5-panel-cap",
+  image: "https://www.batemanssports.co.uk/cdn/shop/files/b15b_navy.jpg?v=1754309767&width=533",
+},
+{
+  name: "Striped Fan Bobble Hat",
+  price: "£10.00",
+  brand: "Batemans Sports",
+  url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-striped-fan-bobble-hat",
+  image: "https://www.batemanssports.co.uk/cdn/shop/files/b449_navywhite.jpg?v=1754309785&width=533",
+},
   ]
 
   return (
