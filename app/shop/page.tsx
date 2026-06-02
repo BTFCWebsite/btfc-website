@@ -137,7 +137,7 @@ export default function ShopPage() {
       brand: "Joma",
       url: "https://www.batemanssports.co.uk/products/joma-brimscombe-thrupp-fc-managers-trivor-winter-bench-jacket-black-black-019974",
       image:
-        "https://www.batemanssports.co.uk/cdn/shop/files/1723124988_019974_BLACK_1.jpg?v=1730903689&width=533",
+        "https://www.batemanssports.co.uk/products/joma-brimscombe-thrupp-fc-managers-trivor-winter-bench-jacket-black-black-019974",
     },
     {
       name: "Beanie Hat",
