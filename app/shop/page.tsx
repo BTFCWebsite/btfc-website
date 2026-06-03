@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 export default function ShopPage() {
   const collectionUrl = "https://www.batemanssports.co.uk/collections/club-shops-football-brimscombe-thrupp-fc"
 
