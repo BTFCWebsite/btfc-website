@@ -6,28 +6,25 @@ export default function TeamsPage() {
       title: "First Team",
       league: "Hellenic League Premier Division",
       manager: "First Team Management",
-      image: "/teams/first-team.jpg",
+      image: "/Ground_Pic.jpeg",
       description:
         "Competing at Step 5 of the National League System, the First Team represents the highest level of football at Brimscombe & Thrupp FC.",
-      accent: "#1149D8",
     },
     {
       title: "Reserve Team",
       league: "Stroud & District Football League",
       manager: "Reserve Team Management",
-      image: "/teams/reserves.jpg",
+      image: "/Ground_Pic.jpeg",
       description:
         "Our Reserve Team provides a vital pathway between youth and senior football whilst competing strongly every week.",
-      accent: "#1149D8",
     },
     {
       title: "Under 17s",
       league: "Gloucestershire Youth Football",
       manager: "U17 Management",
-      image: "/teams/u17.jpg",
+      image: "/Ground_Pic.jpeg",
       description:
         "The new Under 17s side continues the club’s commitment to youth development and creating the next generation of BTFC players.",
-      accent: "#1149D8",
     },
   ]
 
@@ -94,7 +91,6 @@ export default function TeamsPage() {
                 overflow: "hidden",
                 boxShadow: "0 18px 40px rgba(0,0,0,.12)",
                 border: "1px solid rgba(255,255,255,.06)",
-                transition: "all .25s ease",
               }}
             >
               <div
@@ -328,4 +324,3 @@ export default function TeamsPage() {
     </main>
   )
 }
-```
