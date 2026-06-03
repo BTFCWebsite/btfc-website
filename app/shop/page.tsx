@@ -31,8 +31,8 @@ export default function ShopPage() {
       products: [
         { name: "Managers Combi Training Tee", price: "£13.00", brand: "Joma", url: "https://www.batemanssports.co.uk/products/joma-brimscombe-thrupp-fc-managers-combi-training-tee-black-black-019970", image: "https://www.batemanssports.co.uk/cdn/shop/files/1722694806_019970_BLACK_1.jpg?v=1730903682&width=533" },
         { name: "Managers Olimpiada ½ Zip Top", price: "From £29.50", brand: "Joma", url: "https://www.batemanssports.co.uk/products/joma-brimscombe-thrupp-fc-managers-olimpiada-zip-top-black-black-019971", image: "https://www.batemanssports.co.uk/cdn/shop/files/1722690382_019971_BLACK_3.jpg?v=1730903664&width=533" },
-        { name: "Managers Olimpiada Pants", price: "£29.50", brand: "Joma", url: "https://www.batemanssports.co.uk/products/joma-brimscombe-thrupp-fc-managers-olimpiada-pants-black-royal-black-royal-019972", image: "https://www.batemanssports.co.uk/cdn/shop/files/1722692313_019972_BLACK_3.jpg?v=1730903663&width=533" },
-        { name: "Managers Urban V Gilet", price: "£49.00", brand: "Joma", url: "https://www.batemanssports.co.uk/products/joma-brimscombe-thrupp-fc-managers-urban-v-gilet-black-black-019973", image: "https://www.batemanssports.co.uk/cdn/shop/files/1723123966_019973_BLACK_1.jpg?v=1730903679&width=533" },
+        { name: "Managers Olimpiada Pants", price: "£29.50", brand: "Joma", url: "https://www.batemanssports.co.uk/products/joma-brimscombe-thrupp-fc-managers-olimpiada-pants-black-royal-black-royal-019972", image: "https://www.batemanssports.co.uk/cdn/shop/files/1722693548_019972_BLACKROYAL_1.jpg?v=1730903669&width=533" },
+        { name: "Managers Urban V Gilet", price: "£49.00", brand: "Joma", url: "https://www.batemanssports.co.uk/products/joma-brimscombe-thrupp-fc-managers-urban-v-gilet-black-black-019973", image: "https://www.batemanssports.co.uk/cdn/shop/files/1722765655_019973_BLACK_1.jpg?v=1730903681&width=533" },
         { name: "Managers Trivor Winter Bench Jacket", price: "£60.00", brand: "Joma", url: "https://www.batemanssports.co.uk/products/joma-brimscombe-thrupp-fc-managers-trivor-winter-bench-jacket-black-black-019974", image: "https://www.batemanssports.co.uk/cdn/shop/files/1722694806_019970_BLACK_1.jpg?v=1730903682&width=533" },
       ]
     },
@@ -48,12 +48,12 @@ export default function ShopPage() {
       title: "Headwear & Accessories",
       icon: "🧣",
       products: [
-        { name: "Stadium Scarf", price: "£12.00", brand: "Batemans Sports", url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-stadium-scarf-010211", image: "https://www.batemanssports.co.uk/cdn/shop/files/BTFC_Scarf.png?v=1754309800&width=533" },
-        { name: "Beanie Hat", price: "£8.00", brand: "Batemans Sports", url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-beanie-hat-010209", image: "/crest.png" },
-        { name: "Snowstar Bobble Hat", price: "£10.00", brand: "Batemans Sports", url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-bobble-hat-016866", image: "/crest.png" },
-        { name: "Striped Fan Bobble Hat", price: "£10.00", brand: "Batemans Sports", url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-striped-fan-bobble-hat", image: "/crest.png" },
-        { name: "Snapback Trucker Cap", price: "£10.00", brand: "Batemans Sports", url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-snapback-truker-cap-royal-white-019977", image: "/crest.png" },
-        { name: "Ultimate 5-Panel Cap", price: "£10.00", brand: "Batemans Sports", url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-ultimate-5-panel-cap-royal-019978", image: "/crest.png" },
+        { name: "Stadium Scarf", price: "£12.00", brand: "Batemans Sports", url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-stadium-scarf-010211", image: "https://www.batemanssports.co.uk/cdn/shop/files/1656941756_010211_ROYAL_1.jpg?v=1718725467&width=533" },
+        { name: "Beanie Hat", price: "£8.00", brand: "Batemans Sports", url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-beanie-hat-010209", image: "https://www.batemanssports.co.uk/cdn/shop/files/1656930777_010209_ROYAL_1.jpg?v=1718725467&width=533" },
+        { name: "Snowstar Bobble Hat", price: "£10.00", brand: "Batemans Sports", url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-bobble-hat-016866", image: "https://www.batemanssports.co.uk/cdn/shop/files/1656931777_016866_BLUE_1.jpg?v=1718725475&width=533" },
+        { name: "Striped Fan Bobble Hat", price: "£10.00", brand: "Batemans Sports", url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-striped-fan-bobble-hat", image: "https://www.batemanssports.co.uk/cdn/shop/files/1656931777_016866_BLUE_1.jpg?v=1718725475&width=533" },
+        { name: "Snapback Trucker Cap", price: "£10.00", brand: "Batemans Sports", url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-snapback-truker-cap-royal-white-019977", image: "https://www.batemanssports.co.uk/cdn/shop/files/1722765961_019977_product_image.jpg?v=1730903688&width=533" },
+        { name: "Ultimate 5-Panel Cap", price: "£10.00", brand: "Batemans Sports", url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-ultimate-5-panel-cap-royal-019978", image: "https://www.batemanssports.co.uk/cdn/shop/files/1722853527_019978_product_image.jpg?v=1730903690&width=533" },
         { name: "BTFC Sliders", price: "£15.00", brand: "Batemans Sports", url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-sliders", image: "https://www.batemanssports.co.uk/cdn/shop/files/jc092_navy_ft2.jpg?v=1777295455&width=533" },
       ]
     },
