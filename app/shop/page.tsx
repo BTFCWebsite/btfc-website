@@ -178,7 +178,7 @@ export default function ShopPage() {
   price: "£8.00",
   brand: "Batemans Sports",
   url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-beanie-hat-010209",
-  image: "https://cdn.shopify.com/s/files/1/0283/4062/3305/files/bh044f_navy.jpg?v=1754309688",
+  image: "https://www.batemanssports.co.uk/cdn/shop/products/bh044f_navy.jpg?v=1754309688",
 },
         {
           name: "Snowstar Bobble Hat",
@@ -188,14 +188,13 @@ export default function ShopPage() {
           image:
             "https://www.batemanssports.co.uk/cdn/shop/files/1656931777_016866_BLUE_1.jpg?v=1718725475&width=533",
         },
-        {
-          name: "Striped Fan Bobble Hat",
-          price: "£10.00",
-          brand: "Batemans Sports",
-          url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-striped-fan-bobble-hat",
-          image:
-            "https://www.batemanssports.co.uk/cdn/shop/files/1656931777_016866_BLUE_1.jpg?v=1718725475&width=533",
-        },
+       {
+  name: "Striped Fan Bobble Hat",
+  price: "£10.00",
+  brand: "Batemans Sports",
+  url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-striped-fan-bobble-hat",
+  image: "https://www.batemanssports.co.uk/cdn/shop/products/b449_navywhite.jpg?v=1754309785",
+},
         {
           name: "Snapback Trucker Cap",
           price: "£10.00",
