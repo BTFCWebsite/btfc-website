@@ -173,14 +173,13 @@ export default function ShopPage() {
           image:
             "https://www.batemanssports.co.uk/cdn/shop/files/1656941756_010211_ROYAL_1.jpg?v=1718725467&width=533",
         },
-        {
-          name: "Beanie Hat",
-          price: "£8.00",
-          brand: "Batemans Sports",
-          url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-beanie-hat-010209",
-          image:
-            "https://www.batemanssports.co.uk/cdn/shop/products/1656930777_010209_ROYAL_1.jpg?v=1718725467&width=533",
-        },
+      {
+  name: "Beanie Hat",
+  price: "£8.00",
+  brand: "Batemans Sports",
+  url: "https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-beanie-hat-010209",
+  image: "https://cdn.shopify.com/s/files/1/0283/4062/3305/files/bh044f_navy.jpg?v=1754309688",
+},
         {
           name: "Snowstar Bobble Hat",
           price: "£10.00",
