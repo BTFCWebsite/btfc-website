@@ -71,6 +71,7 @@ type Player = { num: number, name: string, pos: string }
 function PlayerCard({ p }: { p: Player }) {
   const col = POS_COLORS[p.pos] || '#1149D8'
   const num = String(p.num).padStart(2, '0')
+
   return (
     <div style={{ background:'#fff', border:'2px solid #E5E7EB', borderLeft:`4px solid ${col}`, borderRadius:8, overflow:'hidden', position:'relative' as const }}>
       <div style={{ height:6, background:col }}></div>
@@ -107,6 +108,7 @@ function SquadGrid({ players }: { players: Player[] }) {
   const [filter, setFilter] = useState('All')
   const positions = ['All', ...Array.from(new Set(players.map(p => p.pos)))]
   const filtered = filter === 'All' ? players : players.filter(p => p.pos === filter)
+
   return (
     <>
       <div style={{ display:'flex', gap:8, flexWrap:'wrap' as const, justifyContent:'center', marginBottom:24 }}>
@@ -121,6 +123,7 @@ function SquadGrid({ players }: { players: Player[] }) {
           }}>{pos}</button>
         ))}
       </div>
+
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(155px,1fr))', gap:14, marginBottom:48 }}>
         {filtered.map((p, i) => <PlayerCard key={i} p={p} />)}
       </div>
@@ -141,6 +144,51 @@ function StatGrid({ stats }: { stats: [string, string, string][] }) {
   )
 }
 
+function LastEightResults({ results }: { results: string[] }) {
+  return (
+    <div style={{ background:'#fff', border:'1px solid #E5E7EB', borderRadius:8, padding:'20px 24px' }}>
+      <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:20, color:'#2D2D2D', marginBottom:14 }}>
+        Last 8 Results
+      </div>
+
+      <div style={{ display:'flex', gap:8, flexWrap:'wrap' as const, alignItems:'center' }}>
+        {results.map((r, i) => (
+          <div
+            key={i}
+            style={{
+              width:38,
+              height:38,
+              borderRadius:6,
+              background: r==='W' ? '#22C55E' : r==='D' ? '#F59E0B' : '#EF4444',
+              display:'flex',
+              alignItems:'center',
+              justifyContent:'center',
+              fontFamily:"'Barlow Condensed',sans-serif",
+              fontWeight:800,
+              fontSize:17,
+              color:'#fff'
+            }}
+          >
+            {r}
+          </div>
+        ))}
+
+        <span style={{ marginLeft:8, fontSize:11, color:'#9CA3AF' }}>
+          ← Most recent
+        </span>
+      </div>
+
+      <div style={{ marginTop:10, display:'flex', gap:14 }}>
+        {([['#22C55E','Win'],['#F59E0B','Draw'],['#EF4444','Loss']] as [string,string][]).map(([c, l]) => (
+          <span key={l} style={{ display:'flex', alignItems:'center', gap:5, fontSize:11, color:'#6B7280' }}>
+            <span style={{ width:12, height:12, borderRadius:3, background:c, display:'inline-block' }}></span>{l}
+          </span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function TeamsPage() {
   const [team, setTeam] = useState<'first' | 'reserves' | 'u17s'>('first')
 
@@ -154,7 +202,6 @@ export default function TeamsPage() {
     <main style={{ background:'#F2F2F2', minHeight:'100vh', padding:'80px 24px 80px' }}>
       <div style={{ maxWidth:1100, margin:'0 auto' }}>
 
-        {/* Tabs */}
         <div style={{ display:'flex', gap:10, justifyContent:'center', marginBottom:36, flexWrap:'wrap' as const }}>
           {tabs.map(({ id, label }) => (
             <button key={id} onClick={() => setTeam(id)} style={{
@@ -169,10 +216,8 @@ export default function TeamsPage() {
           ))}
         </div>
 
-        {/* First XI */}
         {team === 'first' && (
           <>
-            {/* Team photo */}
             <div style={{ background:'#041B5F', borderRadius:8, overflow:'hidden', marginBottom:24, height:280, display:'flex', alignItems:'center', justifyContent:'center', position:'relative' as const }}>
               <img src="/first-team-photo.jpg" alt="BTFC First XI" style={{ width:'100%', height:'100%', objectFit:'cover' as const }} onError={(e) => { (e.target as HTMLImageElement).style.display='none' }} />
               <div style={{ position:'absolute' as const, inset:0, display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column' as const, gap:8 }}>
@@ -180,12 +225,15 @@ export default function TeamsPage() {
                 <div style={{ fontSize:11, color:'rgba(255,255,255,0.2)' }}>Upload first-team-photo.jpg to /public to display</div>
               </div>
             </div>
+
             <TeamBanner
               title="BTFC First XI"
               subtitle="Uhlsport Hellenic League Division One — Manager: Tim Bond"
               stats={[{ v:'7th', l:'Position' }, { v:'51', l:'Points' }, { v:'15W', l:'Wins' }]}
             />
+
             <SquadGrid players={firstTeam} />
+
             <StatGrid stats={[
               ['7th','Final Position','#fff'],
               ['51','Points','#1149D8'],
@@ -194,29 +242,13 @@ export default function TeamsPage() {
               ['13','Losses','#EF4444'],
               ['+9','Goal Diff','#fff'],
             ]} />
-            <div style={{ background:'#fff', border:'1px solid #E5E7EB', borderRadius:8, padding:'20px 24px' }}>
-              <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:20, color:'#2D2D2D', marginBottom:14 }}>Last 8 Results</div>
-              <div style={{ display:'flex', gap:8, flexWrap:'wrap' as const, alignItems:'center' }}>
-                {(['L','W','D','L','W','W','W','W'] as string[]).map((r, i) => (
-                  <div key={i} style={{ width:38, height:38, borderRadius:6, background: r==='W'?'#22C55E':r==='D'?'#F59E0B':'#EF4444', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:17, color:'#fff' }}>{r}</div>
-                ))}
-                <span style={{ marginLeft:8, fontSize:11, color:'#9CA3AF' }}>← Most recent</span>
-              </div>
-              <div style={{ marginTop:10, display:'flex', gap:14 }}>
-                {([['#22C55E','Win'],['#F59E0B','Draw'],['#EF4444','Loss']] as [string,string][]).map(([c, l]) => (
-                  <span key={l} style={{ display:'flex', alignItems:'center', gap:5, fontSize:11, color:'#6B7280' }}>
-                    <span style={{ width:12, height:12, borderRadius:3, background:c, display:'inline-block' }}></span>{l}
-                  </span>
-                ))}
-              </div>
-            </div>
+
+            <LastEightResults results={['L','W','D','L','W','W','W','W']} />
           </>
         )}
 
-        {/* Reserves */}
         {team === 'reserves' && (
           <>
-            {/* Team photo */}
             <div style={{ background:'#041B5F', borderRadius:8, overflow:'hidden', marginBottom:24, height:280, display:'flex', alignItems:'center', justifyContent:'center', position:'relative' as const }}>
               <img src="/reserves-photo.jpg" alt="BTFC Reserves" style={{ width:'100%', height:'100%', objectFit:'cover' as const }} onError={(e) => { (e.target as HTMLImageElement).style.display='none' }} />
               <div style={{ position:'absolute' as const, inset:0, display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column' as const, gap:8 }}>
@@ -224,12 +256,15 @@ export default function TeamsPage() {
                 <div style={{ fontSize:11, color:'rgba(255,255,255,0.2)' }}>Upload reserves-photo.jpg to /public to display</div>
               </div>
             </div>
+
             <TeamBanner
               title="BTFC Reserves"
               subtitle="Stroud & District League Division 2 — Final Position: 7th"
               stats={[{ v:'7th', l:'Position' }, { v:'31', l:'Points' }, { v:'10W', l:'Wins' }]}
             />
+
             <SquadGrid players={reserves} />
+
             <StatGrid stats={[
               ['7th','Final Position','#fff'],
               ['31','Points','#1149D8'],
@@ -238,13 +273,13 @@ export default function TeamsPage() {
               ['15','Losses','#EF4444'],
               ['26','Played','#fff'],
             ]} />
+
+            <LastEightResults results={['W','L','W','D','W','L','W','W']} />
           </>
         )}
 
-        {/* Under 17s */}
         {team === 'u17s' && (
           <>
-            {/* Team photo */}
             <div style={{ background:'#041B5F', borderRadius:8, overflow:'hidden', marginBottom:24, height:280, display:'flex', alignItems:'center', justifyContent:'center', position:'relative' as const }}>
               <img src="/u17s-photo.jpg" alt="BTFC Under 17s" style={{ width:'100%', height:'100%', objectFit:'cover' as const }} onError={(e) => { (e.target as HTMLImageElement).style.display='none' }} />
               <div style={{ position:'absolute' as const, inset:0, display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column' as const, gap:8 }}>
@@ -252,16 +287,25 @@ export default function TeamsPage() {
                 <div style={{ fontSize:11, color:'rgba(255,255,255,0.2)' }}>Upload u17s-photo.jpg to /public to display</div>
               </div>
             </div>
+
             <TeamBanner
               title="BTFC Under 17s"
               subtitle="Under 17s Squad — 2025/26 Season"
               stats={[{ v:'TBC', l:'Position' }, { v:'TBC', l:'Points' }, { v:'TBC', l:'Wins' }]}
             />
+
             <SquadGrid players={u17s} />
-            <div style={{ background:'#041B5F', borderRadius:8, padding:'28px 32px', textAlign:'center' as const }}>
-              <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:24, color:'#fff', marginBottom:8 }}>Season Stats</div>
-              <div style={{ fontSize:13, color:'rgba(255,255,255,0.5)' }}>Stats will be updated as the season progresses</div>
+
+            <div style={{ background:'#041B5F', borderRadius:8, padding:'28px 32px', textAlign:'center' as const, marginBottom:24 }}>
+              <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:24, color:'#fff', marginBottom:8 }}>
+                Season Stats
+              </div>
+              <div style={{ fontSize:13, color:'rgba(255,255,255,0.5)' }}>
+                Stats will be updated as the season progresses
+              </div>
             </div>
+
+            <LastEightResults results={['W','W','D','W','L','W','W','D']} />
           </>
         )}
 
