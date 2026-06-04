@@ -72,12 +72,12 @@ function PlayerCard({ p }: { p: Player }) {
   const col = POS_COLORS[p.pos] || '#1149D8'
   const num = String(p.num).padStart(2, '0')
   return (
-    <div style={{ background:'#fff', border:'2px solid #E5E7EB', borderRadius:8, overflow:'hidden' }}>
+    <div style={{ background:'#fff', border:'2px solid #E5E7EB', borderLeft:`4px solid ${col}`, borderRadius:8, overflow:'hidden', position:'relative' as const }}>
       <div style={{ height:6, background:col }}></div>
-      <div style={{ padding:'18px 14px 16px', textAlign:'center' }}>
-        <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:46, lineHeight:1, marginBottom:-4, color:'rgba(17,73,216,0.08)' }}>{num}</div>
-        <span style={{ display:'inline-block', padding:'3px 10px', borderRadius:4, fontSize:10, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase' as const, color:'#fff', background:col, margin:'6px 0 8px' }}>{p.pos}</span>
-        <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:16, letterSpacing:'0.03em', lineHeight:1.1, color:'#2D2D2D' }}>{p.name}</div>
+      <div style={{ padding:'18px 14px 16px', textAlign:'center' as const, position:'relative' as const }}>
+        <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:52, lineHeight:1, marginBottom:-8, color:'rgba(17,73,216,0.07)', letterSpacing:'0.02em' }}>{num}</div>
+        <span style={{ display:'inline-block', padding:'3px 10px', borderRadius:4, fontSize:10, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase' as const, color:'#fff', background:col, margin:'8px 0 8px', position:'relative' as const, zIndex:1 }}>{p.pos}</span>
+        <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:16, letterSpacing:'0.03em', lineHeight:1.1, color:'#2D2D2D', position:'relative' as const, zIndex:1 }}>{p.name}</div>
       </div>
     </div>
   )
@@ -172,6 +172,14 @@ export default function TeamsPage() {
         {/* First XI */}
         {team === 'first' && (
           <>
+            {/* Team photo */}
+            <div style={{ background:'#041B5F', borderRadius:8, overflow:'hidden', marginBottom:24, height:280, display:'flex', alignItems:'center', justifyContent:'center', position:'relative' as const }}>
+              <img src="/first-team-photo.jpg" alt="BTFC First XI" style={{ width:'100%', height:'100%', objectFit:'cover' as const }} onError={(e) => { (e.target as HTMLImageElement).style.display='none' }} />
+              <div style={{ position:'absolute' as const, inset:0, display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column' as const, gap:8 }}>
+                <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:22, color:'rgba(255,255,255,0.3)', letterSpacing:'0.06em', textTransform:'uppercase' as const }}>First XI Team Photo</div>
+                <div style={{ fontSize:11, color:'rgba(255,255,255,0.2)' }}>Upload first-team-photo.jpg to /public to display</div>
+              </div>
+            </div>
             <TeamBanner
               title="BTFC First XI"
               subtitle="Uhlsport Hellenic League Division One — Manager: Tim Bond"
@@ -208,6 +216,14 @@ export default function TeamsPage() {
         {/* Reserves */}
         {team === 'reserves' && (
           <>
+            {/* Team photo */}
+            <div style={{ background:'#041B5F', borderRadius:8, overflow:'hidden', marginBottom:24, height:280, display:'flex', alignItems:'center', justifyContent:'center', position:'relative' as const }}>
+              <img src="/reserves-photo.jpg" alt="BTFC Reserves" style={{ width:'100%', height:'100%', objectFit:'cover' as const }} onError={(e) => { (e.target as HTMLImageElement).style.display='none' }} />
+              <div style={{ position:'absolute' as const, inset:0, display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column' as const, gap:8 }}>
+                <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:22, color:'rgba(255,255,255,0.3)', letterSpacing:'0.06em', textTransform:'uppercase' as const }}>Reserves Team Photo</div>
+                <div style={{ fontSize:11, color:'rgba(255,255,255,0.2)' }}>Upload reserves-photo.jpg to /public to display</div>
+              </div>
+            </div>
             <TeamBanner
               title="BTFC Reserves"
               subtitle="Stroud & District League Division 2 — Final Position: 7th"
@@ -228,6 +244,14 @@ export default function TeamsPage() {
         {/* Under 17s */}
         {team === 'u17s' && (
           <>
+            {/* Team photo */}
+            <div style={{ background:'#041B5F', borderRadius:8, overflow:'hidden', marginBottom:24, height:280, display:'flex', alignItems:'center', justifyContent:'center', position:'relative' as const }}>
+              <img src="/u17s-photo.jpg" alt="BTFC Under 17s" style={{ width:'100%', height:'100%', objectFit:'cover' as const }} onError={(e) => { (e.target as HTMLImageElement).style.display='none' }} />
+              <div style={{ position:'absolute' as const, inset:0, display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column' as const, gap:8 }}>
+                <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:22, color:'rgba(255,255,255,0.3)', letterSpacing:'0.06em', textTransform:'uppercase' as const }}>Under 17s Team Photo</div>
+                <div style={{ fontSize:11, color:'rgba(255,255,255,0.2)' }}>Upload u17s-photo.jpg to /public to display</div>
+              </div>
+            </div>
             <TeamBanner
               title="BTFC Under 17s"
               subtitle="Under 17s Squad — 2025/26 Season"
