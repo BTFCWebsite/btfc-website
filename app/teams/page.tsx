@@ -115,7 +115,7 @@ function SquadGrid({ players }: { players: typeof firstTeam }) {
             letterSpacing:'0.08em',textTransform:'uppercase',
             background: filter===pos ? '#1149D8' : '#fff',
             color: filter===pos ? '#fff' : '#6B7280',
-            border: filter===pos ? 'none' : '1px solid #E5E7EB'
+            outline: filter===pos ? 'none' : '1px solid #E5E7EB'
           }}>{pos}</button>
         ))}
       </div>
