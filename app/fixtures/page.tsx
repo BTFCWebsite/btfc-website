@@ -1,6 +1,3 @@
-Replace the page heading and tab labels in your Fixtures page with this structure so it mirrors the Teams page layout/style.
-
-```tsx
 'use client'
 import { useState } from 'react'
 
@@ -53,64 +50,19 @@ export default function FixturesPage() {
       : 'Gloucestershire Youth Football'
 
   return (
-    <main
-      style={{
-        background:'#F2F2F2',
-        minHeight:'100vh',
-        padding:'80px 24px'
-      }}
-    >
+    <main style={{ background:'#F2F2F2', minHeight:'100vh', padding:'80px 24px' }}>
       <div style={{ maxWidth:1100, margin:'0 auto' }}>
-
-        {/* Header */}
         <div style={{ textAlign:'center', marginBottom:42 }}>
-          <h1
-            style={{
-              fontFamily:"'Barlow Condensed',sans-serif",
-              fontWeight:800,
-              fontSize:56,
-              letterSpacing:'0.04em',
-              color:'#041B5F',
-              marginBottom:8,
-              textTransform:'uppercase'
-            }}
-          >
+          <h1 style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:56, letterSpacing:'0.04em', color:'#041B5F', marginBottom:8, textTransform:'uppercase' }}>
             Fixtures
           </h1>
-
-          <div
-            style={{
-              width:70,
-              height:4,
-              background:'#1149D8',
-              margin:'0 auto 16px',
-              borderRadius:2
-            }}
-          />
-
-          <p
-            style={{
-              color:'#6B7280',
-              fontSize:14,
-              maxWidth:680,
-              margin:'0 auto',
-              lineHeight:1.7
-            }}
-          >
+          <div style={{ width:70, height:4, background:'#1149D8', margin:'0 auto 16px', borderRadius:2 }} />
+          <p style={{ color:'#6B7280', fontSize:14, maxWidth:680, margin:'0 auto', lineHeight:1.7 }}>
             Upcoming fixtures across all Brimscombe & Thrupp FC teams.
           </p>
         </div>
 
-        {/* Tabs */}
-        <div
-          style={{
-            display:'flex',
-            gap:10,
-            justifyContent:'center',
-            marginBottom:36,
-            flexWrap:'wrap'
-          }}
-        >
+        <div style={{ display:'flex', gap:10, justifyContent:'center', marginBottom:36, flexWrap:'wrap' }}>
           {tabs.map(({ id, label }) => (
             <button
               key={id}
@@ -126,11 +78,8 @@ export default function FixturesPage() {
                 textTransform:'uppercase',
                 background: team===id ? '#1149D8' : '#fff',
                 color: team===id ? '#fff' : '#041B5F',
-                border:`2px solid #1149D8`,
-                boxShadow:
-                  team===id
-                    ? '0 4px 16px rgba(17,73,216,0.3)'
-                    : 'none'
+                border:'2px solid #1149D8',
+                boxShadow: team===id ? '0 4px 16px rgba(17,73,216,0.3)' : 'none'
               }}
             >
               {label}
@@ -138,61 +87,19 @@ export default function FixturesPage() {
           ))}
         </div>
 
-        {/* Banner */}
-        <div
-          style={{
-            background:'#041B5F',
-            borderRadius:8,
-            padding:'20px 28px',
-            marginBottom:28,
-            display:'flex',
-            alignItems:'center',
-            gap:16,
-            flexWrap:'wrap'
-          }}
-        >
-          <img
-            src="/crest.png"
-            alt="BTFC"
-            style={{
-              width:56,
-              height:56,
-              borderRadius:'50%',
-              border:'2px solid #fff'
-            }}
-          />
-
+        <div style={{ background:'#041B5F', borderRadius:8, padding:'20px 28px', marginBottom:28, display:'flex', alignItems:'center', gap:16, flexWrap:'wrap' }}>
+          <img src="/crest.png" alt="BTFC" style={{ width:56, height:56, borderRadius:'50%', border:'2px solid #fff' }} />
           <div style={{ flex:1 }}>
-            <div
-              style={{
-                fontFamily:"'Barlow Condensed',sans-serif",
-                fontWeight:800,
-                fontSize:28,
-                color:'#fff',
-                letterSpacing:'0.04em'
-              }}
-            >
+            <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:28, color:'#fff', letterSpacing:'0.04em' }}>
               {activeTitle}
             </div>
-
-            <div
-              style={{
-                fontSize:12,
-                color:'rgba(255,255,255,0.55)'
-              }}
-            >
+            <div style={{ fontSize:12, color:'rgba(255,255,255,0.55)' }}>
               {activeSubtitle}
             </div>
           </div>
         </div>
 
-        {/* Fixtures */}
-        <div
-          style={{
-            display:'grid',
-            gap:16
-          }}
-        >
+        <div style={{ display:'grid', gap:16 }}>
           {activeFixtures.map((f, i) => (
             <div
               key={i}
@@ -210,60 +117,27 @@ export default function FixturesPage() {
               }}
             >
               <div>
-                <div
-                  style={{
-                    fontFamily:"'Barlow Condensed',sans-serif",
-                    fontWeight:800,
-                    fontSize:26,
-                    color:'#041B5F',
-                    lineHeight:1
-                  }}
-                >
+                <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:26, color:'#041B5F', lineHeight:1 }}>
                   {f.opp}
                 </div>
-
-                <div
-                  style={{
-                    marginTop:6,
-                    fontSize:12,
-                    color:'#6B7280',
-                    display:'flex',
-                    gap:12,
-                    flexWrap:'wrap'
-                  }}
-                >
+                <div style={{ marginTop:6, fontSize:12, color:'#6B7280', display:'flex', gap:12, flexWrap:'wrap' }}>
                   <span>{f.comp}</span>
                   <span>{f.venue === 'H' ? 'Home' : 'Away'}</span>
                 </div>
               </div>
 
               <div style={{ textAlign:'right' }}>
-                <div
-                  style={{
-                    fontFamily:"'Barlow Condensed',sans-serif",
-                    fontWeight:800,
-                    fontSize:24,
-                    color:'#1149D8'
-                  }}
-                >
+                <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:24, color:'#1149D8' }}>
                   {f.date}
                 </div>
-
-                <div
-                  style={{
-                    fontSize:13,
-                    color:'#6B7280'
-                  }}
-                >
+                <div style={{ fontSize:13, color:'#6B7280' }}>
                   Kick Off: {f.time}
                 </div>
               </div>
             </div>
           ))}
         </div>
-
       </div>
     </main>
   )
 }
-```
