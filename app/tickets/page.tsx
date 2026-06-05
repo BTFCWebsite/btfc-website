@@ -279,6 +279,89 @@ function createTicketAndPay() {
           ))}
         </div>
       </section>
+      {selectedTicket && (
+  <div style={{
+    position:'fixed',
+    inset:0,
+    background:'rgba(0,0,0,.55)',
+    display:'flex',
+    alignItems:'center',
+    justifyContent:'center',
+    zIndex:9999,
+    padding:24
+  }}>
+    <div style={{
+      background:'#fff',
+      borderRadius:8,
+      padding:28,
+      maxWidth:420,
+      width:'100%'
+    }}>
+      <h2 style={{ marginTop:0, color:'#2D2D2D' }}>
+        {selectedTicket.title} Season Ticket
+      </h2>
+
+      <input
+        value={buyerName}
+        onChange={(e) => setBuyerName(e.target.value)}
+        placeholder="Full name"
+        style={{
+          width:'100%',
+          padding:12,
+          marginBottom:12,
+          border:'1px solid #CBD5E1',
+          borderRadius:6
+        }}
+      />
+
+      <input
+        value={buyerEmail}
+        onChange={(e) => setBuyerEmail(e.target.value)}
+        placeholder="Email address"
+        type="email"
+        style={{
+          width:'100%',
+          padding:12,
+          marginBottom:18,
+          border:'1px solid #CBD5E1',
+          borderRadius:6
+        }}
+      />
+
+      <button
+        onClick={createTicketAndPay}
+        style={{
+          width:'100%',
+          background:'#1149D8',
+          color:'#fff',
+          padding:'12px 18px',
+          border:0,
+          borderRadius:6,
+          fontWeight:900,
+          cursor:'pointer'
+        }}
+      >
+        Continue to Payment
+      </button>
+
+      <button
+        onClick={() => setSelectedTicket(null)}
+        style={{
+          width:'100%',
+          marginTop:10,
+          background:'#fff',
+          color:'#6B7280',
+          padding:'10px 18px',
+          border:'1px solid #E5E7EB',
+          borderRadius:6,
+          cursor:'pointer'
+        }}
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+)}
     </main>
   )
 }
