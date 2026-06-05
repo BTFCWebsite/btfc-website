@@ -1,6 +1,10 @@
 'use client'
 
 export default function TicketsPage() {
+  const paymentLinks: Record<string, string> = {
+  Adult: 'https://pay.izettle.com/?k8L8pwP6Q',
+  Concession: 'https://pay.izettle.com/?k8DRFS_yZ',
+}
   const tickets = [
     {
       title: 'Adult',
@@ -167,7 +171,7 @@ export default function TicketsPage() {
                 ))}
               </div>
 
-              <a href="/contact" style={{
+              <a href={paymentLinks[t.title] || '/contact'} target="_blank" rel="noopener" style={{
                 marginTop:'auto',
                 border:'2px solid #1149D8',
                 color:'#1149D8',
