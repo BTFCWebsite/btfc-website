@@ -43,10 +43,20 @@ export default function TicketsPage() {
     <main style={{ background:'#F2F2F2', minHeight:'100vh', padding:'90px 24px 90px' }}>
       <section style={{ maxWidth:980, margin:'0 auto' }}>
         <div style={{ textAlign:'center', marginBottom:42 }}>
-          <h1 style={{ fontSize:52, fontWeight:900, color:'#2D2D2D', margin:'0 0 8px' }}>
+          <h1 style={{
+            fontFamily:"'Barlow Condensed',sans-serif",
+            fontSize:64,
+            fontWeight:800,
+            letterSpacing:'0.04em',
+            textTransform:'uppercase',
+            color:'#2D2D2D',
+            margin:'0 0 8px'
+          }}>
             Season Tickets
           </h1>
-          <p style={{ color:'#6B7280', margin:0 }}>Secure your seat for the 2026/27 season</p>
+          <p style={{ fontFamily:"'Montserrat',sans-serif", color:'#6B7280', margin:0, fontSize:13 }}>
+            Secure your seat for the 2026/27 season
+          </p>
           <div style={{ width:52, height:4, background:'#1149D8', margin:'14px auto 0' }} />
         </div>
 
@@ -63,16 +73,39 @@ export default function TicketsPage() {
           marginBottom:44
         }}>
           <div>
-            <h2 style={{ fontSize:24, fontWeight:900, margin:'0 0 6px' }}>
+            <h2 style={{
+              fontFamily:"'Barlow Condensed',sans-serif",
+              fontSize:30,
+              fontWeight:800,
+              letterSpacing:'0.02em',
+              lineHeight:1,
+              margin:'0 0 8px'
+            }}>
               🎟️ 2026/27 Season Tickets On Sale Now
             </h2>
-            <p style={{ margin:0, color:'rgba(255,255,255,.7)', fontSize:13, lineHeight:1.6, textAlign:'justify' }}>
+            <p style={{
+              fontFamily:"'Montserrat',sans-serif",
+              margin:0,
+              color:'rgba(255,255,255,.7)',
+              fontSize:12,
+              lineHeight:1.6,
+              textAlign:'justify'
+            }}>
               Adult Early Bird £90 · Concession Early Bird £70 · Secure payment via Zettle · All major cards accepted
             </p>
           </div>
 
-          <div style={{ background:'#1149D8', padding:'12px 18px', borderRadius:6, textAlign:'center', fontWeight:900 }}>
-            <div style={{ fontSize:9, opacity:.7 }}>POWERED BY</div>
+          <div style={{
+            background:'#1149D8',
+            padding:'12px 18px',
+            borderRadius:6,
+            textAlign:'center',
+            fontFamily:"'Barlow Condensed',sans-serif",
+            fontWeight:800,
+            fontSize:18,
+            letterSpacing:'0.04em'
+          }}>
+            <div style={{ fontSize:9, opacity:.7, fontFamily:"'Montserrat',sans-serif" }}>POWERED BY</div>
             Zettle
           </div>
         </div>
@@ -91,7 +124,7 @@ export default function TicketsPage() {
               padding:20,
               display:'flex',
               flexDirection:'column',
-              minHeight:245,
+              minHeight:268,
               position:'relative'
             }}>
               <div style={{ height:4, background:'#1149D8', marginBottom:18 }} />
@@ -103,6 +136,7 @@ export default function TicketsPage() {
                   right:14,
                   background:'#15803D',
                   color:'#fff',
+                  fontFamily:"'Montserrat',sans-serif",
                   fontSize:9,
                   fontWeight:900,
                   padding:'3px 8px',
@@ -112,21 +146,48 @@ export default function TicketsPage() {
                 </div>
               )}
 
-              <h2 style={{ fontSize:22, fontWeight:900, color:'#2D2D2D', margin:'0 0 4px' }}>
+              <h2 style={{
+                fontFamily:"'Barlow Condensed',sans-serif",
+                fontSize:30,
+                fontWeight:800,
+                letterSpacing:'0.02em',
+                lineHeight:1,
+                color:'#2D2D2D',
+                margin:'0 0 8px'
+              }}>
                 {t.title}
               </h2>
 
-              <div style={{ fontSize:42, fontWeight:900, color:'#1149D8', lineHeight:1 }}>
+              <div style={{
+                fontFamily:"'Barlow Condensed',sans-serif",
+                fontSize:58,
+                fontWeight:800,
+                lineHeight:0.95,
+                letterSpacing:'0.02em',
+                color:'#1149D8',
+              }}>
                 {t.price}
               </div>
 
-              <p style={{ fontSize:12, color:'#6B7280', lineHeight:1.55, textAlign:'justify', margin:'8px 0 16px' }}>
+              <p style={{
+                fontFamily:"'Montserrat',sans-serif",
+                fontSize:12,
+                color:'#6B7280',
+                lineHeight:1.55,
+                textAlign:'justify',
+                margin:'10px 0 16px'
+              }}>
                 {t.note}
               </p>
 
               <div style={{ display:'grid', gap:7, marginBottom:18 }}>
                 {t.items.map((item) => (
-                  <div key={item} style={{ fontSize:11, color:'#374151', lineHeight:1.4 }}>
+                  <div key={item} style={{
+                    fontFamily:"'Montserrat',sans-serif",
+                    fontSize:11,
+                    color:'#374151',
+                    lineHeight:1.4
+                  }}>
                     <span style={{ color:'#1149D8', fontWeight:900 }}>✓</span> {item}
                   </div>
                 ))}
@@ -140,11 +201,13 @@ export default function TicketsPage() {
                 padding:'10px 14px',
                 borderRadius:6,
                 textDecoration:'none',
-                fontSize:11,
-                fontWeight:900,
-                letterSpacing:'.08em'
+                fontFamily:"'Barlow Condensed',sans-serif",
+                fontSize:13,
+                fontWeight:800,
+                textTransform:'uppercase',
+                letterSpacing:'0.08em'
               }}>
-                SELECT
+                Select
               </a>
             </div>
           ))}
@@ -161,14 +224,29 @@ export default function TicketsPage() {
               border:'1px solid #E5E7EB',
               borderRadius:8,
               padding:22,
-              minHeight:150,
+              minHeight:155,
               display:'flex',
               flexDirection:'column'
             }}>
-              <h3 style={{ fontSize:20, fontWeight:900, color:'#2D2D2D', margin:'0 0 12px' }}>
+              <h3 style={{
+                fontFamily:"'Barlow Condensed',sans-serif",
+                fontSize:28,
+                fontWeight:800,
+                letterSpacing:'0.02em',
+                lineHeight:1,
+                color:'#2D2D2D',
+                margin:'0 0 14px'
+              }}>
                 {title}
               </h3>
-              <p style={{ fontSize:12, color:'#4B5563', lineHeight:1.7, textAlign:'justify', margin:0 }}>
+              <p style={{
+                fontFamily:"'Montserrat',sans-serif",
+                fontSize:12,
+                color:'#4B5563',
+                lineHeight:1.7,
+                textAlign:'justify',
+                margin:0
+              }}>
                 {text}
               </p>
             </div>
