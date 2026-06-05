@@ -16,7 +16,7 @@ export default function TicketsPage() {
     {
       title: 'Concession',
       price: '£80',
-      note: '2026/27 Season — 65+ / students with valid ID.',
+      note: note: '2026/27 Season — 65+ / students with valid ID.',
       items: [
         'All First Team home league games',
         'All First Team home cup games',
