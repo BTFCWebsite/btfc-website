@@ -10,57 +10,24 @@ function startPurchase(ticket: any) {
   setSelectedTicket(ticket)
 }
 
-function createTicketAndPay() {
+function goToPayment() {
   if (!buyerName.trim() || !buyerEmail.includes('@')) {
     alert('Please enter a valid name and email address.')
     return
   }
 
   const type = selectedTicket.title.includes('Concession') ? 'Concession' : 'Adult'
-  const ref = `BTFC-${type.toUpperCase()}-${Date.now()}`
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(ref)}`
 
-  const ticketWindow = window.open('', '_blank')
-
-  if (ticketWindow) {
-    ticketWindow.document.write(`
-      <html>
-        <head>
-          <title>BTFC Season Ticket</title>
-          <style>
-            body { font-family: Arial, sans-serif; background:#F2F2F2; padding:40px; }
-            .ticket { max-width:700px; margin:auto; background:#fff; border:4px solid #041B5F; padding:32px; }
-            h1 { color:#041B5F; margin:0; }
-            h2 { color:#1149D8; }
-            .qr { text-align:center; margin:24px 0; }
-            .ref { font-weight:bold; color:#041B5F; }
-            .note { font-size:12px; color:#666; margin-top:20px; }
-            button { background:#1149D8; color:#fff; border:0; padding:12px 22px; border-radius:6px; font-weight:bold; }
-          </style>
-        </head>
-        <body>
-          <div class="ticket">
-            <h1>Brimscombe & Thrupp FC</h1>
-            <h2>2026/27 ${type} Season Ticket</h2>
-            <p><strong>Name:</strong> ${buyerName}</p>
-            <p><strong>Email:</strong> ${buyerEmail}</p>
-            <p><strong>Ticket:</strong> ${selectedTicket.title} — ${selectedTicket.price}</p>
-            <p><strong>Includes:</strong> First Team home league and cup games, plus free online matchday programme.</p>
-            <div class="qr"><img src="${qrUrl}" /></div>
-            <p class="ref">Ticket Ref: ${ref}</p>
-            <p class="note">Ticket valid once payment has been confirmed by BTFC against Zettle records.</p>
-            <button onclick="window.print()">Save / Print PDF</button>
-          </div>
-        </body>
-      </html>
-    `)
-  }
+  localStorage.setItem('btfcPendingTicket', JSON.stringify({
+    name: buyerName,
+    email: buyerEmail,
+    ticket: selectedTicket.title,
+    price: selectedTicket.price,
+    type,
+    createdAt: new Date().toISOString()
+  }))
 
   window.open(paymentLinks[type], '_blank')
-}
-  const paymentLinks: Record<string, string> = {
-  Adult: 'https://pay.izettle.com/?k8L8pwP6Q',
-  Concession: 'https://pay.izettle.com/?k8DRFS_yZ',
 }
   const tickets = [
     {
@@ -329,7 +296,7 @@ function createTicketAndPay() {
       />
 
       <button
-        onClick={createTicketAndPay}
+        onClick={goToPayment}
         style={{
           width:'100%',
           background:'#1149D8',
