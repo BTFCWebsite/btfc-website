@@ -3,390 +3,211 @@
 export default function TicketsPage() {
   const tickets = [
     {
-      title: 'Adult Early Bird',
-      price: '£90',
-      note: '2026/27 Season — Early bird price, limited availability',
-      badge: 'BEST VALUE',
-      items: [
-        'All home league games',
-        'All home cup games',
-        'Free matchday programme',
-        'Early bird saving — save £10',
-      ],
-    },
-    {
       title: 'Adult',
       price: '£100',
-      note: '2026/27 Season — All home league and cup games',
-      badge: '',
+      note: '2026/27 Season — Adult Season Ticket.',
       items: [
-        'All home league games',
-        'All home cup games',
-        'Free matchday programme',
-      ],
-    },
-    {
-      title: 'Concession Early Bird',
-      price: '£70',
-      note: '2026/27 Season — 65+ / Students with valid ID',
-      badge: 'BEST VALUE',
-      items: [
-        'All home league games',
-        'All home cup games',
-        'Free matchday programme',
-        'Early bird saving — save £10',
+        'All First Team home league games',
+        'All First Team home cup games',
+        'Free online matchday programme',
+        'Digital season ticket included',
       ],
     },
     {
       title: 'Concession',
       price: '£80',
-      note: '2026/27 Season — 65+ / Students with valid ID',
-      badge: '',
+      note: '2026/27 Season — Concession Season Ticket.',
       items: [
-        'All home league games',
-        'All home cup games',
-        'Free matchday programme',
+        'All First Team home league games',
+        'All First Team home cup games',
+        'Free online matchday programme',
+        'Digital season ticket included',
       ],
     },
   ]
 
   const faqs = [
-    [
-      'Can I pay in instalments?',
-      'Not currently — season tickets must be paid in full at time of purchase.',
-    ],
-    [
-      'How do I collect my ticket?',
-      'After payment you will receive an email with your digital season ticket. Show it on your phone at the gate or print it at home.',
-    ],
-    [
-      'Refund policy',
-      'Please contact us within 14 days of purchase. Subject to our terms and conditions.',
-    ],
-    [
-      'Is my payment secure?',
-      'Yes. All payments are processed securely by Zettle, a PayPal company, using bank-grade encryption.',
-    ],
+    ['Can I pay in instalments?', 'Not currently — season tickets must be paid in full at time of purchase.'],
+    ['How do I collect my ticket?', 'After payment you will receive your digital season ticket by email. Show it on your phone at the gate or print it at home.'],
+    ['What is included?', 'Your season ticket covers all First Team home league and cup fixtures, plus a free online matchday programme.'],
+    ['Is my payment secure?', 'Yes. Payments are processed securely by Zettle, a PayPal company.'],
   ]
 
   return (
-    <main
-      style={{
-        background: '#F2F2F2',
-        minHeight: '100vh',
-        padding: '90px 24px 90px',
-      }}
-    >
-      <section style={{ maxWidth: 1180, margin: '0 auto' }}>
-        {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: 42 }}>
-          <h1
-            style={{
-              fontFamily: "'Barlow Condensed',sans-serif",
-              fontSize: 72,
-              fontWeight: 800,
-              letterSpacing: '0.04em',
-              textTransform: 'uppercase',
-              color: '#2D2D2D',
-              margin: '0 0 10px',
-              lineHeight: 1,
-            }}
-          >
+    <main style={{ background:'#F2F2F2', minHeight:'100vh', padding:'90px 24px 90px' }}>
+      <section style={{ maxWidth:980, margin:'0 auto' }}>
+        <div style={{ textAlign:'center', marginBottom:42 }}>
+          <h1 style={{
+            fontFamily:"'Barlow Condensed',sans-serif",
+            fontSize:52,
+            fontWeight:800,
+            color:'#2D2D2D',
+            margin:'0 0 8px',
+            letterSpacing:'0.04em'
+          }}>
             Season Tickets
           </h1>
-
-          <p
-            style={{
-              fontFamily: "'Montserrat',sans-serif",
-              color: '#6B7280',
-              margin: 0,
-              fontSize: 14,
-            }}
-          >
+          <p style={{ fontFamily:"'Montserrat',sans-serif", color:'#6B7280', margin:0, fontSize:14 }}>
             Secure your seat for the 2026/27 season
           </p>
-
-          <div
-            style={{
-              width: 54,
-              height: 4,
-              background: '#1149D8',
-              margin: '16px auto 0',
-              borderRadius: 2,
-            }}
-          />
+          <div style={{ width:52, height:4, background:'#1149D8', margin:'14px auto 0' }} />
         </div>
 
-        {/* Top Banner */}
-        <div
-          style={{
-            background: '#041B5F',
-            borderRadius: 8,
-            padding: '22px 28px',
-            color: '#fff',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 20,
-            flexWrap: 'wrap',
-            marginBottom: 44,
-          }}
-        >
+        <div style={{
+          background:'#041B5F',
+          borderRadius:8,
+          padding:'22px 28px',
+          color:'#fff',
+          display:'flex',
+          alignItems:'center',
+          justifyContent:'space-between',
+          gap:20,
+          flexWrap:'wrap',
+          marginBottom:44
+        }}>
           <div>
-            <h2
-              style={{
-                fontFamily: "'Barlow Condensed',sans-serif",
-                fontSize: 42,
-                fontWeight: 800,
-                margin: '0 0 8px',
-                letterSpacing: '0.02em',
-                lineHeight: 1,
-              }}
-            >
+            <h2 style={{
+              fontFamily:"'Barlow Condensed',sans-serif",
+              fontSize:28,
+              fontWeight:800,
+              margin:'0 0 6px',
+              letterSpacing:'0.03em'
+            }}>
               🎟️ 2026/27 Season Tickets On Sale Now
             </h2>
-
-            <p
-              style={{
-                fontFamily: "'Montserrat',sans-serif",
-                margin: 0,
-                color: 'rgba(255,255,255,.75)',
-                fontSize: 13,
-                lineHeight: 1.6,
-              }}
-            >
-              Adult Early Bird £90 · Concession Early Bird £70 · Secure payment via{' '}
-              <strong>Zettle</strong> · All major cards accepted
+            <p style={{
+              fontFamily:"'Montserrat',sans-serif",
+              margin:0,
+              color:'rgba(255,255,255,.7)',
+              fontSize:13,
+              lineHeight:1.6
+            }}>
+              Adult £100 · Concession £80 · League and cup games included · Free online programme · Secure payment via <strong>Zettle</strong>
             </p>
           </div>
 
-          <div
-            style={{
-              background: '#1149D8',
-              padding: '12px 22px',
-              borderRadius: 6,
-              textAlign: 'center',
-            }}
-          >
-            <div
-              style={{
-                fontFamily: "'Montserrat',sans-serif",
-                fontSize: 9,
-                opacity: 0.7,
-                letterSpacing: '.14em',
-              }}
-            >
+          <div style={{
+            background:'#1149D8',
+            padding:'12px 22px',
+            borderRadius:6,
+            textAlign:'center',
+            fontFamily:"'Barlow Condensed',sans-serif",
+            fontWeight:800,
+            fontSize:20
+          }}>
+            <div style={{ fontFamily:"'Montserrat',sans-serif", fontSize:9, opacity:.7, letterSpacing:'.12em' }}>
               POWERED BY
             </div>
-
-            <div
-              style={{
-                fontFamily: "'Barlow Condensed',sans-serif",
-                fontWeight: 800,
-                fontSize: 24,
-                letterSpacing: '0.03em',
-              }}
-            >
-              Zettle
-            </div>
+            Zettle
           </div>
         </div>
 
-        {/* Ticket Cards */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-            gap: 20,
-            marginBottom: 44,
-            alignItems: 'stretch',
-          }}
-        >
+        <div style={{
+          display:'grid',
+          gridTemplateColumns:'repeat(2, minmax(0, 1fr))',
+          gap:28,
+          marginBottom:44,
+          alignItems:'stretch'
+        }}>
           {tickets.map((t) => (
-            <div
-              key={t.title}
-              style={{
-                background: '#fff',
-                border: '1px solid #E5E7EB',
-                borderRadius: 8,
-                padding: 22,
-                display: 'flex',
-                flexDirection: 'column',
-                minHeight: 360,
-                position: 'relative',
-              }}
-            >
-              <div
-                style={{
-                  height: 4,
-                  background: '#1149D8',
-                  marginBottom: 18,
-                }}
-              />
+            <div key={t.title} style={{
+              background:'#fff',
+              border:'1px solid #E5E7EB',
+              borderRadius:8,
+              padding:24,
+              display:'flex',
+              flexDirection:'column',
+              minHeight:320
+            }}>
+              <div style={{ height:4, background:'#1149D8', marginBottom:20 }} />
 
-              {t.badge && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: 16,
-                    right: 16,
-                    background: '#15803D',
-                    color: '#fff',
-                    fontFamily: "'Montserrat',sans-serif",
-                    fontSize: 9,
-                    fontWeight: 800,
-                    padding: '4px 8px',
-                    borderRadius: 4,
-                    letterSpacing: '.06em',
-                  }}
-                >
-                  {t.badge}
-                </div>
-              )}
-
-              <h2
-                style={{
-                  fontFamily: "'Barlow Condensed',sans-serif",
-                  fontSize:
-                    t.title === 'Concession Early Bird' ? 32 : 36,
-                  fontWeight: 800,
-                  letterSpacing: '0.02em',
-                  lineHeight: 0.95,
-                  color: '#2D2D2D',
-                  margin: '0 0 10px',
-                  maxWidth:
-                    t.title === 'Concession Early Bird'
-                      ? 180
-                      : '100%',
-                }}
-              >
+              <h2 style={{
+                fontFamily:"'Barlow Condensed',sans-serif",
+                fontSize:30,
+                fontWeight:800,
+                color:'#2D2D2D',
+                margin:'0 0 6px',
+                lineHeight:1.05
+              }}>
                 {t.title}
               </h2>
 
-              <div
-                style={{
-                  fontFamily: "'Barlow Condensed',sans-serif",
-                  fontSize: 68,
-                  fontWeight: 800,
-                  lineHeight: 0.9,
-                  letterSpacing: '0.02em',
-                  color: '#1149D8',
-                  marginBottom: 10,
-                }}
-              >
+              <div style={{
+                fontFamily:"'Barlow Condensed',sans-serif",
+                fontSize:54,
+                fontWeight:800,
+                color:'#1149D8',
+                lineHeight:.95,
+                marginBottom:10
+              }}>
                 {t.price}
               </div>
 
-              <p
-                style={{
-                  fontFamily: "'Montserrat',sans-serif",
-                  fontSize: 12,
-                  color: '#6B7280',
-                  lineHeight: 1.55,
-                  textAlign: 'justify',
-                  margin: '0 0 18px',
-                  minHeight: 48,
-                }}
-              >
+              <p style={{
+                fontFamily:"'Montserrat',sans-serif",
+                fontSize:13,
+                color:'#6B7280',
+                lineHeight:1.55,
+                margin:'0 0 18px',
+                minHeight:42
+              }}>
                 {t.note}
               </p>
 
-              <div
-                style={{
-                  display: 'grid',
-                  gap: 8,
-                  marginBottom: 22,
-                }}
-              >
+              <div style={{ display:'grid', gap:8, marginBottom:22 }}>
                 {t.items.map((item) => (
-                  <div
-                    key={item}
-                    style={{
-                      fontFamily: "'Montserrat',sans-serif",
-                      fontSize: 11,
-                      color: '#374151',
-                      lineHeight: 1.45,
-                    }}
-                  >
-                    <span
-                      style={{
-                        color: '#1149D8',
-                        fontWeight: 900,
-                      }}
-                    >
-                      ✓
-                    </span>{' '}
-                    {item}
+                  <div key={item} style={{
+                    fontFamily:"'Montserrat',sans-serif",
+                    fontSize:12,
+                    color:'#374151',
+                    lineHeight:1.4
+                  }}>
+                    <span style={{ color:'#1149D8', fontWeight:900 }}>✓</span> {item}
                   </div>
                 ))}
               </div>
 
-              <a
-                href="/contact"
-                style={{
-                  marginTop: 'auto',
-                  border: '2px solid #1149D8',
-                  color: '#1149D8',
-                  textAlign: 'center',
-                  padding: '11px 14px',
-                  borderRadius: 6,
-                  textDecoration: 'none',
-                  fontFamily: "'Barlow Condensed',sans-serif",
-                  fontSize: 16,
-                  fontWeight: 800,
-                  letterSpacing: '.08em',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Select
+              <a href="/contact" style={{
+                marginTop:'auto',
+                border:'2px solid #1149D8',
+                color:'#1149D8',
+                textAlign:'center',
+                padding:'12px 14px',
+                borderRadius:6,
+                textDecoration:'none',
+                fontFamily:"'Barlow Condensed',sans-serif",
+                fontSize:14,
+                fontWeight:800,
+                letterSpacing:'.08em',
+                textTransform:'uppercase'
+              }}>
+                SELECT
               </a>
             </div>
           ))}
         </div>
 
-        {/* FAQs */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-            gap: 20,
-          }}
-        >
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(4, minmax(0, 1fr))', gap:20 }}>
           {faqs.map(([title, text]) => (
-            <div
-              key={title}
-              style={{
-                background: '#fff',
-                border: '1px solid #E5E7EB',
-                borderRadius: 8,
-                padding: 22,
-                minHeight: 170,
-              }}
-            >
-              <h3
-                style={{
-                  fontFamily: "'Barlow Condensed',sans-serif",
-                  fontSize: 34,
-                  fontWeight: 800,
-                  lineHeight: 0.95,
-                  color: '#2D2D2D',
-                  margin: '0 0 14px',
-                  letterSpacing: '0.02em',
-                }}
-              >
+            <div key={title} style={{ background:'#fff', border:'1px solid #E5E7EB', borderRadius:8, padding:22, minHeight:150 }}>
+              <h3 style={{
+                fontFamily:"'Barlow Condensed',sans-serif",
+                fontSize:22,
+                fontWeight:800,
+                color:'#2D2D2D',
+                margin:'0 0 12px',
+                lineHeight:1.1
+              }}>
                 {title}
               </h3>
-
-              <p
-                style={{
-                  fontFamily: "'Montserrat',sans-serif",
-                  fontSize: 12,
-                  color: '#4B5563',
-                  lineHeight: 1.7,
-                  textAlign: 'justify',
-                  margin: 0,
-                }}
-              >
+              <p style={{
+                fontFamily:"'Montserrat',sans-serif",
+                fontSize:12,
+                color:'#4B5563',
+                lineHeight:1.65,
+                textAlign:'justify',
+                margin:0
+              }}>
                 {text}
               </p>
             </div>
