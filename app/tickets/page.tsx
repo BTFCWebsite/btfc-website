@@ -5,23 +5,23 @@ export default function TicketsPage() {
     {
       title: 'Adult',
       price: '£100',
-      note: '2026/27 Season — admission to all First Team home league matches.',
+      note: '2026/27 Season — All First Team home league and cup games.',
       items: [
-        'All First Team home league matches',
+        'All First Team home league games',
+        'All First Team home cup games',
         'Free online matchday programme',
-        'Simple one-off payment',
-        'Supports the club for the full season',
+        'Digital season ticket',
       ],
     },
     {
       title: 'Concession',
       price: '£80',
-      note: '2026/27 Season — for 65+ supporters and students with valid ID.',
+      note: '2026/27 Season — 65+ / Students with valid ID.',
       items: [
-        'All First Team home league matches',
+        'All First Team home league games',
+        'All First Team home cup games',
         'Free online matchday programme',
-        'Valid ID may be required',
-        'Supports the club for the full season',
+        'Digital season ticket',
       ],
     },
   ]
@@ -29,7 +29,7 @@ export default function TicketsPage() {
   const faqs = [
     ['Can I pay in instalments?', 'Not currently — season tickets must be paid in full at time of purchase.'],
     ['How do I collect my ticket?', 'After payment you will receive an email with your digital season ticket. Show it on your phone at the gate or print it at home.'],
-    ['Cup matches', 'Season tickets apply to First Team home league matches only. Cup matches and friendlies may be priced separately.'],
+    ['What is included?', 'Season tickets include all First Team home league and cup games, plus a free online matchday programme.'],
     ['Is my payment secure?', 'Yes. All payments are processed by Zettle, a PayPal company, using bank-grade encryption.'],
   ]
 
@@ -37,13 +37,7 @@ export default function TicketsPage() {
     <main style={{ background:'#F2F2F2', minHeight:'100vh', padding:'90px 24px 90px' }}>
       <section style={{ maxWidth:980, margin:'0 auto' }}>
         <div style={{ textAlign:'center', marginBottom:42 }}>
-          <h1 style={{
-            fontSize:52,
-            fontWeight:900,
-            color:'#2D2D2D',
-            margin:'0 0 8px',
-            letterSpacing:'0.04em'
-          }}>
+          <h1 style={{ fontSize:52, fontWeight:900, color:'#2D2D2D', margin:'0 0 8px', letterSpacing:'0.04em' }}>
             Season Tickets
           </h1>
           <p style={{ color:'#6B7280', margin:0, fontSize:14 }}>
@@ -69,7 +63,7 @@ export default function TicketsPage() {
               🎟️ 2026/27 Season Tickets On Sale Now
             </h2>
             <p style={{ margin:0, color:'rgba(255,255,255,.7)', fontSize:13, lineHeight:1.6 }}>
-              Adult £100 · Concession £80 · First Team home league matches · Free online programme · Secure payment via <strong>Zettle</strong>
+              Adult £100 · Concession £80 · League and cup games included · Free online programme · Secure payment via <strong>Zettle</strong>
             </p>
           </div>
 
@@ -94,40 +88,19 @@ export default function TicketsPage() {
               padding:24,
               display:'flex',
               flexDirection:'column',
-              minHeight:330,
-              position:'relative',
-              overflow:'hidden'
+              minHeight:320
             }}>
               <div style={{ height:4, background:'#1149D8', marginBottom:20 }} />
 
-              <h2 style={{
-                fontSize:30,
-                fontWeight:900,
-                color:'#2D2D2D',
-                margin:'0 0 6px',
-                lineHeight:1.05
-              }}>
+              <h2 style={{ fontSize:30, fontWeight:900, color:'#2D2D2D', margin:'0 0 6px', lineHeight:1.05 }}>
                 {t.title}
               </h2>
 
-              <div style={{
-                fontSize:54,
-                fontWeight:900,
-                color:'#1149D8',
-                lineHeight:.95,
-                marginBottom:10
-              }}>
+              <div style={{ fontSize:54, fontWeight:900, color:'#1149D8', lineHeight:.95, marginBottom:10 }}>
                 {t.price}
               </div>
 
-              <p style={{
-                fontSize:13,
-                color:'#6B7280',
-                lineHeight:1.55,
-                margin:'0 0 18px',
-                minHeight:42,
-                textAlign:'justify'
-              }}>
+              <p style={{ fontSize:13, color:'#6B7280', lineHeight:1.55, margin:'0 0 18px', minHeight:42, textAlign:'left' }}>
                 {t.note}
               </p>
 
@@ -158,19 +131,9 @@ export default function TicketsPage() {
           ))}
         </div>
 
-        <div style={{
-          display:'grid',
-          gridTemplateColumns:'repeat(4, minmax(0, 1fr))',
-          gap:20
-        }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(4, minmax(0, 1fr))', gap:20 }}>
           {faqs.map(([title, text]) => (
-            <div key={title} style={{
-              background:'#fff',
-              border:'1px solid #E5E7EB',
-              borderRadius:8,
-              padding:22,
-              minHeight:150
-            }}>
+            <div key={title} style={{ background:'#fff', border:'1px solid #E5E7EB', borderRadius:8, padding:22, minHeight:150 }}>
               <h3 style={{ fontSize:22, fontWeight:900, color:'#2D2D2D', margin:'0 0 12px', lineHeight:1.1 }}>
                 {title}
               </h3>
