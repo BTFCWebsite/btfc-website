@@ -5,7 +5,7 @@ export default function TicketsPage() {
     {
       title: 'Adult',
       price: '£100',
-      note: '2026/27 Season — all First Team home league and cup fixtures.',
+      note: '2026/27 Season — Adult Season Ticket.',
       items: [
         'All First Team home league games',
         'All First Team home cup games',
@@ -16,7 +16,7 @@ export default function TicketsPage() {
     {
       title: 'Concession',
       price: '£80',
-      note: '2026/27 Season — concession season ticket.',
+      note: '2026/27 Season — Concession Season Ticket.',
       items: [
         'All First Team home league games',
         'All First Team home cup games',
