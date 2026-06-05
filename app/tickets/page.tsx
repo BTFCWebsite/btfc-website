@@ -6,11 +6,6 @@ export default function TicketsPage() {
 const [buyerEmail, setBuyerEmail] = useState('')
 const [selectedTicket, setSelectedTicket] = useState<any>(null)
 
-const paymentLinks: Record<string, string> = {
-  Adult: 'https://pay.izettle.com/?k8L8pwP6Q',
-  Concession: 'https://pay.izettle.com/?k8DRFS_yZ',
-}
-
 function startPurchase(ticket: any) {
   setSelectedTicket(ticket)
 }
