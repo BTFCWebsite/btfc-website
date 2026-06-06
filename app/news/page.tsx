@@ -1,6 +1,15 @@
 'use client'
 import { useState } from 'react'
 
+type Article = {
+  id: number
+  category: string
+  icon: string
+  date: string
+  title: string
+  summary: string
+}
+
 // ─── ADD / EDIT NEWS ARTICLES HERE ───────────────────────────────────────────
 const NEWS: Article[] = [
   {
@@ -24,8 +33,8 @@ const NEWS: Article[] = [
     category: 'Club News',
     icon: '🤝',
     date: '20 May 2026',
-    title: 'GEL Engineering Kit Sponsorship Renewed',
-    summary: 'We are delighted to confirm that GEL Engineering have renewed their First Team kit sponsorship for the 2026/27 season. A fantastic continued partnership.',
+    title: 'Brackenfern Advisory Limited — Kit Sponsorship Confirmed',
+    summary: 'We are delighted to confirm that Brackenfern Advisory Limited have signed as our First Team kit sponsor for the 2026/27 season. A fantastic new partnership for the club.',
   },
   {
     id: 4,
@@ -77,15 +86,6 @@ const NEWS: Article[] = [
   },
 ]
 // ─────────────────────────────────────────────────────────────────────────────
-
-type Article = {
-  id: number
-  category: string
-  icon: string
-  date: string
-  title: string
-  summary: string
-}
 
 const CATEGORIES = ['All', 'Match Report', 'Club News', 'Tickets', 'Announcement', 'Youth', 'Matchday']
 
