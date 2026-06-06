@@ -27,60 +27,135 @@ function Nav() {
     return () => window.removeEventListener('scroll', handler)
   }, [])
 
+  // Close menu on route change
+  useEffect(() => {
+    setMenuOpen(false)
+  }, [pathname])
+
   return (
-    <nav style={{
-      position: 'fixed', top: 0, left: 0, right: 0, zIndex: 200,
-      background: scrolled ? 'rgba(4,27,95,.98)' : '#041B5F',
-      borderBottom: '3px solid #1149D8',
-      padding: '0 20px',
-      transition: 'background .3s',
-    }}>
-      <div style={{ maxWidth: 1320, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
+    <>
+      <style>{`
+        @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+        @media(max-width:900px){
+          .nav-desktop{display:none !important}
+          .nav-hamburger{display:flex !important}
+        }
+        @media(min-width:901px){
+          .nav-mobile-menu{display:none !important}
+          .nav-hamburger{display:none !important}
+        }
+      `}</style>
 
-        {/* Logo */}
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-          <img src="/branding/crest.png" alt="BTFC" style={{ width: 42, height: 42, borderRadius: '50%', border: '2px solid #fff' }} />
-          <div>
-            <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 18, color: '#fff', letterSpacing: '.06em', lineHeight: 1 }}>BRIMSCOMBE & THRUPP FC</div>
-            <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: 'rgba(255,255,255,.4)', letterSpacing: '.15em', textTransform: 'uppercase' }}>Official Website</div>
+      <nav style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 200,
+        background: scrolled ? 'rgba(4,27,95,.98)' : '#041B5F',
+        borderBottom: '3px solid #1149D8',
+        transition: 'background .3s',
+      }}>
+        <div style={{ maxWidth: 1320, margin: '0 auto', padding: '0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
+
+          {/* Logo */}
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+            <img src="/branding/crest.png" alt="BTFC" style={{ width: 42, height: 42, borderRadius: '50%', border: '2px solid #fff' }} />
+            <div>
+              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 18, color: '#fff', letterSpacing: '.06em', lineHeight: 1 }}>BRIMSCOMBE & THRUPP FC</div>
+              <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: 'rgba(255,255,255,.4)', letterSpacing: '.15em', textTransform: 'uppercase' }}>Official Website</div>
+            </div>
+          </Link>
+
+          {/* Desktop nav */}
+          <div className="nav-desktop" style={{ display: 'flex', gap: 0, alignItems: 'center' }}>
+            {NAV_LINKS.map(([label, href]) => {
+              const active = pathname === href || (href !== '/' && pathname.startsWith(href + '/'))
+              return (
+                <Link key={href} href={href} style={{
+                  color: active ? '#fff' : 'rgba(255,255,255,.65)',
+                  fontFamily: "'Montserrat', sans-serif",
+                  fontWeight: 700,
+                  fontSize: 11,
+                  letterSpacing: '.07em',
+                  textTransform: 'uppercase',
+                  padding: '8px 10px',
+                  borderBottom: active ? '3px solid #1149D8' : '3px solid transparent',
+                  textDecoration: 'none',
+                  height: 64,
+                  display: 'flex',
+                  alignItems: 'center',
+                }}>
+                  {label}
+                </Link>
+              )
+            })}
+            <Link href="/tickets" style={{
+              background: '#1149D8', color: '#fff', padding: '10px 18px', borderRadius: 6,
+              fontFamily: "'Montserrat', sans-serif", fontWeight: 800, fontSize: 11,
+              letterSpacing: '.08em', textTransform: 'uppercase', textDecoration: 'none',
+              marginLeft: 12, whiteSpace: 'nowrap',
+            }}>
+              🎟 Buy Tickets
+            </Link>
           </div>
-        </Link>
 
-        {/* Desktop nav */}
-        <div style={{ display: 'flex', gap: 0, alignItems: 'center' }}>
+          {/* Hamburger button */}
+          <button
+            className="nav-hamburger"
+            onClick={() => setMenuOpen(!menuOpen)}
+            style={{
+              display: 'none',
+              background: 'none', border: 'none', cursor: 'pointer',
+              padding: 8, flexDirection: 'column', gap: 5, alignItems: 'center', justifyContent: 'center',
+            }}
+            aria-label="Menu"
+          >
+            <span style={{ display: 'block', width: 24, height: 2, background: '#fff', transition: 'all .3s', transform: menuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none' }} />
+            <span style={{ display: 'block', width: 24, height: 2, background: '#fff', transition: 'all .3s', opacity: menuOpen ? 0 : 1 }} />
+            <span style={{ display: 'block', width: 24, height: 2, background: '#fff', transition: 'all .3s', transform: menuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }} />
+          </button>
+        </div>
+
+        {/* Mobile menu */}
+        <div
+          className="nav-mobile-menu"
+          style={{
+            display: menuOpen ? 'block' : 'none',
+            background: '#041B5F',
+            borderTop: '1px solid rgba(255,255,255,.1)',
+            padding: '12px 0 20px',
+          }}
+        >
           {NAV_LINKS.map(([label, href]) => {
-            const active = pathname === href || pathname.startsWith(href + '/')
+            const active = pathname === href || (href !== '/' && pathname.startsWith(href + '/'))
             return (
               <Link key={href} href={href} style={{
-                color: active ? '#fff' : 'rgba(255,255,255,.65)',
+                display: 'block',
+                color: active ? '#fff' : 'rgba(255,255,255,.7)',
                 fontFamily: "'Montserrat', sans-serif",
                 fontWeight: 700,
-                fontSize: 11,
+                fontSize: 13,
                 letterSpacing: '.07em',
                 textTransform: 'uppercase',
-                padding: '8px 11px',
-                borderBottom: active ? '3px solid #1149D8' : '3px solid transparent',
+                padding: '12px 24px',
                 textDecoration: 'none',
-                transition: 'all .15s',
-                height: 64,
-                display: 'flex',
-                alignItems: 'center',
+                borderLeft: active ? '3px solid #1149D8' : '3px solid transparent',
+                background: active ? 'rgba(17,73,216,.15)' : 'none',
               }}>
                 {label}
               </Link>
             )
           })}
-          <Link href="/tickets" style={{
-            background: '#1149D8', color: '#fff', padding: '10px 18px', borderRadius: 6,
-            fontFamily: "'Montserrat', sans-serif", fontWeight: 800, fontSize: 11,
-            letterSpacing: '.08em', textTransform: 'uppercase', textDecoration: 'none',
-            marginLeft: 12, whiteSpace: 'nowrap',
-          }}>
-            🎟 Buy Tickets
-          </Link>
+          <div style={{ padding: '12px 24px 0' }}>
+            <Link href="/tickets" style={{
+              display: 'block', textAlign: 'center',
+              background: '#1149D8', color: '#fff', padding: '14px 18px', borderRadius: 6,
+              fontFamily: "'Montserrat', sans-serif", fontWeight: 800, fontSize: 13,
+              letterSpacing: '.08em', textTransform: 'uppercase', textDecoration: 'none',
+            }}>
+              🎟 Buy Tickets
+            </Link>
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </>
   )
 }
 
@@ -91,7 +166,6 @@ function Ticker() {
       background: '#041B5F', borderTop: '2px solid #1149D8',
       padding: '7px 0', overflow: 'hidden',
     }}>
-      <style>{`@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}`}</style>
       <div style={{ display: 'flex', gap: 52, whiteSpace: 'nowrap', animation: 'ticker 30s linear infinite' }}>
         {[
           ['Jessons Real Estate', 'Official Ground Sponsor — The Jessons Meadow'],
@@ -119,8 +193,12 @@ function Ticker() {
 function Footer() {
   return (
     <footer style={{ background: '#020B30', borderTop: '3px solid #1149D8', padding: '52px 24px 24px' }}>
-      <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(190px,1fr))', gap: 44, marginBottom: 44 }}>
-
+      <div style={{
+        maxWidth: 1280, margin: '0 auto',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+        gap: 44, marginBottom: 44
+      }}>
         {/* Brand */}
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
@@ -133,8 +211,8 @@ function Footer() {
           <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 12, color: 'rgba(255,255,255,.3)', lineHeight: 1.7, marginBottom: 16 }}>Est. 1886 · The Lilywhites</p>
           <div style={{ display: 'flex', gap: 9 }}>
             {[
-              ['𝕏',  'https://x.com/Btfcthemeadow'],
-              ['f',  'https://www.facebook.com/BrimscombeandThruppFC/'],
+              ['𝕏', 'https://x.com/Btfcthemeadow'],
+              ['f', 'https://www.facebook.com/BrimscombeandThruppFC/'],
               ['in', 'https://www.instagram.com/brimscombeandthruppfc/'],
             ].map(([icon, url]) => (
               <a key={url} href={url} target="_blank" rel="noopener noreferrer" style={{ width: 34, height: 34, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 6, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 13, color: 'rgba(255,255,255,.5)', textDecoration: 'none' }}>
@@ -213,9 +291,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           ::-webkit-scrollbar-track { background: #041B5F; }
           ::-webkit-scrollbar-thumb { background: #1149D8; border-radius: 3px; }
           a { color: inherit; }
-          @media(max-width:768px) {
-            nav > div > div:last-child { display: none; }
-          }
         `}</style>
       </head>
       <body>

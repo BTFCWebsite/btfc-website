@@ -1,6 +1,22 @@
 'use client'
 import Link from 'next/link'
 
+const mobileStyles = `
+  @media(max-width:768px) {
+    .news-grid { grid-template-columns: 1fr !important; }
+    .fixtures-grid { grid-template-columns: 1fr !important; }
+    .sponsor-grid { flex-direction: column; align-items: center; }
+    .hero-cards { flex-direction: column; align-items: stretch; }
+    .hero-cards > div { min-width: unset !important; }
+    .promo-inner { flex-direction: column !important; }
+    .promo-prices { justify-content: center; }
+    .jessons-strip { flex-direction: column; gap: 8px !important; text-align: center; }
+    .stats-strip > div { padding: 12px 20px !important; }
+    .hero-title { font-size: clamp(42px,12vw,80px) !important; }
+  }
+`
+
+
 const NEXT_FIXTURE = {
   opponent: 'Fixture TBC',
   date: 'Fixtures released July 2026',
@@ -29,6 +45,7 @@ const SPONSORS = [
 export default function HomePage() {
   return (
     <main>
+      <style>{mobileStyles}</style>
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <section style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '100px 24px 0', position: 'relative', overflow: 'hidden' }}>
@@ -76,7 +93,7 @@ export default function HomePage() {
           </div>
 
           {/* Result + Fixture cards */}
-          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
+          <div className="hero-cards" style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
             <div style={{ background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.12)', borderLeft: '4px solid #EF4444', borderRadius: 8, padding: '16px 22px', textAlign: 'left', minWidth: 230, backdropFilter: 'blur(8px)' }}>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: 'rgba(255,255,255,.5)', letterSpacing: '.16em', textTransform: 'uppercase', marginBottom: 6 }}>Latest Result</div>
               <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 22, color: '#fff', letterSpacing: '.04em' }}>
@@ -95,7 +112,7 @@ export default function HomePage() {
         {/* ── JESSONS MEADOW + STATS STRIP ── */}
         <div style={{ position: 'relative', zIndex: 1, width: '100%' }}>
           {/* Jessons Meadow name bar */}
-          <div style={{ background: 'rgba(4,27,95,.95)', borderTop: '1px solid rgba(255,255,255,.08)', padding: '16px 40px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
+          <div className="jessons-strip" style={{ background: 'rgba(4,27,95,.95)', borderTop: '1px solid rgba(255,255,255,.08)', padding: '16px 40px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
               <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 10, color: 'rgba(255,255,255,.4)', letterSpacing: '.15em', textTransform: 'uppercase' }}>Home of BTFC</span>
               <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,.15)' }} />
@@ -106,7 +123,7 @@ export default function HomePage() {
             </div>
           </div>
           {/* Stats strip */}
-          <div style={{ background: '#1149D8', display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <div className="stats-strip" style={{ background: '#1149D8', display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
             {[
               ['7th', 'League Position'],
               ['59', 'Goals Scored'],
@@ -130,7 +147,7 @@ export default function HomePage() {
             <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 14, color: '#6B7280' }}>The latest from Brimscombe & Thrupp FC</p>
             <div style={{ width: 52, height: 4, background: '#1149D8', margin: '12px auto 0', borderRadius: 2 }} />
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20, marginBottom: 36 }}>
+          <div className="news-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20, marginBottom: 36 }}>
             {NEWS.map(n => (
               <Link key={n.title} href="/news" style={{ textDecoration: 'none' }}>
                 <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, overflow: 'hidden', height: '100%', transition: 'transform .2s, box-shadow .2s' }}>
@@ -166,7 +183,7 @@ export default function HomePage() {
             <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 14, color: '#6B7280' }}>Upcoming games and recent results</p>
             <div style={{ width: 52, height: 4, background: '#1149D8', margin: '12px auto 0', borderRadius: 2 }} />
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 28 }}>
+          <div className="fixtures-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 28 }}>
             <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderLeft: '4px solid #EF4444', borderRadius: 8, padding: 24 }}>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 10, color: '#9CA3AF', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: 12 }}>Latest Result</div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
@@ -196,7 +213,7 @@ export default function HomePage() {
       {/* ── SEASON TICKET PROMO ──────────────────────────────────────────── */}
       <section style={{ padding: '72px 24px', background: '#F2F2F2' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ background: '#041B5F', borderRadius: 8, padding: '44px 40px', display: 'flex', gap: 28, alignItems: 'center', flexWrap: 'wrap' }}>
+          <div className="promo-inner" style={{ background: '#041B5F', borderRadius: 8, padding: '44px 40px', display: 'flex', gap: 28, alignItems: 'center', flexWrap: 'wrap' }}>
             <div style={{ flex: 1 }}>
               <span style={{ display: 'inline-block', background: '#1149D8', color: '#fff', padding: '3px 10px', borderRadius: 4, fontFamily: "'Montserrat', sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 12 }}>Now On Sale</span>
               <h3 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 'clamp(26px,3.5vw,42px)', color: '#fff', margin: '0 0 8px', letterSpacing: '.04em' }}>2026/27 Season Tickets</h3>
