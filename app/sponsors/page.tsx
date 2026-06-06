@@ -284,7 +284,7 @@ export default function SponsorsPage() {
               <div key={s.name} style={card}>
                 <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
                 <div style={{
-                  background: '#F8FAFF',
+                  background: '#ffffff',
                   border: '1px solid #E5E7EB',
                   borderRadius: 8,
                   height: 100,
