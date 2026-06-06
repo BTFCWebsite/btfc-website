@@ -149,7 +149,7 @@ const packages = [
 const currentSponsors = {
   principal: [
     { name: 'Jessons Real Estate', role: 'Ground Sponsor', logo: '/sponsors/jessons-logo.png', url: '#' },
-    { name: 'Brackenfern Advisory Limited', role: 'First Team Sponsor', logo: '/sponsors/brackenfern-logo.png', url: '#' },
+    { name: 'Brackenfern Advisory Limited', role: 'First Team Sponsor', logo: '/sponsors/Brackenfern Advisory Limited.png', url: '#' },
   ],
   gold: [
     { name: 'Greenleaf Landscaping', role: 'Gold Partner', logo: null },

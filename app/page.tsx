@@ -32,7 +32,7 @@ const NEWS = [
 
 const SPONSORS = [
   { name: 'Jessons Real Estate',          role: 'Ground Sponsor',     logo: '/sponsors/jessons-logo.png' },
-  { name: 'Brackenfern Advisory Limited', role: 'First Team Sponsor', logo: '/sponsors/brackenfern-logo.png' },
+  { name: 'Brackenfern Advisory Limited', role: 'First Team Sponsor', logo: '/sponsors/Brackenfern Advisory Limited.png' },
 ]
 
 export default function HomePage() {
@@ -52,7 +52,7 @@ export default function HomePage() {
           <div style={{ background: 'rgba(17,73,216,.35)', border: '1px solid rgba(17,73,216,.6)', borderRadius: 4, padding: '7px 22px', marginBottom: 36, display: 'flex', alignItems: 'center', gap: 12 }}>
             <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 10, color: 'rgba(255,255,255,.6)', letterSpacing: '.14em', textTransform: 'uppercase' }}>First Team Sponsor</span>
             <div style={{ background: '#fff', borderRadius: 4, padding: '3px 10px', display: 'flex', alignItems: 'center' }}>
-              <img src="/sponsors/brackenfern-logo.png" alt="Brackenfern Advisory Limited" style={{ height: 24, objectFit: 'contain' }} />
+              <img src="/sponsors/Brackenfern Advisory Limited.png" alt="Brackenfern Advisory Limited" style={{ height: 24, objectFit: 'contain' }} />
             </div>
           </div>
 
