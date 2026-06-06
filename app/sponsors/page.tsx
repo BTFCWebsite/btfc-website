@@ -77,7 +77,7 @@ const packages = [
     color: '#1149D8',
     highlight: true,
     taken: true,
-    sponsor: 'GEL Engineering',
+    sponsor: 'Brackenfern Advisory Limited',
     benefits: [
       'First team shirt sponsorship',
       'Logo on all matchday graphics',
@@ -149,7 +149,7 @@ const packages = [
 const currentSponsors = {
   principal: [
     { name: 'Jessons Real Estate', role: 'Ground Sponsor', logo: '/jessons-logo.png', url: '#' },
-    { name: 'GEL Engineering', role: 'First Team Sponsor', logo: '/gel-logo.png', url: '#' },
+    { name: 'Brackenfern Advisory Limited', role: 'First Team Sponsor', logo: '/brackenfern-logo.png', url: '#' },
   ],
   gold: [
     { name: 'Greenleaf Landscaping', role: 'Gold Partner', logo: null },
