@@ -53,8 +53,8 @@ export default function HomePage() {
         {/* Background */}
         <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
           <img src="/matchday/Ground_Pic.jpeg" alt="The Jessons Meadow" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 55%', filter: 'contrast(1.05) saturate(1.05)' }} />
-          <div style={{ position: 'absolute', inset: 0, background: 'rgba(4,27,95,.45)' }} />
-          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '40%', background: 'linear-gradient(0deg,rgba(4,27,95,.95) 0%,transparent 100%)' }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'rgba(4,27,95,.25)' }} />
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '40%', background: 'linear-gradient(0deg,rgba(4,27,95,.92) 0%,transparent 100%)' }} />
         </div>
 
         {/* Content */}
