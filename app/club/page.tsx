@@ -1,4 +1,5 @@
 'use client'
+import { PageHeader } from '../layout'
 
 const h2 = {
   fontFamily: "'Barlow Condensed', sans-serif",
@@ -61,26 +62,10 @@ const youthAges = ['U6', 'U7', 'U8', 'U9', 'U10', 'U11', 'U12', 'U13', 'U14', 'U
 
 export default function ClubPage() {
   return (
-    <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '90px 24px 90px' }}>
+    <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '0 0 90px' }}>
       <section style={{ maxWidth: 980, margin: '0 auto' }}>
 
-        {/* Title */}
-        <div style={{ textAlign: 'center', marginBottom: 42 }}>
-          <h1 style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontSize: 52,
-            fontWeight: 800,
-            color: '#2D2D2D',
-            margin: '0 0 8px',
-            letterSpacing: '0.04em'
-          }}>
-            The Club
-          </h1>
-          <p style={{ fontFamily: "'Montserrat', sans-serif", color: '#6B7280', margin: 0, fontSize: 14 }}>
-            Brimscombe & Thrupp FC — Est. 1886
-          </p>
-          <div style={{ width: 52, height: 4, background: '#1149D8', margin: '14px auto 0' }} />
-        </div>
+        <PageHeader title="The Club" subtitle="Brimscombe & Thrupp FC — Est. 1886" />
 
         {/* Hero banner */}
         <div style={{

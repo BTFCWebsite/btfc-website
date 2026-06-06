@@ -304,3 +304,42 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   )
 }
+
+// ─── PAGE HEADER ─────────────────────────────────────────────────────────────
+// Use this on every inner page for consistent styling
+// Usage: <PageHeader title="News" subtitle="The latest from BTFC" />
+export function PageHeader({ title, subtitle }: { title: string; subtitle?: string }) {
+  return (
+    <div style={{
+      background: '#041B5F',
+      borderBottom: '3px solid #1149D8',
+      padding: '52px 24px 44px',
+      textAlign: 'center',
+    }}>
+      <div style={{ maxWidth: 980, margin: '0 auto' }}>
+        <h1 style={{
+          fontFamily: "'Barlow Condensed', sans-serif",
+          fontWeight: 800,
+          fontSize: 'clamp(36px,6vw,64px)',
+          color: '#fff',
+          margin: '0 0 10px',
+          letterSpacing: '.04em',
+          lineHeight: 1,
+        }}>
+          {title}
+        </h1>
+        {subtitle && (
+          <p style={{
+            fontFamily: "'Montserrat', sans-serif",
+            fontSize: 14,
+            color: 'rgba(255,255,255,.55)',
+            margin: '0 0 16px',
+          }}>
+            {subtitle}
+          </p>
+        )}
+        <div style={{ width: 52, height: 4, background: '#1149D8', margin: '0 auto', borderRadius: 2 }} />
+      </div>
+    </div>
+  )
+}

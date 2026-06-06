@@ -1,4 +1,5 @@
 'use client'
+import { PageHeader } from '../layout'
 import { useState } from 'react'
 
 const h2 = {
@@ -196,81 +197,9 @@ export default function SponsorsPage() {
   }
 
   return (
-    <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '90px 24px 90px' }}>
+    <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '0 0 90px' }}>
       <section style={{ maxWidth: 980, margin: '0 auto' }}>
-
-        {/* Title */}
-        <div style={{ textAlign: 'center', marginBottom: 42 }}>
-          <h1 style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontSize: 52,
-            fontWeight: 800,
-            color: '#2D2D2D',
-            margin: '0 0 8px',
-            letterSpacing: '0.04em',
-          }}>
-            Sponsors
-          </h1>
-          <p style={{ fontFamily: "'Montserrat', sans-serif", color: '#6B7280', margin: 0, fontSize: 14 }}>
-            Our valued club partners and sponsorship opportunities
-          </p>
-          <div style={{ width: 52, height: 4, background: '#1149D8', margin: '14px auto 0' }} />
-        </div>
-
-        {/* Why sponsor banner */}
-        <div style={{
-          background: '#041B5F',
-          borderRadius: 8,
-          padding: '28px 32px',
-          color: '#fff',
-          marginBottom: 44,
-        }}>
-          <h2 style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontSize: 28,
-            fontWeight: 800,
-            margin: '0 0 10px',
-            letterSpacing: '0.03em',
-          }}>
-            Reach 2,000+ Local Supporters Every Season
-          </h2>
-          <p style={{
-            fontFamily: "'Montserrat', sans-serif",
-            fontSize: 13,
-            color: 'rgba(255,255,255,.75)',
-            lineHeight: 1.7,
-            margin: '0 0 24px',
-            maxWidth: 600,
-          }}>
-            Sponsoring Brimscombe & Thrupp FC puts your business in front of a loyal,
-            local audience across matchdays, social media, and our website — throughout
-            the entire season.
-          </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 16 }}>
-            {stats.map(s => (
-              <div key={s.label} style={{
-                background: 'rgba(255,255,255,.08)',
-                borderRadius: 6,
-                padding: '14px 16px',
-                textAlign: 'center',
-              }}>
-                <div style={{
-                  fontFamily: "'Barlow Condensed', sans-serif",
-                  fontSize: 28,
-                  fontWeight: 800,
-                  marginBottom: 4,
-                }}>
-                  {s.value}
-                </div>
-                <div style={{
-                  fontFamily: "'Montserrat', sans-serif",
-                  fontSize: 10,
-                  opacity: .7,
-                  letterSpacing: '.06em',
-                }}>
-                  {s.label}
-                </div>
-              </div>
+        <PageHeader title="Sponsors" subtitle="Our valued club partners and sponsorship opportunities" />
             ))}
           </div>
         </div>
