@@ -158,7 +158,7 @@ function Footer() {
         <div>
           <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 10, color: 'rgba(255,255,255,.28)', letterSpacing: '.14em', textTransform: 'uppercase', marginBottom: 14 }}>Kit Sponsor</div>
           <div style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 6, padding: '10px 12px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
-            <img src="/sponsors/Brackenfern Advisory Limited.png" style={{ height: 28, objectFit: 'contain', background: '#fff', borderRadius: 3, padding: '2px 4px' }} alt="Brackenfern Advisory Limited" />
+            <img src="/sponsors/brackenfern-logo.png" style={{ height: 28, objectFit: 'contain', background: '#fff', borderRadius: 3, padding: '2px 4px' }} alt="Brackenfern Advisory Limited" />
             <div>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 12, color: '#fff' }}>Brackenfern Advisory</div>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 10, color: '#D4AF37' }}>First Team Sponsor</div>
