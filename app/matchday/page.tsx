@@ -7,66 +7,60 @@ const NEXT_HOME_GAME = {
   competition: '2026/27 Season',
 }
 
-const gettingHere = [
-  {
-    icon: '🚗',
-    title: 'By Car',
-    text: 'The Jessons Meadow is located on London Road, Brimscombe, Stroud, GL5 2SH. Free parking is available in the main car park off Station Road. Overflow parking at the leisure centre — approximately 5 minutes walk.',
-  },
-  {
-    icon: '🚌',
-    title: 'By Bus',
-    text: 'Bus routes 14 and 22 stop directly outside the ground on London Road. Services run regularly from Stroud town centre. Check Traveline for timetables.',
-  },
-  {
-    icon: '🚆',
-    title: 'By Train',
-    text: "Brimscombe station is approximately a 10-minute walk from the ground. Stroud station is served by GWR with regular services from Gloucester, Swindon and London Paddington.",
-  },
-  {
-    icon: '🚶',
-    title: 'On Foot',
-    text: 'The ground is easily walkable from Brimscombe village centre. Follow London Road south — the floodlights are visible from the road.',
-  },
-]
-
 const facilities = [
-  {
-    icon: '🍔',
-    title: 'Food & Drink',
-    text: 'Hot food, snacks and drinks available from the clubhouse and pitch-side kiosk. Open from one hour before kick-off. Licensed bar in the clubhouse.',
-  },
   {
     icon: '🍺',
     title: 'Clubhouse Bar',
-    text: 'The clubhouse bar is open before, during and after the match. A warm welcome for home and away supporters alike. Cash and card accepted.',
+    text: 'The clubhouse bar is open before, during and after the match. A warm welcome for home and away supporters. Cash and card accepted.',
+  },
+  {
+    icon: '🍔',
+    title: 'Food & Drink',
+    text: 'Hot food, snacks and drinks from the pitch-side kiosk. Open from one hour before kick-off.',
   },
   {
     icon: '♿',
     title: 'Accessibility',
-    text: 'Wheelchair spaces are available in the main stand. Level access from the car park. Please contact us in advance if you require any additional assistance.',
+    text: 'Wheelchair spaces available in the main stand. Level access from the car park. Contact us in advance if you need assistance.',
   },
   {
     icon: '📋',
-    title: 'Matchday Programme',
-    text: 'Official matchday programme £2. Available at the gate. Free digital version available on the website for all season ticket holders.',
-  },
-  {
-    icon: '🎫',
-    title: 'Tickets',
-    text: 'Match tickets available on the gate — cash and card accepted. Season ticket holders show their QR code at the turnstile. No pre-booking required.',
+    title: 'Programme',
+    text: 'Official matchday programme £2 at the gate. Free digital version on the website for all season ticket holders.',
   },
   {
     icon: '🅿',
     title: 'Parking',
-    text: 'Free parking in the main car park off Station Road. Please be considerate of local residents when parking on nearby streets.',
+    text: 'Free parking in the main car park off Station Road. Overflow parking at the leisure centre — approximately 5 minutes walk.',
+  },
+  {
+    icon: '📱',
+    title: 'Season Tickets',
+    text: 'Season ticket holders show their QR code at the turnstile. Save to Apple Wallet for quick and easy entry.',
   },
 ]
 
-const admission = [
-  { label: 'Adult', league: '£7', friendly: '£3' },
-  { label: 'Concession (65+)', league: '£5', friendly: '£3' },
-  { label: 'Under 16', league: 'Free', friendly: '£3' },
+const gettingHere = [
+  {
+    icon: '🚗',
+    title: 'By Car',
+    text: 'The Jessons Meadow is on London Road, Brimscombe, GL5 2SH. Free parking off Station Road. Overflow at the leisure centre (5 min walk).',
+  },
+  {
+    icon: '🚌',
+    title: 'By Bus',
+    text: 'Bus routes 14 and 22 stop directly outside on London Road. Regular services from Stroud town centre. Check Traveline for timetables.',
+  },
+  {
+    icon: '🚆',
+    title: 'By Train',
+    text: 'Brimscombe station is a 10-minute walk. Stroud station is served by GWR with regular services from Gloucester, Swindon and London Paddington.',
+  },
+  {
+    icon: '🚶',
+    title: 'On Foot',
+    text: 'Easily walkable from Brimscombe village. Follow London Road south — the floodlights are visible from the road.',
+  },
 ]
 
 const h2 = {
@@ -151,7 +145,7 @@ export default function MatchdayPage() {
               fontSize: 10,
               letterSpacing: '.12em',
               opacity: .6,
-              textTransform: 'uppercase',
+              textTransform: 'uppercase' as const,
               marginBottom: 6,
             }}>
               Next Home Game
@@ -179,72 +173,106 @@ export default function MatchdayPage() {
             background: '#1149D8',
             padding: '12px 22px',
             borderRadius: 6,
-            textAlign: 'center',
+            textAlign: 'center' as const,
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 800,
             fontSize: 18,
             color: '#fff',
             textDecoration: 'none',
-            whiteSpace: 'nowrap',
+            whiteSpace: 'nowrap' as const,
           }}>
-            🎫 Get Tickets
+            🎫 Season Tickets
           </a>
         </div>
 
-        {/* Admission */}
+        {/* Entrance Fees */}
         <div style={{ marginBottom: 52 }}>
-          <h2 style={h2}>Admission Prices</h2>
-          <p style={subhead}>Pay on the gate — First XI matches only. All other fixtures are free to attend.</p>
-          <div style={{ ...card, padding: 0, overflow: 'hidden' }}>
-            <div style={{ height: 4, background: '#1149D8' }} />
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ background: '#F9FAFB' }}>
-                  <th style={{ ...body, padding: '12px 20px', textAlign: 'left', fontWeight: 700, color: '#374151' }}>Ticket Type</th>
-                  <th style={{ ...body, padding: '12px 20px', textAlign: 'center', fontWeight: 700, color: '#374151' }}>League &amp; Cup</th>
-                  <th style={{ ...body, padding: '12px 20px', textAlign: 'center', fontWeight: 700, color: '#374151' }}>Friendlies</th>
-                </tr>
-              </thead>
-              <tbody>
-                {admission.map((row, i) => (
-                  <tr key={row.label} style={{ borderTop: '1px solid #F3F4F6', background: i % 2 === 0 ? '#fff' : '#FAFAFA' }}>
-                    <td style={{ ...body, padding: '14px 20px', color: '#374151' }}>{row.label}</td>
-                    <td style={{
-                      padding: '14px 20px',
-                      textAlign: 'center',
-                      fontFamily: "'Barlow Condensed', sans-serif",
-                      fontSize: 22,
-                      fontWeight: 800,
-                      color: row.league === 'Free' ? '#16a34a' : '#1149D8',
-                    }}>
-                      {row.league}
-                    </td>
-                    <td style={{
-                      padding: '14px 20px',
-                      textAlign: 'center',
-                      fontFamily: "'Barlow Condensed', sans-serif",
-                      fontSize: 22,
-                      fontWeight: 800,
-                      color: '#1149D8',
-                    }}>
-                      {row.friendly}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <div style={{ padding: '12px 20px', background: '#F9FAFB', borderTop: '1px solid #F3F4F6' }}>
-              <p style={{ ...body, fontSize: 11, color: '#9CA3AF', margin: 0 }}>
-                Cash and card accepted at the gate. Season ticket holders show QR code. Under 16s free for league &amp; cup only — £3 for friendlies.
+          <h2 style={h2}>Entrance Fees</h2>
+          <p style={subhead}>Pay on the gate · First XI matches only · Cash and card accepted</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 20 }}>
+
+            {/* League & Cup */}
+            <div style={card}>
+              <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
+              <h3 style={h3}>League &amp; Cup</h3>
+              {[
+                { label: 'Adult', price: '£7', color: '#1149D8' },
+                { label: 'Concession (65 and over)', price: '£5', color: '#1149D8' },
+                { label: 'Under 16', price: 'Free', color: '#16a34a' },
+              ].map((row, i, arr) => (
+                <div key={row.label} style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '12px 0',
+                  borderBottom: i < arr.length - 1 ? '1px solid #F3F4F6' : 'none',
+                }}>
+                  <span style={{ ...body, color: '#374151', fontSize: 13 }}>{row.label}</span>
+                  <span style={{
+                    fontFamily: "'Barlow Condensed', sans-serif",
+                    fontSize: 26,
+                    fontWeight: 800,
+                    color: row.color,
+                  }}>
+                    {row.price}
+                  </span>
+                </div>
+              ))}
+              <p style={{ ...body, fontSize: 11, color: '#9CA3AF', marginTop: 14 }}>
+                All other fixtures (reserves, youth) are free to attend.
               </p>
             </div>
+
+            {/* Friendlies */}
+            <div style={card}>
+              <div style={{ height: 4, background: '#6B7280', marginBottom: 20, borderRadius: 2 }} />
+              <h3 style={h3}>Pre-Season Friendlies</h3>
+              {[
+                { label: 'Everyone', price: '£3', color: '#1149D8' },
+              ].map((row, i, arr) => (
+                <div key={row.label} style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '12px 0',
+                  borderBottom: i < arr.length - 1 ? '1px solid #F3F4F6' : 'none',
+                }}>
+                  <span style={{ ...body, color: '#374151', fontSize: 13 }}>{row.label}</span>
+                  <span style={{
+                    fontFamily: "'Barlow Condensed', sans-serif",
+                    fontSize: 26,
+                    fontWeight: 800,
+                    color: row.color,
+                  }}>
+                    {row.price}
+                  </span>
+                </div>
+              ))}
+              <p style={{ ...body, fontSize: 11, color: '#9CA3AF', marginTop: 14 }}>
+                Flat rate for all supporters including under 16s. Season tickets do not cover friendly fixtures.
+              </p>
+              {/* Season ticket upsell */}
+              <div style={{
+                background: '#F0F4FF',
+                border: '1px solid #C7D6FA',
+                borderRadius: 6,
+                padding: '12px 14px',
+                marginTop: 16,
+              }}>
+                <p style={{ ...body, fontSize: 11, color: '#1149D8', fontWeight: 600 }}>
+                  💡 Save money — season tickets cover all First XI home league & cup games from £80.{' '}
+                  <a href="/tickets" style={{ color: '#1149D8', textDecoration: 'underline' }}>Buy now →</a>
+                </p>
+              </div>
+            </div>
+
           </div>
         </div>
 
         {/* Ground & Facilities */}
         <div style={{ marginBottom: 52 }}>
-          <h2 style={h2}>The Jessons Meadow</h2>
-          <p style={subhead}>Ground facilities and matchday information</p>
+          <h2 style={h2}>Ground & Facilities</h2>
+          <p style={subhead}>The Jessons Meadow — what to expect on matchday</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20 }}>
             {facilities.map(f => (
               <div key={f.title} style={card}>
@@ -257,11 +285,11 @@ export default function MatchdayPage() {
         </div>
 
         {/* Getting Here */}
-        <div style={{ marginBottom: 52 }}>
+        <div style={{ marginBottom: 44 }}>
           <h2 style={h2}>Getting Here</h2>
           <p style={subhead}>The Jessons Meadow · London Road · Brimscombe · Stroud · GL5 2SH</p>
 
-          {/* Map embed */}
+          {/* Map */}
           <div style={{ borderRadius: 8, overflow: 'hidden', marginBottom: 20, border: '1px solid #E5E7EB' }}>
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2474.3!2d-2.147!3d51.717!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x487108b3b3b3b3b3%3A0x0!2sBrimscombe+%26+Thrupp+FC!5e0!3m2!1sen!2suk!4v1"
@@ -286,7 +314,7 @@ export default function MatchdayPage() {
           </div>
         </div>
 
-        {/* Ground address card */}
+        {/* Address bar */}
         <div style={{
           ...card,
           background: '#041B5F',
@@ -316,7 +344,7 @@ export default function MatchdayPage() {
               fontWeight: 800,
               fontSize: 16,
               textDecoration: 'none',
-              whiteSpace: 'nowrap',
+              whiteSpace: 'nowrap' as const,
             }}
           >
             Open in Maps →
