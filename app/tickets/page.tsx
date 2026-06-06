@@ -43,31 +43,6 @@ const labelStyle = (home: boolean) => ({
 })
 
 export default function TicketsPage() {
-  useEffect(() => {
-    const existing = document.getElementById('tt-widget-script')
-    if (existing) existing.remove()
-
-    const script = document.createElement('script')
-    script.id = 'tt-widget-script'
-    script.src = 'https://cdn.tickettailor.com/js/widgets/min/widget.js'
-    script.setAttribute('data-url', 'https://www.tickettailor.com/all-tickets/brimscombeandthruppfc/?ref=website_widget&show_search_filter=true&show_date_filter=true&show_sort=true')
-    script.setAttribute('data-type', 'inline')
-    script.setAttribute('data-inline-minimal', 'true')
-    script.setAttribute('data-inline-show-logo', 'false')
-    script.setAttribute('data-inline-bg-fill', 'false')
-    script.setAttribute('data-inline-inherit-ref-from-url-param', '')
-    script.setAttribute('data-inline-ref', 'website_widget')
-    script.async = true
-
-    const container = document.getElementById('tt-widget-container')
-    if (container) container.appendChild(script)
-
-    return () => {
-      const s = document.getElementById('tt-widget-script')
-      if (s) s.remove()
-    }
-  }, [])
-
   return (
     <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '90px 24px 90px' }}>
       <section style={{ maxWidth: 980, margin: '0 auto' }}>
@@ -165,13 +140,14 @@ export default function TicketsPage() {
           }}>
             Select your ticket type below. Your QR code season ticket will be emailed to you instantly on payment.
           </p>
-          <div id="tt-widget-container" style={{ minHeight: 100 }}>
-            <noscript>
-              <a href="https://www.tickettailor.com/all-tickets/brimscombeandthruppfc/" target="_blank" rel="noopener noreferrer" style={{ color: '#1149D8' }}>
-                Click here to buy tickets
-              </a>
-            </noscript>
-          </div>
+          <iframe
+            src="https://www.tickettailor.com/all-tickets/brimscombeandthruppfc/?ref=website_widget"
+            width="100%"
+            height="500"
+            frameBorder="0"
+            style={{ border: 'none', borderRadius: 8 }}
+            title="BTFC Season Tickets"
+          />
         </div>
 
         {/* ── MATCHDAY ADMISSION ── */}
