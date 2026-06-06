@@ -192,28 +192,42 @@ export default function HomePage() {
 
       {/* ── GROUND ───────────────────────────────────────────────────────── */}
       <section style={{ background: '#041B5F' }}>
-        <div style={{ position: 'relative', height: 'clamp(320px,50vw,520px)', overflow: 'hidden' }}>
+        <div style={{ position: 'relative', height: 'clamp(400px,55vw,600px)', overflow: 'hidden' }}>
           <img src="/matchday/Ground_Pic.jpeg" alt="The Jessons Meadow" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 55%' }} />
-          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%', background: 'linear-gradient(0deg,rgba(4,27,95,.92) 0%,transparent 100%)' }} />
-          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '28px 40px 32px' }}>
-            <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+          {/* Stronger overlay for readability */}
+          <div style={{ position: 'absolute', inset: 0, background: 'rgba(4,27,95,.35)' }} />
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '70%', background: 'linear-gradient(0deg,rgba(4,27,95,.97) 0%,rgba(4,27,95,.4) 60%,transparent 100%)' }} />
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '36px 48px 44px' }}>
+            <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 20 }}>
               <div>
-                <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 10, color: 'rgba(255,255,255,.5)', letterSpacing: '.2em', textTransform: 'uppercase', marginBottom: 6 }}>Our Home Ground</div>
-                <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 'clamp(26px,4vw,48px)', color: '#fff', margin: 0, letterSpacing: '.04em' }}>The Jessons Meadow</h2>
-                <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 13, color: 'rgba(255,255,255,.6)', margin: '6px 0 0' }}>Brimscombe · Est. 1886</p>
+                <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 10, color: 'rgba(255,255,255,.5)', letterSpacing: '.2em', textTransform: 'uppercase', marginBottom: 8 }}>Our Home Ground</div>
+                <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 'clamp(42px,6vw,72px)', color: '#fff', margin: '0 0 8px', letterSpacing: '.04em', lineHeight: 1, textShadow: '0 2px 20px rgba(4,27,95,.8)' }}>The Jessons Meadow</h2>
+                <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 13, color: 'rgba(255,255,255,.6)', margin: '0 0 14px' }}>Brimscombe · Stroud · Est. 1886</p>
+                {/* Jessons Real Estate sponsor credit */}
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.15)', borderRadius: 6, padding: '8px 14px' }}>
+                  <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 10, color: 'rgba(255,255,255,.5)', letterSpacing: '.12em', textTransform: 'uppercase' }}>Ground Sponsor</span>
+                  <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,.2)' }} />
+                  <img src="/sponsors/jessons-logo.png" alt="Jessons Real Estate" style={{ height: 22, objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: .85 }} />
+                </div>
               </div>
-              <div style={{ display: 'flex', gap: 12 }}>
-                <Link href="/matchday" style={{ background: '#1149D8', color: '#fff', padding: '12px 24px', borderRadius: 6, fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 16, textDecoration: 'none' }}>Matchday Info</Link>
-                <Link href="/tickets" style={{ background: 'transparent', color: '#fff', border: '2px solid rgba(255,255,255,.4)', padding: '10px 24px', borderRadius: 6, fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 16, textDecoration: 'none' }}>Get Tickets</Link>
+              <div style={{ display: 'flex', gap: 12, flexShrink: 0 }}>
+                <Link href="/matchday" style={{ background: '#1149D8', color: '#fff', padding: '14px 28px', borderRadius: 6, fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 18, textDecoration: 'none', letterSpacing: '.04em' }}>Matchday Info</Link>
+                <Link href="/tickets" style={{ background: 'transparent', color: '#fff', border: '2px solid rgba(255,255,255,.5)', padding: '12px 28px', borderRadius: 6, fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 18, textDecoration: 'none', letterSpacing: '.04em' }}>Get Tickets</Link>
               </div>
             </div>
           </div>
         </div>
+        {/* Stats strip */}
         <div style={{ background: '#1149D8', display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
-          {[['🏟 The Jessons Meadow', 'Sponsored by Jessons Real Estate'], ['📍 Brimscombe, Stroud', 'Gloucestershire'], ['🎟 1,000', 'Capacity'], ['📅 Est. 1886', 'Founded']].map(([val, label]) => (
-            <div key={label} style={{ padding: '14px 32px', textAlign: 'center', flex: '1 1 140px', borderRight: '1px solid rgba(255,255,255,.18)' }}>
-              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 18, color: '#fff', lineHeight: 1 }}>{val}</div>
-              <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 600, fontSize: 9, color: 'rgba(255,255,255,.6)', letterSpacing: '.14em', textTransform: 'uppercase', marginTop: 3 }}>{label}</div>
+          {[
+            ['The Jessons Meadow', 'Ground Name'],
+            ['Brimscombe, Stroud', 'Gloucestershire'],
+            ['1,000', 'Capacity'],
+            ['Est. 1886', 'Founded'],
+          ].map(([val, label]) => (
+            <div key={label} style={{ padding: '18px 36px', textAlign: 'center', flex: '1 1 160px', borderRight: '1px solid rgba(255,255,255,.18)' }}>
+              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 22, color: '#fff', lineHeight: 1 }}>{val}</div>
+              <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 600, fontSize: 9, color: 'rgba(255,255,255,.6)', letterSpacing: '.14em', textTransform: 'uppercase', marginTop: 4 }}>{label}</div>
             </div>
           ))}
         </div>
