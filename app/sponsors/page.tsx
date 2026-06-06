@@ -391,7 +391,10 @@ export default function SponsorsPage() {
                   ))}
                 </div>
                 <button
-                  onClick={() => setForm({ ...form, package: p.tier })}
+                  onClick={() => {
+                    setForm({ ...form, package: p.tier })
+                    document.getElementById('enquiry-form')?.scrollIntoView({ behavior: 'smooth' })
+                  }}
                   style={{
                     width: '100%',
                     background: '#fff',
@@ -404,10 +407,6 @@ export default function SponsorsPage() {
                     fontSize: 16,
                     cursor: 'pointer',
                     letterSpacing: '.04em',
-                  }}
-                  onClick={() => {
-                    setForm({ ...form, package: p.tier })
-                    document.getElementById('enquiry-form')?.scrollIntoView({ behavior: 'smooth' })
                   }}
                 >
                   Enquire →
