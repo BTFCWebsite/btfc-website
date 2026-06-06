@@ -221,6 +221,19 @@ export default function MatchdayPage() {
               <p style={{ ...body, fontSize: 11, color: '#9CA3AF', marginTop: 14 }}>
                 All other fixtures (reserves, youth) are free to attend.
               </p>
+              {/* Season ticket upsell */}
+              <div style={{
+                background: '#F0F4FF',
+                border: '1px solid #C7D6FA',
+                borderRadius: 6,
+                padding: '12px 14px',
+                marginTop: 16,
+              }}>
+                <p style={{ ...body, fontSize: 11, color: '#1149D8', fontWeight: 600 }}>
+                  💡 Save money — season tickets cover all First XI home league & cup games from £80.{' '}
+                  <a href="/tickets" style={{ color: '#1149D8', textDecoration: 'underline' }}>Buy now →</a>
+                </p>
+              </div>
             </div>
 
             {/* Friendlies */}
@@ -251,19 +264,6 @@ export default function MatchdayPage() {
               <p style={{ ...body, fontSize: 11, color: '#9CA3AF', marginTop: 14 }}>
                 Flat rate for all supporters including under 16s. Season tickets do not cover friendly fixtures.
               </p>
-              {/* Season ticket upsell */}
-              <div style={{
-                background: '#F0F4FF',
-                border: '1px solid #C7D6FA',
-                borderRadius: 6,
-                padding: '12px 14px',
-                marginTop: 16,
-              }}>
-                <p style={{ ...body, fontSize: 11, color: '#1149D8', fontWeight: 600 }}>
-                  💡 Save money — season tickets cover all First XI home league & cup games from £80.{' '}
-                  <a href="/tickets" style={{ color: '#1149D8', textDecoration: 'underline' }}>Buy now →</a>
-                </p>
-              </div>
             </div>
 
           </div>
