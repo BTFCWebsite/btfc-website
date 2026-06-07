@@ -144,9 +144,12 @@ export default function TicketsPage() {
                   </span>
                 </div>
               ))}
-              <div style={{ marginTop: 14, padding: '10px 14px', background: '#F0FDF4', borderRadius: 6, border: '1px solid #86EFAC' }}>
-                <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: '#16a34a', fontWeight: 700, margin: 0 }}>
-                  ✓ Reserves and Under 17s fixtures are free admission for all supporters
+              <div style={{ marginTop: 16, background: '#F0FDF4', borderRadius: 8, border: '2px solid #86EFAC', padding: '16px 18px' }}>
+                <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 20, color: '#16a34a', marginBottom: 6 }}>
+                  🆓 Free Admission
+                </div>
+                <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 12, color: '#15803d', lineHeight: 1.6, margin: 0 }}>
+                  All <strong>Reserves</strong> and <strong>Under 17s</strong> home fixtures are completely free to attend — no ticket needed, just turn up and enjoy the football.
                 </p>
               </div>
             </div>

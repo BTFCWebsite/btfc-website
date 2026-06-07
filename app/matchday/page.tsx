@@ -34,9 +34,9 @@ const facilities = [
     text: 'Free parking in the main car park off Station Road. Overflow parking at the leisure centre — approximately 5 minutes walk.',
   },
   {
-    icon: '📱',
-    title: 'Season Tickets',
-    text: 'Season ticket holders show their QR code at the turnstile. Save to Apple Wallet for quick and easy entry.',
+    icon: '🎫',
+    title: 'Entrance Fees',
+    text: 'League & Cup: Adult £7 · Concession (65+) £5 · Under 16 Free. Friendlies: £3 for all. Reserves and Under 17s fixtures are free admission for all supporters.',
   },
 ]
 
@@ -167,104 +167,7 @@ export default function MatchdayPage() {
           </a>
         </div>
 
-        {/* Entrance Fees */}
-        <div style={{ marginBottom: 52 }}>
-          <h2 style={h2}>Entrance Fees</h2>
-          <p style={subhead}>Pay on the gate · First XI matches only · Cash and card accepted</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 20 }}>
-
-            {/* League & Cup */}
-            <div style={card}>
-              <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
-              <h3 style={h3}>League &amp; Cup</h3>
-              {[
-                { label: 'Adult', price: '£7', color: '#1149D8' },
-                { label: 'Concession (65 and over)', price: '£5', color: '#1149D8' },
-                { label: 'Under 16', price: 'Free', color: '#16a34a' },
-              ].map((row, i, arr) => (
-                <div key={row.label} style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: '12px 0',
-                  borderBottom: i < arr.length - 1 ? '1px solid #F3F4F6' : 'none',
-                }}>
-                  <span style={{ ...body, color: '#374151', fontSize: 13 }}>{row.label}</span>
-                  <span style={{
-                    fontFamily: "'Barlow Condensed', sans-serif",
-                    fontSize: 26,
-                    fontWeight: 800,
-                    color: row.color,
-                  }}>
-                    {row.price}
-                  </span>
-                </div>
-              ))}
-              <p style={{ ...body, fontSize: 11, color: '#9CA3AF', marginTop: 14 }}>
-                All other fixtures (reserves, youth) are free to attend.
-              </p>
-              {/* Season ticket upsell */}
-              <div style={{
-                background: '#F0F4FF',
-                border: '1px solid #C7D6FA',
-                borderRadius: 6,
-                padding: '12px 14px',
-                marginTop: 16,
-              }}>
-                <p style={{ ...body, fontSize: 11, color: '#1149D8', fontWeight: 600 }}>
-                  💡 Save money — season tickets cover all First XI home league & cup games from £80.{' '}
-                  <a href="/tickets" style={{ color: '#1149D8', textDecoration: 'underline' }}>Buy now →</a>
-                </p>
-              </div>
-            </div>
-
-            {/* Friendlies */}
-            <div style={card}>
-              <div style={{ height: 4, background: '#6B7280', marginBottom: 20, borderRadius: 2 }} />
-              <h3 style={h3}>Pre-Season Friendlies</h3>
-              {[
-                { label: 'Everyone', price: '£3', color: '#1149D8' },
-              ].map((row, i, arr) => (
-                <div key={row.label} style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: '12px 0',
-                  borderBottom: i < arr.length - 1 ? '1px solid #F3F4F6' : 'none',
-                }}>
-                  <span style={{ ...body, color: '#374151', fontSize: 13 }}>{row.label}</span>
-                  <span style={{
-                    fontFamily: "'Barlow Condensed', sans-serif",
-                    fontSize: 26,
-                    fontWeight: 800,
-                    color: row.color,
-                  }}>
-                    {row.price}
-                  </span>
-                </div>
-              ))}
-              <p style={{ ...body, fontSize: 11, color: '#9CA3AF', marginTop: 14 }}>
-                Flat rate for all supporters including under 16s. Season tickets do not cover friendly fixtures.
-              </p>
-            </div>
-
-          </div>
-        </div>
-
-        {/* Ground & Facilities */}
-        <div style={{ marginBottom: 52 }}>
-          <h2 style={h2}>Ground & Facilities</h2>
-          <p style={subhead}>Jessons Meadow — what to expect on matchday</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20 }}>
-            {facilities.map(f => (
-              <div key={f.title} style={card}>
-                <div style={{ fontSize: 24, marginBottom: 10 }}>{f.icon}</div>
-                <h3 style={h3}>{f.title}</h3>
-                <p style={body}>{f.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+        
 
         {/* Getting Here */}
         <div style={{ marginBottom: 44 }}>
