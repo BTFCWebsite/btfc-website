@@ -168,12 +168,12 @@ function Ticker() {
     }}>
       <div style={{ display: 'flex', gap: 52, whiteSpace: 'nowrap', animation: 'ticker 30s linear infinite' }}>
         {[
-          ['Jessons Real Estate', 'Official Ground Sponsor — The Jessons Meadow'],
+          ['Jessons Real Estate', 'Official Ground Sponsor — Jessons Meadow'],
           ['Brackenfern Advisory Limited', 'First Team Sponsor'],
           ['Reserves Sponsor TBC', 'Reserves Sponsor — enquire now'],
           ['U17s Sponsor TBC', 'Under 17s Sponsor — enquire now'],
           ['Your Business Here', 'Gold Partner — enquire now'],
-          ['Jessons Real Estate', 'Official Ground Sponsor — The Jessons Meadow'],
+          ['Jessons Real Estate', 'Official Ground Sponsor — Jessons Meadow'],
           ['Brackenfern Advisory Limited', 'First Team Sponsor'],
           ['Reserves Sponsor TBC', 'Reserves Sponsor — enquire now'],
           ['U17s Sponsor TBC', 'Under 17s Sponsor — enquire now'],
@@ -251,7 +251,7 @@ function Footer() {
         <div>
           <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 10, color: 'rgba(255,255,255,.28)', letterSpacing: '.14em', textTransform: 'uppercase', marginBottom: 14 }}>Contact</div>
           {[
-            '📍 The Jessons Meadow, London Road, Brimscombe, GL5 2SH',
+            '📍 Jessons Meadow, London Road, Brimscombe, GL5 2SH',
             '📧 info@brimscombeandthruppfc.co.uk',
             '📞 07814 854108',
             '🕐 Mon–Fri 9am–5pm',
@@ -279,7 +279,7 @@ const PAGE_HEADERS: Record<string, { title: string; subtitle: string }> = {
   '/teams':    { title: 'Our Teams',           subtitle: 'First XI · Reserves · Under 17s' },
   '/fixtures': { title: 'Fixtures & Results',  subtitle: '2025/26 Season' },
   '/tickets':  { title: 'Tickets',             subtitle: 'Season tickets and matchday admission' },
-  '/matchday': { title: 'Matchday',            subtitle: 'Everything you need for The Jessons Meadow' },
+  '/matchday': { title: 'Matchday',            subtitle: 'Everything you need for Jessons Meadow' },
   '/sponsors': { title: 'Sponsors',            subtitle: 'Our valued club partners' },
   '/club':     { title: 'The Club',            subtitle: 'Brimscombe & Thrupp FC — Est. 1886' },
   '/shop':     { title: 'Club Shop',           subtitle: 'Official BTFC merchandise' },

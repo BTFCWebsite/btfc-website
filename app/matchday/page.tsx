@@ -44,7 +44,7 @@ const gettingHere = [
   {
     icon: '🚗',
     title: 'By Car',
-    text: 'The Jessons Meadow is on London Road, Brimscombe, GL5 2SH. Free parking off Station Road. Overflow at the leisure centre (5 min walk).',
+    text: 'Jessons Meadow is on London Road, Brimscombe, GL5 2SH. Free parking off Station Road. Overflow at the leisure centre (5 min walk).',
   },
   {
     icon: '🚌',
@@ -148,7 +148,7 @@ export default function MatchdayPage() {
               fontSize: 13,
               lineHeight: 1.6,
             }}>
-              📅 {NEXT_HOME_GAME.date} · ⏰ {NEXT_HOME_GAME.time} · 📍 The Jessons Meadow · {NEXT_HOME_GAME.competition}
+              📅 {NEXT_HOME_GAME.date} · ⏰ {NEXT_HOME_GAME.time} · 📍 Jessons Meadow · {NEXT_HOME_GAME.competition}
             </p>
           </div>
           <a href="/tickets" style={{
@@ -254,7 +254,7 @@ export default function MatchdayPage() {
         {/* Ground & Facilities */}
         <div style={{ marginBottom: 52 }}>
           <h2 style={h2}>Ground & Facilities</h2>
-          <p style={subhead}>The Jessons Meadow — what to expect on matchday</p>
+          <p style={subhead}>Jessons Meadow — what to expect on matchday</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20 }}>
             {facilities.map(f => (
               <div key={f.title} style={card}>
@@ -269,7 +269,7 @@ export default function MatchdayPage() {
         {/* Getting Here */}
         <div style={{ marginBottom: 44 }}>
           <h2 style={h2}>Getting Here</h2>
-          <p style={subhead}>The Jessons Meadow · London Road · Brimscombe · Stroud · GL5 2SH</p>
+          <p style={subhead}>Jessons Meadow · London Road · Brimscombe · Stroud · GL5 2SH</p>
 
           {/* Map */}
           <div style={{ borderRadius: 8, overflow: 'hidden', marginBottom: 20, border: '1px solid #E5E7EB' }}>
@@ -281,7 +281,7 @@ export default function MatchdayPage() {
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title="The Jessons Meadow location"
+              title="Jessons Meadow location"
             />
           </div>
 
@@ -308,7 +308,7 @@ export default function MatchdayPage() {
           gap: 20,
         }}>
           <div>
-            <h3 style={{ ...h3, color: '#fff', fontSize: 20, margin: '0 0 8px' }}>🏟 The Jessons Meadow</h3>
+            <h3 style={{ ...h3, color: '#fff', fontSize: 20, margin: '0 0 8px' }}>🏟 Jessons Meadow</h3>
             <p style={{ ...body, color: 'rgba(255,255,255,.7)', fontSize: 13 }}>
               London Road · Brimscombe · Stroud · Gloucestershire · GL5 2SH
             </p>

@@ -63,7 +63,7 @@ const packages = [
     taken: true,
     sponsor: 'Jessons Real Estate',
     benefits: [
-      'Ground naming rights — The Jessons Meadow',
+      'Ground naming rights — Jessons Meadow',
       'Large pitch-side hoarding',
       'Logo on all matchday materials',
       'Homepage feature — maximum visibility',

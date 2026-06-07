@@ -42,7 +42,7 @@ const NEWS: Article[] = [
     icon: '📅',
     date: '15 May 2026',
     title: 'Pre-Season Training Dates Announced',
-    summary: 'The First Team will return for pre-season training on Monday 7th July. All players should report to The Jessons Meadow at 7pm. Contact the manager for more details.',
+    summary: 'The First Team will return for pre-season training on Monday 7th July. All players should report to Jessons Meadow at 7pm. Contact the manager for more details.',
   },
   {
     id: 5,
@@ -58,7 +58,7 @@ const NEWS: Article[] = [
     icon: '🅿',
     date: '8 May 2026',
     title: 'Matchday Parking Changes for 2026/27',
-    summary: 'Please be aware of updated parking arrangements at The Jessons Meadow for the forthcoming season. The main car park entrance will move to the northern gate off Station Road.',
+    summary: 'Please be aware of updated parking arrangements at Jessons Meadow for the forthcoming season. The main car park entrance will move to the northern gate off Station Road.',
   },
   {
     id: 7,
@@ -66,7 +66,7 @@ const NEWS: Article[] = [
     icon: '⚽',
     date: '3 May 2026',
     title: 'BTFC 2–1 Wantage Town — Late Winner Seals Vital Points',
-    summary: 'A late header from Danny Morris secured all three points in a tense finish at The Jessons Meadow. The win keeps BTFC firmly in mid-table with two games remaining.',
+    summary: 'A late header from Danny Morris secured all three points in a tense finish at Jessons Meadow. The win keeps BTFC firmly in mid-table with two games remaining.',
   },
   {
     id: 8,
@@ -74,7 +74,7 @@ const NEWS: Article[] = [
     icon: '🤝',
     date: '28 Apr 2026',
     title: 'Jessons Real Estate Extend Ground Sponsorship',
-    summary: 'We are thrilled to confirm that Jessons Real Estate have extended their ground sponsorship deal, keeping the naming rights to The Jessons Meadow for a further two seasons.',
+    summary: 'We are thrilled to confirm that Jessons Real Estate have extended their ground sponsorship deal, keeping the naming rights to Jessons Meadow for a further two seasons.',
   },
   {
     id: 9,
@@ -82,7 +82,7 @@ const NEWS: Article[] = [
     icon: '📣',
     date: '20 Apr 2026',
     title: 'AGM Date Confirmed — All Members Welcome',
-    summary: 'The club\'s Annual General Meeting will take place on Thursday 12th June at The Jessons Meadow clubhouse, starting at 7:30pm. All members and supporters are welcome to attend.',
+    summary: 'The club\'s Annual General Meeting will take place on Thursday 12th June at Jessons Meadow clubhouse, starting at 7:30pm. All members and supporters are welcome to attend.',
   },
 ]
 // ─────────────────────────────────────────────────────────────────────────────

@@ -51,7 +51,7 @@ const officials = [
 const clubFacts = [
   { label: 'Founded', value: '1886' },
   { label: 'Nickname', value: 'The Lilywhites' },
-  { label: 'Ground', value: 'The Jessons Meadow' },
+  { label: 'Ground', value: 'Jessons Meadow' },
   { label: 'Capacity', value: '1,200' },
   { label: 'League', value: 'Hellenic Division One' },
   { label: 'County', value: 'Gloucestershire' },
@@ -171,7 +171,7 @@ export default function ClubPage() {
               <p style={body}>
                 The club is now rebuilding with ambition and purpose in Hellenic League
                 Division One, with a clear aim of returning to the higher levels of the
-                non-league pyramid. The Jessons Meadow has been renamed in honour of the
+                non-league pyramid. Jessons Meadow has been renamed in honour of the
                 club's ground sponsors.
               </p>
             </div>
@@ -180,13 +180,13 @@ export default function ClubPage() {
 
         {/* The Ground */}
         <div style={{ marginBottom: 52 }}>
-          <h2 style={h2}>The Jessons Meadow</h2>
+          <h2 style={h2}>Jessons Meadow</h2>
           <p style={subhead}>Home of Brimscombe & Thrupp FC since 1886</p>
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 20 }}>
             <div style={card}>
               <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
               <p style={{ ...body, marginBottom: 14 }}>
-                The Jessons Meadow has been the home of Brimscombe & Thrupp FC since the
+                Jessons Meadow has been the home of Brimscombe & Thrupp FC since the
                 club's foundation in 1886. Set in the beautiful Cotswold valley between
                 Stroud and Chalford, the ground holds 1,200 supporters with covered seating
                 in the main stand.

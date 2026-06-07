@@ -55,7 +55,7 @@ const inputStyle = {
 }
 
 const contactDetails = [
-  { icon: '📍', label: 'Address', value: 'The Jessons Meadow, London Road, Brimscombe, Stroud, GL5 2SH' },
+  { icon: '📍', label: 'Address', value: 'Jessons Meadow, London Road, Brimscombe, Stroud, GL5 2SH' },
   { icon: '📧', label: 'Email', value: 'info@brimscombeandthruppfc.co.uk', href: 'mailto:info@brimscombeandthruppfc.co.uk' },
   { icon: '📞', label: 'Phone', value: '07814 854108', href: 'tel:07814854108' },
   { icon: '🕐', label: 'Office Hours', value: 'Mon–Fri 9am–5pm' },
@@ -288,7 +288,7 @@ export default function ContactPage() {
         {/* Map */}
         <div>
           <h2 style={{ ...h2, marginBottom: 6 }}>Find Us</h2>
-          <p style={subhead}>The Jessons Meadow · London Road · Brimscombe · Stroud · GL5 2SH</p>
+          <p style={subhead}>Jessons Meadow · London Road · Brimscombe · Stroud · GL5 2SH</p>
           <div style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid #E5E7EB', marginBottom: 16 }}>
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2474.3!2d-2.147!3d51.717!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x487108b3b3b3b3b3%3A0x0!2sBrimscombe+%26+Thrupp+FC!5e0!3m2!1sen!2suk!4v1"
@@ -298,7 +298,7 @@ export default function ContactPage() {
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title="The Jessons Meadow location"
+              title="Jessons Meadow location"
             />
           </div>
           <a
