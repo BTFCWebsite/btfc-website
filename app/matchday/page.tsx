@@ -59,12 +59,7 @@ const gettingHere = [
     text: 'The nearest station is Stroud, served by GWR with regular services from Gloucester, Swindon and London Paddington. From Stroud take the 67 bus or a taxi to the ground.',
     link: null,
   },
-  {
-    icon: '🚕',
-    title: 'By Taxi',
-    text: 'Taxis are available from Stroud station. The journey to Jessons Meadow takes approximately 10 minutes. Several local taxi firms serve the Stroud area.',
-    link: null,
-  },
+
   {
     icon: '🚶',
     title: 'On Foot',
@@ -198,7 +193,7 @@ export default function MatchdayPage() {
           {/* Map */}
           <div style={{ borderRadius: 8, overflow: 'hidden', marginBottom: 20, border: '1px solid #E5E7EB' }}>
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d402.0214455110228!2d-2.196852797087878!3d51.722527574592554!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sen!2suk!4v1780823187484!5m2!1sen!2suk"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d737.3188611688546!2d-2.196166640744735!3d51.72201894723951!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48710c418313cc5f%3A0x6e0c3c089afa1c4d!2sBrimscombe%20and%20Thrupp%20Football%20Club!5e1!3m2!1sen!2suk!4v1780823602873!5m2!1sen!2suk"
               width="100%"
               height="280"
               style={{ border: 0, display: 'block' }}
