@@ -61,11 +61,11 @@ export default function HomePage() {
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, justifyContent: 'center', paddingBottom: 60 }}>
 
           {/* First Team Sponsor — more prominent */}
-          <div style={{ background: 'rgba(4,27,95,.7)', border: '1px solid rgba(255,255,255,.2)', borderRadius: 8, padding: '10px 24px', marginBottom: 36, display: 'flex', alignItems: 'center', gap: 16 }}>
-            <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 10, color: 'rgba(255,255,255,.6)', letterSpacing: '.14em', textTransform: 'uppercase' }}>First Team Sponsor</span>
-            <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,.2)' }} />
-            <div style={{ background: '#fff', borderRadius: 6, padding: '6px 14px', display: 'flex', alignItems: 'center' }}>
-              <img src="/sponsors/brackenfern-logo.png" alt="Brackenfern Advisory Limited" style={{ height: 28, objectFit: 'contain' }} />
+          <div style={{ background: 'rgba(4,27,95,.8)', border: '1px solid rgba(255,255,255,.25)', borderRadius: 8, padding: '12px 28px', marginBottom: 36, display: 'flex', alignItems: 'center', gap: 18 }}>
+            <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 11, color: 'rgba(255,255,255,.7)', letterSpacing: '.14em', textTransform: 'uppercase' }}>First Team Sponsor</span>
+            <div style={{ width: 1, height: 24, background: 'rgba(255,255,255,.25)' }} />
+            <div style={{ background: '#fff', borderRadius: 6, padding: '8px 18px', display: 'flex', alignItems: 'center', boxShadow: '0 2px 12px rgba(0,0,0,.2)' }}>
+              <img src="/sponsors/brackenfern-logo.png" alt="Brackenfern Advisory Limited" style={{ height: 36, objectFit: 'contain' }} />
             </div>
           </div>
 
