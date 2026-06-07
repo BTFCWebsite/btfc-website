@@ -146,33 +146,43 @@ export default function ClubPage() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
             <div style={card}>
               <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
-              <h3 style={h3}>Origins</h3>
-              <p style={{ ...body, marginBottom: 14 }}>
-                Brimscombe FC were formed in 1886 and became founder members of the
-                Mid-Gloucestershire League in 1894 — one of the oldest league competitions
-                in the county. The club has deep roots in the local industrial community,
-                originally drawing its players from the mills and factories of the Stroud valleys.
+              <h3 style={h3}>Brimscombe FC — Est. 1886</h3>
+              <p style={{ ...body, marginBottom: 12 }}>
+                Brimscombe Football Club was established in 1886. They were founding members of the
+                Mid-Gloucestershire League in 1894 and played their first ever game on 29th September.
+                The club switched to the Stroud & District League in 1902 and were its inaugural champions,
+                going on to win the title again in 1906/07, 1907/08 and 1912/13.
+              </p>
+              <p style={{ ...body, marginBottom: 12 }}>
+                After World War I, Brimscombe joined the North Gloucestershire League and were founding
+                members of the Gloucestershire Northern Senior League in 1922 — becoming its first
+                ever champions. Further titles followed in 1930/31 and 1947/48.
               </p>
               <p style={body}>
-                Thrupp FC, formed separately, eventually merged with Brimscombe to create
-                the combined Brimscombe & Thrupp FC that supporters know today — bringing
-                together two proud local football traditions under one banner.
+                The club joined the Gloucestershire County League in 1968 but left after the 1972/73
+                season. Shortly after, Brimscombe FC merged with local side Thrupp FC to form
+                Brimscombe & Thrupp FC.
               </p>
             </div>
             <div style={card}>
               <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
-              <h3 style={h3}>Recent History</h3>
-              <p style={{ ...body, marginBottom: 14 }}>
-                Under chairman Neil Long and the Long-Baker family, the club enjoyed a
-                remarkable period of sustained success — winning four promotions in six years
-                and claiming the Hellenic League Division One West title in 2012/13 to reach
-                the Premier Division.
+              <h3 style={h3}>Brimscombe & Thrupp FC</h3>
+              <p style={{ ...body, marginBottom: 12 }}>
+                The newly formed club rejoined the County League but dropped out again in 1988/89.
+                Returning to the Gloucestershire Northern Senior League, they finished as Division 1
+                runners-up in 2008/09 before winning the County League in 2010/11 — earning promotion
+                to the Hellenic League Division 1 West.
+              </p>
+              <p style={{ ...body, marginBottom: 12 }}>
+                The Hellenic League Division 1 West title followed in 2012/13, securing promotion to
+                the Premier Division. The 2013/14 season brought both the Floodlit Cup and Supplementary
+                Cup. In 2018 the Lilywhites beat Bitton 3–1 to win the Gloucestershire Challenge Trophy.
               </p>
               <p style={body}>
-                The club is now rebuilding with ambition and purpose in Hellenic League
-                Division One, with a clear aim of returning to the higher levels of the
-                non-league pyramid. Jessons Meadow has been renamed in honour of the
-                club's ground sponsors.
+                The club remained in the Premier Division for several seasons, narrowly missing
+                promotion in 2018/19 after finishing second. Following a difficult 2024/25 campaign,
+                BTFC now compete in Hellenic League Division One with ambitions to return to the
+                higher levels of the pyramid.
               </p>
             </div>
           </div>
@@ -232,6 +242,76 @@ export default function ClubPage() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+
+        {/* Honours */}
+        <div style={{ marginBottom: 52 }}>
+          <h2 style={h2}>Club Honours</h2>
+          <p style={subhead}>A proud record of achievement — 1886 to present</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 16 }}>
+            {[
+              {
+                era: 'Hellenic League',
+                honours: [
+                  '🏆 Division 1 West Champions 2012/13',
+                  '🏆 Floodlit Cup Winners 2013/14',
+                  '🏆 Supplementary Cup Winners 2013/14',
+                  '🥈 Premier Division Runners-up 2018/19',
+                  '🥈 Floodlit Cup Runners-up 2015/16',
+                ],
+              },
+              {
+                era: 'County & Regional',
+                honours: [
+                  '🏆 Gloucestershire County League 2010/11',
+                  '🏆 Gloucestershire FA Challenge Trophy 2017/18',
+                  '🥈 GFA Challenge Trophy Runners-up 2021/22',
+                  '🏆 Berkeley Hospital Cup Premier 1981/82',
+                  '🏆 Gloucestershire Junior Challenge Cup 1981/82',
+                  '🏆 Harry Greening Memorial Trophy 2013/14',
+                ],
+              },
+              {
+                era: 'Northern Senior League',
+                honours: [
+                  '🏆 Division 1 Champions 1922/23, 1947/48, 1984/85',
+                  '🥈 Division 1 Runners-up 1946/47, 2008/09',
+                  '🏆 Division 2 Champions 1981/82, 2004/05',
+                ],
+              },
+              {
+                era: 'Stroud & District League Div 1',
+                honours: [
+                  '🏆 Champions 1902/03, 1906/07, 1907/08, 1912/13, 1950/51',
+                  '🥈 Runners-up 1903/04, 1904/05, 1910/11, 1911/12, 1913/14, 1921/22',
+                ],
+              },
+              {
+                era: 'Stroud & District League Div 2',
+                honours: [
+                  '🏆 Champions 1933/34, 1954/55, 1955/56, 1996/97',
+                  '🥈 Runners-up 1928/29, 1938/39, 1960/61, 1975/76, 1983/84, 1987/88, 1990/91',
+                ],
+              },
+              {
+                era: 'Stroud & District Other',
+                honours: [
+                  '🏆 Division 4 Champions 1974/75',
+                  '🥈 Division 3 Runners-up 1975/76, 1983/84, 2004/05',
+                  '🥈 Auxiliary Cup Runners-up 1934/35',
+                  '🥈 Charity Cup Runners-up 2008/09',
+                ],
+              },
+            ].map(section => (
+              <div key={section.era} style={card}>
+                <div style={{ height: 4, background: '#1149D8', marginBottom: 14, borderRadius: 2 }} />
+                <h3 style={{ ...h3, fontSize: 18, marginBottom: 12 }}>{section.era}</h3>
+                {section.honours.map(h => (
+                  <p key={h} style={{ ...body, fontSize: 11, marginBottom: 6 }}>{h}</p>
+                ))}
+              </div>
+            ))}
           </div>
         </div>
 
