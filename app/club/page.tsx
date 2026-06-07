@@ -377,9 +377,17 @@ export default function ClubPage() {
                 fontSize: 11,
                 fontWeight: 700,
                 color: '#1149D8',
+                marginBottom: 14,
               }}>
                 ⚽ Under 17s — Inaugural Season 2026/27
               </span>
+              <p style={{ ...body, marginTop: 14 }}>
+                Interested in getting involved? Whether as a player, volunteer or supporter,
+                we'd love to hear from you. Get in touch at{' '}
+                <a href="mailto:info@brimscombeandthruppfc.co.uk" style={{ color: '#1149D8', fontWeight: 700 }}>
+                  info@brimscombeandthruppfc.co.uk
+                </a>
+              </p>
             </div>
             <div style={card}>
               <div style={{ fontSize: 28, marginBottom: 12 }}>🚶</div>
