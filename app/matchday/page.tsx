@@ -209,7 +209,12 @@ export default function MatchdayPage() {
               <div key={g.title} style={card}>
                 <div style={{ fontSize: 22, marginBottom: 8 }}>{g.icon}</div>
                 <h3 style={h3}>{g.title}</h3>
-                <p style={body}>{g.text}</p>
+                <p style={{ ...body, marginBottom: g.link ? 10 : 0 }}>{g.text}</p>
+                {g.link && (
+                  <a href={g.link.url} target="_blank" rel="noopener noreferrer" style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 12, fontWeight: 700, color: '#1149D8', textDecoration: 'none' }}>
+                    {g.link.label} →
+                  </a>
+                )}
               </div>
             ))}
           </div>
