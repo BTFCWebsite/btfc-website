@@ -116,7 +116,7 @@ export default function HomePage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
               <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 10, color: 'rgba(255,255,255,.4)', letterSpacing: '.15em', textTransform: 'uppercase' }}>Home of BTFC</span>
               <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,.15)' }} />
-              <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 20, color: '#fff', letterSpacing: '.06em' }}>THE JESSONS MEADOW</span>
+              <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 20, color: '#fff', letterSpacing: '.06em' }}>JESSONS MEADOW</span>
               <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,.15)' }} />
               <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 10, color: 'rgba(255,255,255,.4)', letterSpacing: '.12em', textTransform: 'uppercase' }}>Ground Sponsor</span>
               <img src="/sponsors/jessons-logo.png" alt="Jessons Real Estate" style={{ height: 28, objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: .8 }} />
