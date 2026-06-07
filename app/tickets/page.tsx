@@ -49,6 +49,45 @@ export default function TicketsPage() {
 
         {/* Page Title */}
 
+        {/* ── SEASON TICKET PROMO ── */}
+        <div style={{
+          background: '#041B5F',
+          borderRadius: 8,
+          padding: '32px 36px',
+          color: '#fff',
+          display: 'grid',
+          gridTemplateColumns: '1fr 200px',
+          gap: 32,
+          alignItems: 'center',
+          marginBottom: 28,
+        }}>
+          <div>
+            <span style={{ display: 'inline-block', background: '#1149D8', color: '#fff', padding: '3px 10px', borderRadius: 4, fontFamily: "'Montserrat', sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase' as const, marginBottom: 12 }}>Now On Sale</span>
+            <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 34, fontWeight: 800, margin: '0 0 10px', letterSpacing: '0.03em', lineHeight: 1 }}>
+              2026/27 Season Tickets
+            </h2>
+            <p style={{ fontFamily: "'Montserrat', sans-serif", margin: '0 0 20px', color: 'rgba(255,255,255,.7)', fontSize: 13, lineHeight: 1.7 }}>
+              All First XI home league & cup games included.<br />
+              Digital QR ticket delivered instantly by email — save to Apple Wallet for easy matchday entry.
+            </p>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' as const }}>
+              {[['Adult', '£100'], ['Concession', '£80']].map(([label, price]) => (
+                <div key={label} style={{ background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.15)', borderRadius: 6, padding: '10px 16px', textAlign: 'center' as const }}>
+                  <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 10, color: 'rgba(255,255,255,.55)', letterSpacing: '.1em', textTransform: 'uppercase' as const }}>{label}</div>
+                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 26, color: '#fff' }}>{price}</div>
+                </div>
+              ))}
+              <div style={{ background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.15)', borderRadius: 6, padding: '10px 16px', textAlign: 'center' as const }}>
+                <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 10, color: 'rgba(255,255,255,.55)', letterSpacing: '.1em', textTransform: 'uppercase' as const }}>Under 16</div>
+                <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 26, color: '#22C55E' }}>Free</div>
+              </div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <img src="/matchday/btfc_apple_pass_mock.png" alt="BTFC Season Ticket Apple Wallet Pass" style={{ width: 190, borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,.4)' }} />
+          </div>
+        </div>
+
         <div style={{
           background: '#fff',
           border: '1px solid #E5E7EB',
