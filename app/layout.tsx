@@ -292,9 +292,9 @@ function AutoPageHeader() {
   if (!header) return null
   return (
     <div style={{
-      background: '#041B5F',
-      borderBottom: '3px solid #1149D8',
-      padding: '52px 24px 44px',
+      background: '#fff',
+      borderBottom: '1px solid #E5E7EB',
+      padding: '48px 24px 40px',
       textAlign: 'center',
     }}>
       <div style={{ maxWidth: 980, margin: '0 auto' }}>
@@ -302,7 +302,7 @@ function AutoPageHeader() {
           fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 800,
           fontSize: 'clamp(36px,6vw,64px)',
-          color: '#fff',
+          color: '#041B5F',
           margin: '0 0 10px',
           letterSpacing: '.04em',
           lineHeight: 1,
@@ -312,7 +312,7 @@ function AutoPageHeader() {
         <p style={{
           fontFamily: "'Montserrat', sans-serif",
           fontSize: 14,
-          color: 'rgba(255,255,255,.55)',
+          color: '#6B7280',
           margin: '0 0 16px',
         }}>
           {header.subtitle}
