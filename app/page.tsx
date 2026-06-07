@@ -45,7 +45,7 @@ const labelStyle = (home: boolean) => ({
 export default function TicketsPage() {
   return (
     <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '0 0 90px' }}>
-      <section style={{ maxWidth: 980, margin: '0 auto' }}>
+      <section style={{ maxWidth: 980, margin: '0 auto', padding: '52px 24px' }}>
 
         {/* Page Title */}
 

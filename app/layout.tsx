@@ -288,6 +288,8 @@ const PAGE_HEADERS: Record<string, { title: string; subtitle: string }> = {
 
 function AutoPageHeader() {
   const pathname = usePathname()
+  // Never show on homepage - it has its own hero
+  if (pathname === '/') return null
   const header = PAGE_HEADERS[pathname]
   if (!header) return null
   return (
