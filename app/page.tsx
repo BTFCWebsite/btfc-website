@@ -1,269 +1,344 @@
 'use client'
-import Link from 'next/link'
 
-const mobileStyles = `
-  @media(max-width:768px) {
-    .news-grid { grid-template-columns: 1fr !important; }
-    .fixtures-grid { grid-template-columns: 1fr !important; }
-    .sponsor-grid { flex-direction: column; align-items: center; }
-    .hero-cards { flex-direction: column; align-items: stretch; }
-    .hero-cards > div { min-width: unset !important; }
-    .promo-inner { flex-direction: column !important; }
-    .promo-prices { justify-content: center; }
-    .jessons-strip { flex-direction: column; gap: 8px !important; text-align: center; }
-    .stats-strip > div { padding: 12px 20px !important; }
-    .hero-title { font-size: clamp(42px,12vw,80px) !important; }
-  }
-`
-
-
-const NEXT_FIXTURE = {
+const NEXT_HOME_GAME = {
   opponent: 'Fixture TBC',
-  date: 'Fixtures released July 2026',
+  date: 'TBC — fixtures released July 2026',
   time: '15:00',
+  competition: '2026/27 Season',
 }
 
-const LAST_RESULT = {
-  opponent: 'FC Stratford',
-  score: '1–2',
-  date: 'Sat 18 Apr 2026',
-  competition: 'Hellenic Div One',
-  win: false,
-}
-
-const NEWS = [
-  { category: 'Match Report', color: '#1149D8', icon: '⚽', date: '24 May 2026', title: 'Tyler Cross Hits 18 Goals for the Season', summary: 'A brace against Vale Athletic takes our top scorer to an incredible 18 league goals this season.' },
-  { category: 'Tickets', color: '#7C3AED', icon: '🎟', date: '21 May 2026', title: '2026/27 Season Tickets Now on Sale', summary: 'Season tickets for the 2026/27 campaign are now available online. Adult £100 · Concession £80.' },
-  { category: 'Club News', color: '#059669', icon: '🤝', date: '20 May 2026', title: 'Brackenfern Advisory — Kit Sponsorship Confirmed', summary: 'We are delighted to confirm Brackenfern Advisory Limited as our First Team kit sponsor for 2026/27.' },
+const facilities = [
+  {
+    icon: '🍺',
+    title: 'Clubhouse Bar',
+    text: 'The clubhouse bar is open before, during and after the match. A warm welcome for home and away supporters. Cash and card accepted.',
+  },
+  {
+    icon: '🍔',
+    title: 'Food & Drink',
+    text: 'Hot food, snacks and drinks from the pitch-side kiosk. Open from one hour before kick-off.',
+  },
+  {
+    icon: '♿',
+    title: 'Accessibility',
+    text: 'Wheelchair spaces available in the main stand. Level access from the car park. Contact us in advance if you need assistance.',
+  },
+  {
+    icon: '📋',
+    title: 'Programme',
+    text: 'Official matchday programme £2 at the gate. Free digital version on the website for all season ticket holders.',
+  },
+  {
+    icon: '🅿',
+    title: 'Parking',
+    text: 'Free parking in the main car park off Station Road. Overflow parking at the leisure centre — approximately 5 minutes walk.',
+  },
+  {
+    icon: '📱',
+    title: 'Season Tickets',
+    text: 'Season ticket holders show their QR code at the turnstile. Save to Apple Wallet for quick and easy entry.',
+  },
 ]
 
-const SPONSORS = [
-  { name: 'Jessons Real Estate', role: 'Ground Sponsor', logo: '/sponsors/jessons-logo.png' },
-  { name: 'Brackenfern Advisory Limited', role: 'First Team Sponsor', logo: '/sponsors/brackenfern-logo.png' },
+const gettingHere = [
+  {
+    icon: '🚗',
+    title: 'By Car',
+    text: 'Jessons Meadow is on London Road, Brimscombe, GL5 2SH. Free parking off Station Road. Overflow at the leisure centre (5 min walk).',
+  },
+  {
+    icon: '🚌',
+    title: 'By Bus',
+    text: 'Bus routes 14 and 22 stop directly outside on London Road. Regular services from Stroud town centre. Check Traveline for timetables.',
+  },
+  {
+    icon: '🚆',
+    title: 'By Train',
+    text: 'Brimscombe station is a 10-minute walk. Stroud station is served by GWR with regular services from Gloucester, Swindon and London Paddington.',
+  },
+  {
+    icon: '🚶',
+    title: 'On Foot',
+    text: 'Easily walkable from Brimscombe village. Follow London Road south — the floodlights are visible from the road.',
+  },
 ]
 
-export default function HomePage() {
+const h2 = {
+  fontFamily: "'Barlow Condensed', sans-serif",
+  fontSize: 36,
+  fontWeight: 800,
+  color: '#2D2D2D',
+  margin: '0 0 6px',
+  letterSpacing: '0.03em',
+} as const
+
+const h3 = {
+  fontFamily: "'Barlow Condensed', sans-serif",
+  fontSize: 22,
+  fontWeight: 800,
+  color: '#2D2D2D',
+  margin: '0 0 10px',
+  lineHeight: 1.1,
+} as const
+
+const body = {
+  fontFamily: "'Montserrat', sans-serif",
+  fontSize: 12,
+  color: '#4B5563',
+  lineHeight: 1.65,
+  margin: 0,
+} as const
+
+const card = {
+  background: '#fff',
+  border: '1px solid #E5E7EB',
+  borderRadius: 8,
+  padding: 24,
+} as const
+
+const subhead = {
+  fontFamily: "'Montserrat', sans-serif",
+  fontSize: 12,
+  color: '#6B7280',
+  margin: '0 0 24px',
+} as const
+
+export default function MatchdayPage() {
   return (
-    <main>
-      <style>{mobileStyles}</style>
+    <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '0 0 90px' }}>
+      <section style={{ maxWidth: 980, margin: '0 auto' }}>
 
-      {/* ── HERO ─────────────────────────────────────────────────────────── */}
-      <section style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '100px 24px 0', position: 'relative', overflow: 'hidden' }}>
-
-        {/* Background */}
-        <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-          <img src="/matchday/Ground_Pic.jpeg" alt="Jessons Meadow" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 55%', filter: 'contrast(1.05) saturate(1.05)' }} />
-          <div style={{ position: 'absolute', inset: 0, background: 'rgba(4,27,95,.12)' }} />
-          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '40%', background: 'linear-gradient(0deg,rgba(4,27,95,.92) 0%,transparent 100%)' }} />
+        {/* Next Home Game Banner */}
+        <div style={{
+          background: '#041B5F',
+          borderRadius: 8,
+          padding: '22px 28px',
+          color: '#fff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 20,
+          flexWrap: 'wrap',
+          marginBottom: 44,
+        }}>
+          <div>
+            <div style={{
+              fontFamily: "'Montserrat', sans-serif",
+              fontSize: 10,
+              letterSpacing: '.12em',
+              opacity: .6,
+              textTransform: 'uppercase' as const,
+              marginBottom: 6,
+            }}>
+              Next Home Game
+            </div>
+            <h2 style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontSize: 28,
+              fontWeight: 800,
+              margin: '0 0 6px',
+              letterSpacing: '0.03em'
+            }}>
+              BTFC vs {NEXT_HOME_GAME.opponent}
+            </h2>
+            <p style={{
+              fontFamily: "'Montserrat', sans-serif",
+              margin: 0,
+              color: 'rgba(255,255,255,.7)',
+              fontSize: 13,
+              lineHeight: 1.6,
+            }}>
+              📅 {NEXT_HOME_GAME.date} · ⏰ {NEXT_HOME_GAME.time} · 📍 Jessons Meadow · {NEXT_HOME_GAME.competition}
+            </p>
+          </div>
+          <a href="/tickets" style={{
+            background: '#1149D8',
+            padding: '12px 22px',
+            borderRadius: 6,
+            textAlign: 'center' as const,
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 800,
+            fontSize: 18,
+            color: '#fff',
+            textDecoration: 'none',
+            whiteSpace: 'nowrap' as const,
+          }}>
+            🎫 Season Tickets
+          </a>
         </div>
 
-        {/* Content */}
-        <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, justifyContent: 'center', paddingBottom: 60 }}>
+        {/* Entrance Fees */}
+        <div style={{ marginBottom: 52 }}>
+          <h2 style={h2}>Entrance Fees</h2>
+          <p style={subhead}>Pay on the gate · First XI matches only · Cash and card accepted</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 20 }}>
 
-          {/* First Team Sponsor — more prominent */}
-          <div style={{ background: 'rgba(4,27,95,.8)', border: '1px solid rgba(255,255,255,.25)', borderRadius: 8, padding: '12px 28px', marginBottom: 36, display: 'flex', alignItems: 'center', gap: 18 }}>
-            <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 11, color: 'rgba(255,255,255,.7)', letterSpacing: '.14em', textTransform: 'uppercase' }}>First Team Sponsor</span>
-            <div style={{ width: 1, height: 24, background: 'rgba(255,255,255,.25)' }} />
-            <div style={{ background: '#fff', borderRadius: 6, padding: '8px 18px', display: 'flex', alignItems: 'center', boxShadow: '0 2px 12px rgba(0,0,0,.2)' }}>
-              <img src="/sponsors/brackenfern-logo.png" alt="Brackenfern Advisory Limited" style={{ height: 36, objectFit: 'contain' }} />
-            </div>
-          </div>
-
-          {/* Crest */}
-          <div style={{ width: 120, height: 120, borderRadius: '50%', border: '3px solid #fff', boxShadow: '0 0 0 3px #041B5F, 0 0 0 5px #1149D8', overflow: 'hidden', background: '#fff' }}>
-            <img src="/branding/crest.png" alt="BTFC" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          </div>
-
-          {/* Title */}
-          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 'clamp(48px,10vw,110px)', color: '#fff', margin: '18px 0 0', letterSpacing: '.04em', lineHeight: .88, textShadow: '0 2px 20px rgba(4,27,95,.9)' }}>
-            BRIMSCOMBE<br />&amp; THRUPP FC
-          </h1>
-          <p style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 600, fontSize: 12, color: 'rgba(255,255,255,.7)', letterSpacing: '.22em', textTransform: 'uppercase', margin: '14px 0 44px', textShadow: '0 1px 10px rgba(4,27,95,.9)' }}>
-            Est. 1886 · The Lilywhites
-          </p>
-
-          {/* CTAs */}
-          <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 48 }}>
-            <Link href="/tickets" style={{ background: '#1149D8', color: '#fff', padding: '16px 36px', borderRadius: 6, fontFamily: "'Montserrat', sans-serif", fontWeight: 800, fontSize: 12, letterSpacing: '.1em', textTransform: 'uppercase', textDecoration: 'none', boxShadow: '0 8px 28px rgba(17,73,216,.45)' }}>
-              🎟 Season Tickets
-            </Link>
-            <Link href="/fixtures" style={{ background: 'transparent', color: '#fff', border: '2px solid rgba(255,255,255,.28)', padding: '14px 36px', borderRadius: 6, fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 12, letterSpacing: '.1em', textTransform: 'uppercase', textDecoration: 'none' }}>
-              View Fixtures
-            </Link>
-          </div>
-
-          {/* Result + Fixture cards */}
-          <div className="hero-cards" style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
-            <div style={{ background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.12)', borderLeft: '4px solid #EF4444', borderRadius: 8, padding: '16px 22px', textAlign: 'left', minWidth: 230, backdropFilter: 'blur(8px)' }}>
-              <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: 'rgba(255,255,255,.5)', letterSpacing: '.16em', textTransform: 'uppercase', marginBottom: 6 }}>Latest Result</div>
-              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 22, color: '#fff', letterSpacing: '.04em' }}>
-                BTFC <span style={{ color: '#EF4444' }}>{LAST_RESULT.score}</span> {LAST_RESULT.opponent}
-              </div>
-              <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: 'rgba(255,255,255,.4)', marginTop: 4 }}>{LAST_RESULT.date} · {LAST_RESULT.competition}</div>
-            </div>
-            <div style={{ background: 'rgba(17,73,216,.3)', border: '1px solid rgba(255,255,255,.12)', borderLeft: '4px solid #1149D8', borderRadius: 8, padding: '16px 22px', textAlign: 'left', minWidth: 230, backdropFilter: 'blur(8px)' }}>
-              <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: 'rgba(255,255,255,.5)', letterSpacing: '.16em', textTransform: 'uppercase', marginBottom: 6 }}>Next Fixture</div>
-              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 22, color: '#fff', letterSpacing: '.04em' }}>BTFC vs {NEXT_FIXTURE.opponent}</div>
-              <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: 'rgba(255,255,255,.4)', marginTop: 4 }}>{NEXT_FIXTURE.date}</div>
-            </div>
-          </div>
-        </div>
-
-        {/* ── JESSONS MEADOW + STATS STRIP ── */}
-        <div style={{ position: 'relative', zIndex: 1, width: '100%' }}>
-          {/* Jessons Meadow name bar */}
-          <div className="jessons-strip" style={{ background: 'rgba(4,27,95,.95)', borderTop: '1px solid rgba(255,255,255,.08)', padding: '16px 40px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 10, color: 'rgba(255,255,255,.4)', letterSpacing: '.15em', textTransform: 'uppercase' }}>Home of BTFC</span>
-              <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,.15)' }} />
-              <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 20, color: '#fff', letterSpacing: '.06em' }}>JESSONS MEADOW</span>
-              <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,.15)' }} />
-              <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 10, color: 'rgba(255,255,255,.4)', letterSpacing: '.12em', textTransform: 'uppercase' }}>Ground Sponsor</span>
-              <img src="/sponsors/jessons-logo.png" alt="Jessons Real Estate" style={{ height: 28, objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: .8 }} />
-            </div>
-          </div>
-          {/* Stats strip */}
-          <div className="stats-strip" style={{ background: '#1149D8', display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
-            {[
-              ['7th', 'League Position'],
-              ['59', 'Goals Scored'],
-              ['44%', 'Win Rate'],
-              ['Hellenic', 'Division One'],
-            ].map(([val, label]) => (
-              <div key={label} style={{ padding: '14px 36px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,.18)' }}>
-                <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 26, color: '#fff', letterSpacing: '.04em' }}>{val}</div>
-                <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 600, fontSize: 9, color: 'rgba(255,255,255,.65)', letterSpacing: '.12em', textTransform: 'uppercase', marginTop: 2 }}>{label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── LATEST NEWS ──────────────────────────────────────────────────── */}
-      <section style={{ padding: '72px 24px', background: '#fff' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 'clamp(30px,4.5vw,50px)', color: '#2D2D2D', margin: '0 0 8px', letterSpacing: '.04em' }}>Latest News</h2>
-            <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 14, color: '#6B7280' }}>The latest from Brimscombe & Thrupp FC</p>
-            <div style={{ width: 52, height: 4, background: '#1149D8', margin: '12px auto 0', borderRadius: 2 }} />
-          </div>
-          <div className="news-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20, marginBottom: 36 }}>
-            {NEWS.map(n => (
-              <Link key={n.title} href="/news" style={{ textDecoration: 'none' }}>
-                <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, overflow: 'hidden', height: '100%', transition: 'transform .2s, box-shadow .2s' }}>
-                  <div style={{ height: 6, background: n.color }} />
-                  <div style={{ padding: 20 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                      <span style={{ background: `${n.color}18`, color: n.color, padding: '3px 10px', borderRadius: 4, fontFamily: "'Montserrat', sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase' }}>
-                        {n.icon} {n.category}
-                      </span>
-                      <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: '#9CA3AF' }}>{n.date}</span>
-                    </div>
-                    <h3 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 20, color: '#2D2D2D', margin: '0 0 8px', lineHeight: 1.15 }}>{n.title}</h3>
-                    <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 12, color: '#6B7280', margin: '0 0 16px', lineHeight: 1.55 }}>{n.summary}</p>
-                    <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 15, color: '#1149D8' }}>Read More →</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            <Link href="/news" style={{ display: 'inline-block', color: '#1149D8', border: '2px solid #1149D8', padding: '12px 28px', borderRadius: 6, fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 12, letterSpacing: '.08em', textTransform: 'uppercase', textDecoration: 'none' }}>
-              All News →
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── FIXTURES PREVIEW ─────────────────────────────────────────────── */}
-      <section style={{ padding: '72px 24px', background: '#F2F2F2' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 'clamp(30px,4.5vw,50px)', color: '#2D2D2D', margin: '0 0 8px', letterSpacing: '.04em' }}>Fixtures & Results</h2>
-            <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 14, color: '#6B7280' }}>Upcoming games and recent results</p>
-            <div style={{ width: 52, height: 4, background: '#1149D8', margin: '12px auto 0', borderRadius: 2 }} />
-          </div>
-          <div className="fixtures-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 28 }}>
-            <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderLeft: '4px solid #EF4444', borderRadius: 8, padding: 24 }}>
-              <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 10, color: '#9CA3AF', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: 12 }}>Latest Result</div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 20, color: '#041B5F' }}>BTFC</span>
-                <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 32, color: '#EF4444', padding: '4px 12px', background: '#FEF2F2', borderRadius: 6 }}>{LAST_RESULT.score}</span>
-                <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 20, color: '#6B7280' }}>{LAST_RESULT.opponent}</span>
-              </div>
-              <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: '#9CA3AF', margin: 0 }}>{LAST_RESULT.date} · {LAST_RESULT.competition} · Home</p>
-            </div>
-            <div style={{ background: '#041B5F', borderRadius: 8, padding: 24 }}>
-              <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 10, color: 'rgba(255,255,255,.5)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: 12 }}>Next Home Game</div>
-              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 24, color: '#fff', marginBottom: 8, letterSpacing: '.03em' }}>BTFC vs {NEXT_FIXTURE.opponent}</div>
-              <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 12, color: 'rgba(255,255,255,.5)', margin: '0 0 16px' }}>{NEXT_FIXTURE.date}</p>
-              <Link href="/tickets" style={{ display: 'inline-block', background: '#1149D8', color: '#fff', padding: '10px 20px', borderRadius: 6, fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 16, textDecoration: 'none' }}>
-                Get Tickets →
-              </Link>
-            </div>
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            <Link href="/fixtures" style={{ display: 'inline-block', color: '#1149D8', border: '2px solid #1149D8', padding: '12px 28px', borderRadius: 6, fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 12, letterSpacing: '.08em', textTransform: 'uppercase', textDecoration: 'none' }}>
-              All Fixtures →
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── SEASON TICKET PROMO ──────────────────────────────────────────── */}
-      <section style={{ padding: '72px 24px', background: '#F2F2F2' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div className="promo-inner" style={{ background: '#041B5F', borderRadius: 8, padding: '44px 40px', display: 'flex', gap: 28, alignItems: 'center', flexWrap: 'wrap' }}>
-            <div style={{ flex: 1 }}>
-              <span style={{ display: 'inline-block', background: '#1149D8', color: '#fff', padding: '3px 10px', borderRadius: 4, fontFamily: "'Montserrat', sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 12 }}>Now On Sale</span>
-              <h3 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 'clamp(26px,3.5vw,42px)', color: '#fff', margin: '0 0 8px', letterSpacing: '.04em' }}>2026/27 Season Tickets</h3>
-              <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 13, color: 'rgba(255,255,255,.55)', margin: 0 }}>Adult £100 · Concession £80 · All home league & cup games · Digital QR ticket by email</p>
-            </div>
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
-              {[['Adult', '£100'], ['Concession', '£80']].map(([label, price]) => (
-                <div key={label} style={{ background: 'rgba(255,255,255,.07)', border: '1px solid rgba(255,255,255,.12)', borderRadius: 6, padding: '12px 18px', textAlign: 'center', minWidth: 90 }}>
-                  <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 600, fontSize: 10, color: 'rgba(255,255,255,.5)', letterSpacing: '.1em', textTransform: 'uppercase' }}>{label}</div>
-                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 28, color: '#fff' }}>{price}</div>
+            {/* League & Cup */}
+            <div style={card}>
+              <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
+              <h3 style={h3}>League &amp; Cup</h3>
+              {[
+                { label: 'Adult', price: '£7', color: '#1149D8' },
+                { label: 'Concession (65 and over)', price: '£5', color: '#1149D8' },
+                { label: 'Under 16', price: 'Free', color: '#16a34a' },
+              ].map((row, i, arr) => (
+                <div key={row.label} style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '12px 0',
+                  borderBottom: i < arr.length - 1 ? '1px solid #F3F4F6' : 'none',
+                }}>
+                  <span style={{ ...body, color: '#374151', fontSize: 13 }}>{row.label}</span>
+                  <span style={{
+                    fontFamily: "'Barlow Condensed', sans-serif",
+                    fontSize: 26,
+                    fontWeight: 800,
+                    color: row.color,
+                  }}>
+                    {row.price}
+                  </span>
                 </div>
               ))}
-              <Link href="/tickets" style={{ background: '#1149D8', color: '#fff', padding: '16px 28px', borderRadius: 6, fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 20, textDecoration: 'none', letterSpacing: '.04em', boxShadow: '0 8px 28px rgba(17,73,216,.45)' }}>
-                🎟 Buy Now
-              </Link>
+              <p style={{ ...body, fontSize: 11, color: '#9CA3AF', marginTop: 14 }}>
+                Only First XI matches require admission. All other fixtures are free.
+              </p>
+              <div style={{ marginTop: 10, padding: '10px 14px', background: '#F0FDF4', borderRadius: 6, border: '1px solid #86EFAC' }}>
+                <p style={{ ...body, fontSize: 11, color: '#16a34a', fontWeight: 600, margin: 0 }}>
+                  ✓ Reserves and Under 17s fixtures — free admission for all supporters
+                </p>
+              </div>
+              {/* Season ticket upsell */}
+              <div style={{
+                background: '#F0F4FF',
+                border: '1px solid #C7D6FA',
+                borderRadius: 6,
+                padding: '12px 14px',
+                marginTop: 16,
+              }}>
+                <p style={{ ...body, fontSize: 11, color: '#1149D8', fontWeight: 600 }}>
+                  💡 Save money — season tickets cover all First XI home league & cup games from £80.{' '}
+                  <a href="/tickets" style={{ color: '#1149D8', textDecoration: 'underline' }}>Buy now →</a>
+                </p>
+              </div>
             </div>
+
+            {/* Friendlies */}
+            <div style={card}>
+              <div style={{ height: 4, background: '#6B7280', marginBottom: 20, borderRadius: 2 }} />
+              <h3 style={h3}>Pre-Season Friendlies</h3>
+              {[
+                { label: 'Everyone', price: '£3', color: '#1149D8' },
+              ].map((row, i, arr) => (
+                <div key={row.label} style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '12px 0',
+                  borderBottom: i < arr.length - 1 ? '1px solid #F3F4F6' : 'none',
+                }}>
+                  <span style={{ ...body, color: '#374151', fontSize: 13 }}>{row.label}</span>
+                  <span style={{
+                    fontFamily: "'Barlow Condensed', sans-serif",
+                    fontSize: 26,
+                    fontWeight: 800,
+                    color: row.color,
+                  }}>
+                    {row.price}
+                  </span>
+                </div>
+              ))}
+              <p style={{ ...body, fontSize: 11, color: '#9CA3AF', marginTop: 14 }}>
+                Flat rate for all supporters including under 16s. Season tickets do not cover friendly fixtures.
+              </p>
+            </div>
+
           </div>
         </div>
-      </section>
 
-      {/* ── SPONSORS ─────────────────────────────────────────────────────── */}
-      <section style={{ padding: '72px 24px', background: '#041B5F' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 'clamp(30px,4.5vw,50px)', color: '#fff', margin: '0 0 8px', letterSpacing: '.04em' }}>Club Sponsors</h2>
-            <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 14, color: 'rgba(255,255,255,.5)' }}>Our valued club partners</p>
-            <div style={{ width: 52, height: 4, background: '#1149D8', margin: '12px auto 0', borderRadius: 2 }} />
-          </div>
-          <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 36 }}>
-            {SPONSORS.map(s => (
-              <Link key={s.name} href="/sponsors" style={{ textDecoration: 'none' }}>
-                <div style={{ background: '#fff', border: '2px solid rgba(255,255,255,.1)', borderRadius: 8, padding: '28px 24px', textAlign: 'center', width: 240, transition: 'transform .22s' }}>
-                  <div style={{ height: 3, background: '#1149D8', margin: '-28px -24px 24px' }} />
-                  <div style={{ height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}>
-                    <img src={s.logo} alt={s.name} style={{ maxHeight: 64, maxWidth: 200, objectFit: 'contain' }} />
-                  </div>
-                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 17, color: '#2D2D2D', marginBottom: 4 }}>{s.name}</div>
-                  <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: '#1149D8', letterSpacing: '.1em', textTransform: 'uppercase' }}>{s.role}</div>
-                </div>
-              </Link>
+        {/* Ground & Facilities */}
+        <div style={{ marginBottom: 52 }}>
+          <h2 style={h2}>Ground & Facilities</h2>
+          <p style={subhead}>Jessons Meadow — what to expect on matchday</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20 }}>
+            {facilities.map(f => (
+              <div key={f.title} style={card}>
+                <div style={{ fontSize: 24, marginBottom: 10 }}>{f.icon}</div>
+                <h3 style={h3}>{f.title}</h3>
+                <p style={body}>{f.text}</p>
+              </div>
             ))}
           </div>
-          <div style={{ textAlign: 'center' }}>
-            <Link href="/sponsors" style={{ display: 'inline-block', color: 'rgba(255,255,255,.6)', border: '2px solid rgba(255,255,255,.2)', padding: '12px 28px', borderRadius: 6, fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 12, letterSpacing: '.08em', textTransform: 'uppercase', textDecoration: 'none' }}>
-              All Sponsors →
-            </Link>
+        </div>
+
+        {/* Getting Here */}
+        <div style={{ marginBottom: 44 }}>
+          <h2 style={h2}>Getting Here</h2>
+          <p style={subhead}>Jessons Meadow · London Road · Brimscombe · Stroud · GL5 2SH</p>
+
+          {/* Map */}
+          <div style={{ borderRadius: 8, overflow: 'hidden', marginBottom: 20, border: '1px solid #E5E7EB' }}>
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2474.3!2d-2.147!3d51.717!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x487108b3b3b3b3b3%3A0x0!2sBrimscombe+%26+Thrupp+FC!5e0!3m2!1sen!2suk!4v1"
+              width="100%"
+              height="280"
+              style={{ border: 0, display: 'block' }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Jessons Meadow location"
+            />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 20 }}>
+            {gettingHere.map(g => (
+              <div key={g.title} style={card}>
+                <div style={{ fontSize: 22, marginBottom: 8 }}>{g.icon}</div>
+                <h3 style={h3}>{g.title}</h3>
+                <p style={body}>{g.text}</p>
+              </div>
+            ))}
           </div>
         </div>
-      </section>
 
+        {/* Address bar */}
+        <div style={{
+          ...card,
+          background: '#041B5F',
+          color: '#fff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 20,
+        }}>
+          <div>
+            <h3 style={{ ...h3, color: '#fff', fontSize: 20, margin: '0 0 8px' }}>🏟 Jessons Meadow</h3>
+            <p style={{ ...body, color: 'rgba(255,255,255,.7)', fontSize: 13 }}>
+              London Road · Brimscombe · Stroud · Gloucestershire · GL5 2SH
+            </p>
+          </div>
+          <a
+            href="https://maps.google.com/?q=Brimscombe+and+Thrupp+FC,+London+Road,+Brimscombe,+GL5+2SH"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              background: '#1149D8',
+              padding: '10px 20px',
+              borderRadius: 6,
+              color: '#fff',
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 800,
+              fontSize: 16,
+              textDecoration: 'none',
+              whiteSpace: 'nowrap' as const,
+            }}
+          >
+            Open in Maps →
+          </a>
+        </div>
+
+      </section>
     </main>
   )
 }

@@ -144,6 +144,11 @@ export default function TicketsPage() {
                   </span>
                 </div>
               ))}
+              <div style={{ marginTop: 14, padding: '10px 14px', background: '#F0FDF4', borderRadius: 6, border: '1px solid #86EFAC' }}>
+                <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: '#16a34a', fontWeight: 700, margin: 0 }}>
+                  ✓ Reserves and Under 17s fixtures are free admission for all supporters
+                </p>
+              </div>
             </div>
 
             {/* Friendlies */}
@@ -193,100 +198,7 @@ export default function TicketsPage() {
           </div>
         </div>
 
-        {/* ── FIXTURES ── */}
-        <div style={{ marginBottom: 52 }}>
-          <h2 style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontSize: 36,
-            fontWeight: 800,
-            color: '#2D2D2D',
-            margin: '0 0 6px',
-            letterSpacing: '0.03em'
-          }}>
-            2026/27 Fixtures
-          </h2>
-          <p style={{
-            fontFamily: "'Montserrat', sans-serif",
-            fontSize: 12,
-            color: '#6B7280',
-            margin: '0 0 20px'
-          }}>
-            Full fixture list to be confirmed in July 2026. Check back soon.
-          </p>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 20 }}>
-
-            {/* League & Cup Fixtures */}
-            <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, padding: 24 }}>
-              <div style={{ height: 4, background: '#1149D8', marginBottom: 16, borderRadius: 2 }} />
-              <h3 style={{
-                fontFamily: "'Barlow Condensed', sans-serif",
-                fontSize: 22,
-                fontWeight: 800,
-                color: '#2D2D2D',
-                margin: '0 0 16px'
-              }}>
-                First XI — League &amp; Cup
-              </h3>
-              {LEAGUE_AND_CUP_FIXTURES.map((f, i) => (
-                <div key={i} style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: '10px 0',
-                  borderBottom: '1px solid #F3F4F6',
-                  gap: 10
-                }}>
-                  <div>
-                    <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 12, color: '#374151', fontWeight: 600 }}>
-                      {f.opponent}
-                    </div>
-                    <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>
-                      {f.date} · {f.time}
-                    </div>
-                  </div>
-                  <span style={labelStyle(f.home)}>{f.home ? 'Home' : 'Away'}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Friendly Fixtures */}
-            <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, padding: 24 }}>
-              <div style={{ height: 4, background: '#6B7280', marginBottom: 16, borderRadius: 2 }} />
-              <h3 style={{
-                fontFamily: "'Barlow Condensed', sans-serif",
-                fontSize: 22,
-                fontWeight: 800,
-                color: '#2D2D2D',
-                margin: '0 0 16px'
-              }}>
-                First XI — Friendlies
-              </h3>
-              {FRIENDLY_FIXTURES.map((f, i) => (
-                <div key={i} style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: '10px 0',
-                  borderBottom: '1px solid #F3F4F6',
-                  gap: 10
-                }}>
-                  <div>
-                    <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 12, color: '#374151', fontWeight: 600 }}>
-                      {f.opponent}
-                    </div>
-                    <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>
-                      {f.date} · {f.time}
-                    </div>
-                  </div>
-                  <span style={labelStyle(f.home)}>{f.home ? 'Home' : 'Away'}</span>
-                </div>
-              ))}
-            </div>
-
-          </div>
-        </div>
-
+        
         {/* ── FAQs ── */}
         <div>
           <h2 style={{
