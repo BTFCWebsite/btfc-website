@@ -71,7 +71,7 @@ export default function TicketsPage() {
               Digital QR ticket delivered instantly by email — save to Apple Wallet for easy matchday entry.
             </p>
             <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' as const }}>
-              {[['Adult', '£100'], ['Concession', '£80']].map(([label, price]) => (
+              {[['Adult', '£89'], ['Concession', '£69']].map(([label, price]) => (
                 <div key={label} style={{ background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.15)', borderRadius: 6, padding: '10px 16px', textAlign: 'center' as const }}>
                   <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 10, color: 'rgba(255,255,255,.55)', letterSpacing: '.1em', textTransform: 'uppercase' as const }}>{label}</div>
                   <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 26, color: '#fff' }}>{price}</div>
@@ -117,7 +117,7 @@ export default function TicketsPage() {
           <iframe
             src="https://www.tickettailor.com/all-tickets/brimscombeandthruppfc/?ref=website_widget"
             width="100%"
-            height="200"
+            height="420"
             frameBorder="0"
             style={{ border: 'none', borderRadius: 8 }}
             title="BTFC Season Tickets"
