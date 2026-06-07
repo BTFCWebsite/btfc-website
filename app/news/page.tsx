@@ -1,5 +1,4 @@
 'use client'
-import { PageHeader } from '../layout'
 import { useState } from 'react'
 
 type Article = {
@@ -115,8 +114,6 @@ export default function NewsPage() {
   return (
     <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '0 0 90px' }}>
       <section style={{ maxWidth: 980, margin: '0 auto' }}>
-
-        <PageHeader title="Club News" subtitle="The latest from Brimscombe & Thrupp FC" />
 
         {/* Category filter */}
         <div style={{

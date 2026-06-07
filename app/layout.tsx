@@ -273,6 +273,56 @@ function Footer() {
   )
 }
 
+
+const PAGE_HEADERS: Record<string, { title: string; subtitle: string }> = {
+  '/news':     { title: 'Club News',          subtitle: 'The latest from Brimscombe & Thrupp FC' },
+  '/teams':    { title: 'Our Teams',           subtitle: 'First XI · Reserves · Under 17s' },
+  '/fixtures': { title: 'Fixtures & Results',  subtitle: '2025/26 Season' },
+  '/tickets':  { title: 'Tickets',             subtitle: 'Season tickets and matchday admission' },
+  '/matchday': { title: 'Matchday',            subtitle: 'Everything you need for The Jessons Meadow' },
+  '/sponsors': { title: 'Sponsors',            subtitle: 'Our valued club partners' },
+  '/club':     { title: 'The Club',            subtitle: 'Brimscombe & Thrupp FC — Est. 1886' },
+  '/shop':     { title: 'Club Shop',           subtitle: 'Official BTFC merchandise' },
+  '/contact':  { title: 'Contact Us',          subtitle: 'Get in touch with the club' },
+}
+
+function AutoPageHeader() {
+  const pathname = usePathname()
+  const header = PAGE_HEADERS[pathname]
+  if (!header) return null
+  return (
+    <div style={{
+      background: '#041B5F',
+      borderBottom: '3px solid #1149D8',
+      padding: '52px 24px 44px',
+      textAlign: 'center',
+    }}>
+      <div style={{ maxWidth: 980, margin: '0 auto' }}>
+        <h1 style={{
+          fontFamily: "'Barlow Condensed', sans-serif",
+          fontWeight: 800,
+          fontSize: 'clamp(36px,6vw,64px)',
+          color: '#fff',
+          margin: '0 0 10px',
+          letterSpacing: '.04em',
+          lineHeight: 1,
+        }}>
+          {header.title}
+        </h1>
+        <p style={{
+          fontFamily: "'Montserrat', sans-serif",
+          fontSize: 14,
+          color: 'rgba(255,255,255,.55)',
+          margin: '0 0 16px',
+        }}>
+          {header.subtitle}
+        </p>
+        <div style={{ width: 52, height: 4, background: '#1149D8', margin: '0 auto', borderRadius: 2 }} />
+      </div>
+    </div>
+  )
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -296,6 +346,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <Nav />
         <div style={{ paddingTop: 64, paddingBottom: 48 }}>
+          <AutoPageHeader />
           {children}
         </div>
         <Ticker />

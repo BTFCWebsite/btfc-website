@@ -1,5 +1,4 @@
 'use client'
-import { PageHeader } from '../layout'
 import { useEffect } from 'react'
 
 // ─── UPDATE FIXTURES HERE WHEN RELEASED IN JULY ───────────────────────────────
@@ -49,7 +48,6 @@ export default function TicketsPage() {
       <section style={{ maxWidth: 980, margin: '0 auto' }}>
 
         {/* Page Title */}
-        <PageHeader title="Tickets" subtitle="Season tickets, matchday admission and fixture information" />
 
         <div style={{
           background: '#fff',

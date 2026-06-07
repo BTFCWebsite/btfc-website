@@ -1,5 +1,4 @@
 'use client'
-import { PageHeader } from '../layout'
 import { useState } from 'react'
 
 const h2 = {
@@ -94,8 +93,6 @@ export default function ContactPage() {
   return (
     <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '0 0 90px' }}>
       <section style={{ maxWidth: 980, margin: '0 auto' }}>
-
-        <PageHeader title="Contact Us" subtitle="Get in touch with Brimscombe & Thrupp FC" />
 
         {/* Main grid — form + contact details */}
         <div style={{
