@@ -4,7 +4,7 @@ export const client = createClient({
   projectId: 'vm0n9zl5',
   dataset: 'production',
   apiVersion: '2024-01-01',
-  useCdn: true,
+  useCdn: false,
 })
 
 export async function getSiteSettings() {
