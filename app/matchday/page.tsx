@@ -169,6 +169,17 @@ export default function MatchdayPage() {
 
         
 
+        {/* Ground & Facilities — 6 tiles */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20, marginBottom: 52 }}>
+          {facilities.map(f => (
+            <div key={f.title} style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, padding: 24 }}>
+              <div style={{ fontSize: 24, marginBottom: 10 }}>{f.icon}</div>
+              <h3 style={h3}>{f.title}</h3>
+              <p style={body}>{f.text}</p>
+            </div>
+          ))}
+        </div>
+
         {/* Getting Here */}
         <div style={{ marginBottom: 44 }}>
           <h2 style={h2}>Getting Here</h2>
