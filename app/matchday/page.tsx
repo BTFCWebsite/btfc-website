@@ -51,7 +51,7 @@ const gettingHere = [
     icon: '🚌',
     title: 'By Bus',
     text: 'The number 67 bus runs from Stroud town centre to Brimscombe (War Memorial stop), approximately 7 minutes. Services run every 30 minutes.',
-    link: { label: 'View 67 Bus Timetable', url: 'https://www.geopunk.co.uk/timetables/south-west/gloucestershire/67-bussage-cashes-green' },
+    link: { label: 'View 67 Bus Timetable', url: 'https://www.stagecoachbus.com/routes/west/67/bussage-cashes-green/xsao067.o' },
   },
   {
     icon: '🚆',
