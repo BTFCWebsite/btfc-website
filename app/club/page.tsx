@@ -143,7 +143,7 @@ export default function ClubPage() {
         <div style={{ marginBottom: 52 }}>
           <h2 style={h2}>Club History</h2>
           <p style={subhead}>Over 130 years in the heart of the Cotswold valley</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 20 }}>
             <div style={card}>
               <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
               <h3 style={h3}>Brimscombe FC — Est. 1886</h3>
