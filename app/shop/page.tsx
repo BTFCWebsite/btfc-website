@@ -60,15 +60,10 @@ export default function ShopPage() {
   ]
 
   return (
-    <main style={{background:"#F2F2F2",minHeight:"100vh",padding:"96px 24px 80px"}}>
+    <main style={{background:"#F2F2F2",minHeight:"100vh",padding:"52px 24px 80px"}}>
       <section style={{maxWidth:1180,margin:"0 auto"}}>
-        <div style={{textAlign:"center",marginBottom:42}}>
-          <h1 style={{fontSize:48,fontWeight:800,color:"#2D2D2D",marginBottom:8}}>Club Shop</h1>
-          <p style={{color:"#6B7280",margin:0}}>Official Brimscombe &amp; Thrupp FC merchandise</p>
-          <div style={{width:52,height:4,background:"#1149D8",margin:"14px auto 0",borderRadius:2}}/>
-        </div>
         <div style={{background:"#041B5F",borderRadius:12,padding:"34px 38px",marginBottom:48,display:"flex",gap:24,alignItems:"center",flexWrap:"wrap"}}>
-          <img src="/crest.png" alt="BTFC" style={{width:74,height:74,borderRadius:"50%",border:"2px solid #fff"}}/>
+          <img src="/branding/crest.png" alt="BTFC" style={{width:74,height:74,borderRadius:"50%",border:"2px solid #fff"}}/>
           <div style={{flex:1,minWidth:260}}>
             <h2 style={{margin:"0 0 8px",fontSize:28,fontWeight:800,color:"#fff"}}>Official BTFC Merchandise</h2>
             <p style={{margin:"0 0 10px",color:"rgba(255,255,255,.72)",lineHeight:1.6,fontSize:13}}>Powered by Batemans Sports. All items are made to order with the official BTFC badge.</p>
