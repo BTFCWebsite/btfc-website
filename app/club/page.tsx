@@ -43,9 +43,9 @@ const subhead = {
 const officials = [
   { role: 'Chairman', name: 'Neil Long' },
   { role: 'Vice Chairman', name: 'Nick Wright' },
-  { role: 'Club Secretary', name: 'Sarah Mills' },
+  { role: 'Club Secretary', name: 'Clive Linehan' },
   { role: 'First Team Manager', name: 'Tim Bond' },
-  { role: 'Welfare Officer', name: 'Mike Hill' },
+  { role: 'Welfare Officer', name: 'Neil Long' },
 ]
 
 const clubFacts = [
@@ -57,7 +57,7 @@ const clubFacts = [
   { label: 'County', value: 'Gloucestershire' },
 ]
 
-const youthAges = ['U6', 'U7', 'U8', 'U9', 'U10', 'U11', 'U12', 'U13', 'U14', 'U15', 'U16', 'U18']
+
 
 export default function ClubPage() {
   return (
@@ -365,26 +365,23 @@ export default function ClubPage() {
               <div style={{ fontSize: 28, marginBottom: 12 }}>👶</div>
               <h3 style={h3}>Youth Football</h3>
               <p style={{ ...body, marginBottom: 14 }}>
-                We run youth teams from Under 6s through to Under 18s, providing a pathway
-                for young players in the area to develop their football from grassroots
-                to first team level.
+                BTFC Under 17s launched as our inaugural youth team in the 2025/26 season,
+                managed by Clive Boulton. The U17s provide a pathway for young local players
+                to develop their football and progress towards the first team.
               </p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                {youthAges.map(a => (
-                  <span key={a} style={{
-                    background: '#F0F4FF',
-                    border: '1px solid #C7D6FA',
-                    borderRadius: 4,
-                    padding: '3px 8px',
-                    fontFamily: "'Montserrat', sans-serif",
-                    fontSize: 10,
-                    fontWeight: 700,
-                    color: '#1149D8',
-                  }}>
-                    {a}
-                  </span>
-                ))}
-              </div>
+              <span style={{
+                display: 'inline-block',
+                background: '#F0F4FF',
+                border: '1px solid #C7D6FA',
+                borderRadius: 4,
+                padding: '4px 12px',
+                fontFamily: "'Montserrat', sans-serif",
+                fontSize: 11,
+                fontWeight: 700,
+                color: '#1149D8',
+              }}>
+                ⚽ Under 17s — Inaugural Season 2025/26
+              </span>
             </div>
             <div style={card}>
               <div style={{ fontSize: 28, marginBottom: 12 }}>🚶</div>
