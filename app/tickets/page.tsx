@@ -44,75 +44,10 @@ const labelStyle = (home: boolean) => ({
 
 export default function TicketsPage() {
   return (
-    <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '90px 24px 90px' }}>
-      <section style={{ maxWidth: 980, margin: '0 auto' }}>
+    <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '0 0 90px' }}>
+      <section style={{ maxWidth: 980, margin: '0 auto', padding: '52px 24px' }}>
 
         {/* Page Title */}
-        <div style={{ textAlign: 'center', marginBottom: 42 }}>
-          <h1 style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontSize: 52,
-            fontWeight: 800,
-            color: '#2D2D2D',
-            margin: '0 0 8px',
-            letterSpacing: '0.04em'
-          }}>
-            Tickets
-          </h1>
-          <p style={{ fontFamily: "'Montserrat', sans-serif", color: '#6B7280', margin: 0, fontSize: 14 }}>
-            Season tickets, matchday admission and fixture information
-          </p>
-          <div style={{ width: 52, height: 4, background: '#1149D8', margin: '14px auto 0' }} />
-        </div>
-
-        {/* ── SEASON TICKETS ── */}
-        <div style={{
-          background: '#041B5F',
-          borderRadius: 8,
-          padding: '22px 28px',
-          color: '#fff',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 20,
-          flexWrap: 'wrap',
-          marginBottom: 28
-        }}>
-          <div>
-            <h2 style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontSize: 28,
-              fontWeight: 800,
-              margin: '0 0 6px',
-              letterSpacing: '0.03em'
-            }}>
-              🎟️ 2026/27 Season Tickets On Sale Now
-            </h2>
-            <p style={{
-              fontFamily: "'Montserrat', sans-serif",
-              margin: 0,
-              color: 'rgba(255,255,255,.7)',
-              fontSize: 13,
-              lineHeight: 1.6
-            }}>
-              Adult £100 · Concession £80 · All First XI home league & cup games · Digital QR ticket by email
-            </p>
-          </div>
-          <div style={{
-            background: '#1149D8',
-            padding: '12px 22px',
-            borderRadius: 6,
-            textAlign: 'center',
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 800,
-            fontSize: 20
-          }}>
-            <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 9, opacity: .7, letterSpacing: '.12em' }}>
-              SECURE PAYMENT
-            </div>
-            Stripe
-          </div>
-        </div>
 
         <div style={{
           background: '#fff',
