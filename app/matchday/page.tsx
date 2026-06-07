@@ -44,22 +44,32 @@ const gettingHere = [
   {
     icon: '🚗',
     title: 'By Car',
-    text: 'Jessons Meadow is on London Road, Brimscombe, GL5 2SH. Free parking off Station Road. Overflow at the leisure centre (5 min walk).',
+    text: 'Jessons Meadow is on London Road, Brimscombe, GL5 2SD. Free parking is available in our car park at the ground.',
+    link: null,
   },
   {
     icon: '🚌',
     title: 'By Bus',
-    text: 'Bus routes 14 and 22 stop directly outside on London Road. Regular services from Stroud town centre. Check Traveline for timetables.',
+    text: 'The number 67 bus runs from Stroud town centre to Brimscombe (War Memorial stop), approximately 7 minutes. Services run every 30 minutes.',
+    link: { label: 'View 67 Bus Timetable', url: 'https://www.geopunk.co.uk/timetables/south-west/gloucestershire/67-bussage-cashes-green' },
   },
   {
     icon: '🚆',
     title: 'By Train',
-    text: 'Brimscombe station is a 10-minute walk. Stroud station is served by GWR with regular services from Gloucester, Swindon and London Paddington.',
+    text: 'The nearest station is Stroud, served by GWR with regular services from Gloucester, Swindon and London Paddington. From Stroud take the 67 bus or a taxi to the ground.',
+    link: null,
+  },
+  {
+    icon: '🚕',
+    title: 'By Taxi',
+    text: 'Taxis are available from Stroud station. The journey to Jessons Meadow takes approximately 10 minutes. Several local taxi firms serve the Stroud area.',
+    link: null,
   },
   {
     icon: '🚶',
     title: 'On Foot',
-    text: 'Easily walkable from Brimscombe village. Follow London Road south — the floodlights are visible from the road.',
+    text: 'Easily walkable from Brimscombe village. Follow London Road — the floodlights are visible from the road.',
+    link: null,
   },
 ]
 
@@ -183,12 +193,12 @@ export default function MatchdayPage() {
         {/* Getting Here */}
         <div style={{ marginBottom: 44 }}>
           <h2 style={h2}>Getting Here</h2>
-          <p style={subhead}>Jessons Meadow · London Road · Brimscombe · Stroud · GL5 2SH</p>
+          <p style={subhead}>Jessons Meadow · London Road · Brimscombe · Stroud · GL5 2SD</p>
 
           {/* Map */}
           <div style={{ borderRadius: 8, overflow: 'hidden', marginBottom: 20, border: '1px solid #E5E7EB' }}>
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2474.3!2d-2.147!3d51.717!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x487108b3b3b3b3b3%3A0x0!2sBrimscombe+%26+Thrupp+FC!5e0!3m2!1sen!2suk!4v1"
+              src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d402.0214455110228!2d-2.196852797087878!3d51.722527574592554!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sen!2suk!4v1780823187484!5m2!1sen!2suk"
               width="100%"
               height="280"
               style={{ border: 0, display: 'block' }}
@@ -224,11 +234,11 @@ export default function MatchdayPage() {
           <div>
             <h3 style={{ ...h3, color: '#fff', fontSize: 20, margin: '0 0 8px' }}>🏟 Jessons Meadow</h3>
             <p style={{ ...body, color: 'rgba(255,255,255,.7)', fontSize: 13 }}>
-              London Road · Brimscombe · Stroud · Gloucestershire · GL5 2SH
+              London Road · Brimscombe · Stroud · Gloucestershire · GL5 2SD
             </p>
           </div>
           <a
-            href="https://maps.google.com/?q=Brimscombe+and+Thrupp+FC,+London+Road,+Brimscombe,+GL5+2SH"
+            href="https://maps.google.com/?q=Brimscombe+and+Thrupp+FC,+London+Road,+Brimscombe,+GL5+2SD"
             target="_blank"
             rel="noopener noreferrer"
             style={{
