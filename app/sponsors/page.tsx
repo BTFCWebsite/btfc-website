@@ -197,10 +197,7 @@ export default function SponsorsPage() {
 
   return (
     <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '0 0 90px' }}>
-      <section style={{ maxWidth: 980, margin: '0 auto' }}>
-            ))}
-          </div>
-        </div>
+      <section style={{ maxWidth: 980, margin: '0 auto', padding: '52px 24px' }}>
 
         {/* Current Principal Sponsors */}
         <div style={{ marginBottom: 52 }}>
