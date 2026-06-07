@@ -365,9 +365,7 @@ export default function ClubPage() {
               <div style={{ fontSize: 28, marginBottom: 12 }}>👶</div>
               <h3 style={h3}>Youth Football</h3>
               <p style={{ ...body, marginBottom: 14 }}>
-                BTFC Under 17s launched as our inaugural youth team in the 2025/26 season,
-                managed by Clive Boulton. The U17s provide a pathway for young local players
-                to develop their football and progress towards the first team.
+                BTFC Under 17s will compete for the first time in the 2026/27 season — our inaugural youth team, managed by Clive Boulton. The U17s provide a pathway for young local players to develop their football and progress towards the first team.
               </p>
               <span style={{
                 display: 'inline-block',
@@ -380,7 +378,7 @@ export default function ClubPage() {
                 fontWeight: 700,
                 color: '#1149D8',
               }}>
-                ⚽ Under 17s — Inaugural Season 2025/26
+                ⚽ Under 17s — Inaugural Season 2026/27
               </span>
             </div>
             <div style={card}>
