@@ -119,7 +119,9 @@ export default function HomePage() {
               <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 20, color: '#fff', letterSpacing: '.06em' }}>JESSONS MEADOW</span>
               <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,.15)' }} />
               <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 10, color: 'rgba(255,255,255,.4)', letterSpacing: '.12em', textTransform: 'uppercase' }}>Ground Sponsor</span>
-              <img src="/sponsors/jessons-logo.png" alt="Jessons Real Estate" style={{ height: 28, objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: .8 }} />
+              <div style={{ background: '#fff', borderRadius: 4, padding: '3px 10px', display: 'flex', alignItems: 'center' }}>
+                <img src="/sponsors/jessons-logo.png" alt="Jessons Real Estate" style={{ height: 22, objectFit: 'contain' }} />
+              </div>
             </div>
           </div>
           {/* Stats strip */}
