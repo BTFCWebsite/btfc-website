@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 
 const CATEGORIES = ['All', 'Match Report', 'Club News', 'Tickets', 'Announcement', 'Youth', 'Matchday']
 
@@ -41,7 +42,7 @@ export default function NewsPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const query = encodeURIComponent(`*[_type == "newsArticle"] | order(date desc) { _id, title, category, date, summary }`)
+    const query = encodeURIComponent(`*[_type == "newsArticle"] | order(date desc) { _id, title, category, date, summary, "slug": slug.current }`)
     fetch(`https://vm0n9zl5.api.sanity.io/v2024-01-01/data/query/production?query=${query}`)
       .then(r => r.json())
       .then(data => {
@@ -99,36 +100,44 @@ export default function NewsPage() {
         {!loading && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20 }}>
             {filtered.map(article => (
-              <div key={article._id} style={{
-                background: '#fff',
-                border: '1px solid #E5E7EB',
-                borderRadius: 8,
-                padding: 24,
-                display: 'flex',
-                flexDirection: 'column',
-              }}>
-                <div style={{ height: 4, background: categoryColor[article.category] ?? '#1149D8', marginBottom: 16, borderRadius: 2 }} />
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                  <span style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 5,
-                    background: `${categoryColor[article.category] ?? '#1149D8'}15`,
-                    color: categoryColor[article.category] ?? '#1149D8',
-                    padding: '3px 10px', borderRadius: 4,
-                    fontFamily: "'Montserrat', sans-serif", fontSize: 10,
-                    fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase' as const,
-                  }}>
-                    {categoryIcon[article.category] ?? '📰'} {article.category}
+              <Link
+                key={article._id}
+                href={article.slug ? `/news/${article.slug}` : '/news'}
+                style={{ textDecoration: 'none' }}
+              >
+                <div style={{
+                  background: '#fff',
+                  border: '1px solid #E5E7EB',
+                  borderRadius: 8,
+                  padding: 24,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  height: '100%',
+                  cursor: 'pointer',
+                }}>
+                  <div style={{ height: 4, background: categoryColor[article.category] ?? '#1149D8', marginBottom: 16, borderRadius: 2 }} />
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                    <span style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 5,
+                      background: `${categoryColor[article.category] ?? '#1149D8'}15`,
+                      color: categoryColor[article.category] ?? '#1149D8',
+                      padding: '3px 10px', borderRadius: 4,
+                      fontFamily: "'Montserrat', sans-serif", fontSize: 10,
+                      fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase' as const,
+                    }}>
+                      {categoryIcon[article.category] ?? '📰'} {article.category}
+                    </span>
+                    <span style={{ ...body, fontSize: 10, color: '#9CA3AF' }}>{formatDate(article.date)}</span>
+                  </div>
+                  <h3 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 22, fontWeight: 800, color: '#2D2D2D', margin: '0 0 10px', lineHeight: 1.15 }}>
+                    {article.title}
+                  </h3>
+                  <p style={{ ...body, marginBottom: 20, flex: 1 }}>{article.summary}</p>
+                  <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 16, fontWeight: 800, color: '#1149D8', letterSpacing: '.03em' }}>
+                    Read More →
                   </span>
-                  <span style={{ ...body, fontSize: 10, color: '#9CA3AF' }}>{formatDate(article.date)}</span>
                 </div>
-                <h3 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 22, fontWeight: 800, color: '#2D2D2D', margin: '0 0 10px', lineHeight: 1.15 }}>
-                  {article.title}
-                </h3>
-                <p style={{ ...body, marginBottom: 20, flex: 1 }}>{article.summary}</p>
-                <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 16, fontWeight: 800, color: '#1149D8', letterSpacing: '.03em' }}>
-                  Read More →
-                </span>
-              </div>
+              </Link>
             ))}
           </div>
         )}
