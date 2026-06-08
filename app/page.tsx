@@ -1,7 +1,8 @@
 export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
-import { getSiteSettings, getLatestNews } from './lib/sanity.client'
+import { getSiteSettings } from './lib/sanity.client'
+import NewsSection from './NewsSection'
 
 const CATEGORY_COLORS: Record<string, string> = {
   'Match Report': '#1149D8',
@@ -58,12 +59,8 @@ export default async function HomePage() {
   let news = FALLBACK_NEWS
 
   try {
-    const [sanitySettings, sanityNews] = await Promise.all([
-      getSiteSettings(),
-      getLatestNews(),
-    ])
+    const sanitySettings = await getSiteSettings()
     if (sanitySettings) settings = { ...FALLBACK_SETTINGS, ...sanitySettings }
-    if (sanityNews && sanityNews.length > 0) news = sanityNews
   } catch (e) {
     // Use fallback data if Sanity fails
   }
@@ -172,45 +169,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── LATEST NEWS ──────────────────────────────────────────────────── */}
-      <section style={{ padding: '72px 24px', background: '#fff' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 'clamp(30px,4.5vw,50px)', color: '#2D2D2D', margin: '0 0 8px', letterSpacing: '.04em' }}>Latest News</h2>
-            <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 14, color: '#6B7280' }}>The latest from Brimscombe & Thrupp FC</p>
-            <div style={{ width: 52, height: 4, background: '#1149D8', margin: '12px auto 0', borderRadius: 2 }} />
-          </div>
-          <div className="news-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20, marginBottom: 36 }}>
-            {news.map((n: any) => {
-              const color = CATEGORY_COLORS[n.category] || '#1149D8'
-              const icon = CATEGORY_ICONS[n.category] || '📰'
-              return (
-                <Link key={n._id} href="/news" style={{ textDecoration: 'none' }}>
-                  <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, overflow: 'hidden', height: '100%' }}>
-                    <div style={{ height: 6, background: color }} />
-                    <div style={{ padding: 20 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                        <span style={{ background: `${color}18`, color, padding: '3px 10px', borderRadius: 4, fontFamily: "'Montserrat', sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase' }}>
-                          {icon} {n.category}
-                        </span>
-                        <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: '#9CA3AF' }}>{n.date ? formatDate(n.date) : ''}</span>
-                      </div>
-                      <h3 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 20, color: '#2D2D2D', margin: '0 0 8px', lineHeight: 1.15 }}>{n.title}</h3>
-                      <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 12, color: '#6B7280', margin: '0 0 16px', lineHeight: 1.55 }}>{n.summary}</p>
-                      <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 15, color: '#1149D8' }}>Read More →</span>
-                    </div>
-                  </div>
-                </Link>
-              )
-            })}
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            <Link href="/news" style={{ display: 'inline-block', color: '#1149D8', border: '2px solid #1149D8', padding: '12px 28px', borderRadius: 6, fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 12, letterSpacing: '.08em', textTransform: 'uppercase', textDecoration: 'none' }}>
-              All News →
-            </Link>
-          </div>
-        </div>
-      </section>
+      
+      <NewsSection />
+
+      
 
       {/* ── SEASON TICKET PROMO ──────────────────────────────────────────── */}
       <section style={{ padding: '72px 24px', background: '#F2F2F2' }}>
