@@ -1,46 +1,8 @@
 export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
-import { getSiteSettings } from './lib/sanity.client'
+import { client } from './lib/sanity.client'
 import NewsSection from './NewsSection'
-
-const CATEGORY_COLORS: Record<string, string> = {
-  'Match Report': '#1149D8',
-  'Club News': '#059669',
-  'Tickets': '#7C3AED',
-  'Announcement': '#D97706',
-  'Youth': '#DB2777',
-  'Matchday': '#0891B2',
-}
-
-const CATEGORY_ICONS: Record<string, string> = {
-  'Match Report': '⚽',
-  'Club News': '🤝',
-  'Tickets': '🎟',
-  'Announcement': '📢',
-  'Youth': '⭐',
-  'Matchday': '🏟',
-}
-
-const FALLBACK_NEWS = [
-  { _id: '1', category: 'Match Report', date: '2026-05-24', title: 'Tyler Cross Hits 18 Goals for the Season', summary: 'A brace against Vale Athletic takes our top scorer to an incredible 18 league goals this season.' },
-  { _id: '2', category: 'Tickets', date: '2026-05-21', title: '2026/27 Season Tickets Now on Sale', summary: 'Season tickets for the 2026/27 campaign are now available online. Adult £89 · Concession £69.' },
-  { _id: '3', category: 'Club News', date: '2026-05-20', title: 'Brackenfern Advisory — Kit Sponsorship Confirmed', summary: 'We are delighted to confirm Brackenfern Advisory Limited as our First Team kit sponsor for 2026/27.' },
-]
-
-const FALLBACK_SETTINGS = {
-  nextMatchOpponent: 'Fixture TBC',
-  nextMatchDate: null,
-  nextMatchTime: '15:00',
-  nextMatchCompetition: 'Fixtures released July 2026',
-  lastResultOpponent: 'FC Stratford',
-  lastResultBTFC: 1,
-  lastResultOpponentScore: 2,
-  lastResultDate: '2026-04-18',
-  lastResultCompetition: 'Hellenic Div One',
-  leaguePosition: '7th',
-  seasonYear: '2025/26',
-}
 
 const SPONSORS = [
   { name: 'Jessons Real Estate', role: 'Ground Sponsor', logo: '/sponsors/jessons-logo.png' },
@@ -53,19 +15,69 @@ function formatDate(dateStr: string) {
   return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
 }
 
+const FALLBACK_LAST = {
+  opponent: 'FC Stratford',
+  btfcScore: 1,
+  opponentScore: 2,
+  date: '2026-04-18',
+  competition: 'Hellenic Div One',
+}
+
+const FALLBACK_NEXT = {
+  opponent: 'Fixture TBC',
+  date: null as string | null,
+  competition: 'Fixtures released July 2026',
+  kickoff: '15:00',
+}
+
+const FALLBACK_SETTINGS = {
+  leaguePosition: '7th',
+  seasonYear: '2025/26',
+}
+
 export default async function HomePage() {
-  // Fetch from Sanity with fallback
-  let settings = FALLBACK_SETTINGS
-  let news = FALLBACK_NEWS
+  let lastResult = FALLBACK_LAST
+  let nextFixture = FALLBACK_NEXT
+  let leaguePosition = FALLBACK_SETTINGS.leaguePosition
+  let seasonYear = FALLBACK_SETTINGS.seasonYear
 
   try {
-    const sanitySettings = await getSiteSettings()
-    if (sanitySettings) settings = { ...FALLBACK_SETTINGS, ...sanitySettings }
+    const today = new Date().toISOString().split('T')[0]
+
+    const [last, next, settings] = await Promise.all([
+      // Most recent played First XI result
+      client.fetch(
+        `*[_type == "fixture" && team == "First XI" && played == true] | order(date desc)[0] {
+          opponent, btfcScore, opponentScore, date, competition
+        }`,
+        {},
+        { cache: 'no-store' }
+      ),
+      // Next unplayed First XI fixture
+      client.fetch(
+        `*[_type == "fixture" && team == "First XI" && played != true && date >= $today] | order(date asc)[0] {
+          opponent, date, competition, kickoff
+        }`,
+        { today },
+        { cache: 'no-store' }
+      ),
+      // Site settings for league position and season year
+      client.fetch(
+        `*[_type == "siteSettings"][0] { leaguePosition, seasonYear }`,
+        {},
+        { cache: 'no-store' }
+      ),
+    ])
+
+    if (last) lastResult = last
+    if (next) nextFixture = next
+    if (settings?.leaguePosition) leaguePosition = settings.leaguePosition
+    if (settings?.seasonYear) seasonYear = settings.seasonYear
   } catch (e) {
-    // Use fallback data if Sanity fails
+    // Use fallback data
   }
 
-  const lastScore = `${settings.lastResultBTFC ?? 1}–${settings.lastResultOpponentScore ?? 2}`
+  const lastScore = `${lastResult.btfcScore ?? 0}–${lastResult.opponentScore ?? 0}`
 
   return (
     <main>
@@ -125,17 +137,17 @@ export default async function HomePage() {
             <div style={{ background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.12)', borderLeft: '4px solid #EF4444', borderRadius: 8, padding: '16px 22px', textAlign: 'left', minWidth: 230, backdropFilter: 'blur(8px)' }}>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: 'rgba(255,255,255,.5)', letterSpacing: '.16em', textTransform: 'uppercase', marginBottom: 6 }}>Latest Result</div>
               <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 22, color: '#fff', letterSpacing: '.04em' }}>
-                BTFC <span style={{ color: '#EF4444' }}>{lastScore}</span> {settings.lastResultOpponent}
+                BTFC <span style={{ color: '#EF4444' }}>{lastScore}</span> {lastResult.opponent}
               </div>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: 'rgba(255,255,255,.4)', marginTop: 4 }}>
-                {settings.lastResultDate ? formatDate(settings.lastResultDate) : ''} · {settings.lastResultCompetition}
+                {lastResult.date ? formatDate(lastResult.date) : ''} · {lastResult.competition}
               </div>
             </div>
             <div style={{ background: 'rgba(17,73,216,.3)', border: '1px solid rgba(255,255,255,.12)', borderLeft: '4px solid #1149D8', borderRadius: 8, padding: '16px 22px', textAlign: 'left', minWidth: 230, backdropFilter: 'blur(8px)' }}>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: 'rgba(255,255,255,.5)', letterSpacing: '.16em', textTransform: 'uppercase', marginBottom: 6 }}>Next Fixture</div>
-              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 22, color: '#fff', letterSpacing: '.04em' }}>BTFC vs {settings.nextMatchOpponent}</div>
+              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 22, color: '#fff', letterSpacing: '.04em' }}>BTFC vs {nextFixture.opponent}</div>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: 'rgba(255,255,255,.4)', marginTop: 4 }}>
-                {settings.nextMatchDate ? formatDate(settings.nextMatchDate) : settings.nextMatchCompetition}
+                {nextFixture.date ? `${formatDate(nextFixture.date)}${nextFixture.kickoff ? ` · ${nextFixture.kickoff}` : ''}` : nextFixture.competition}
               </div>
             </div>
           </div>
@@ -155,9 +167,9 @@ export default async function HomePage() {
           </div>
           <div className="stats-strip" style={{ background: '#1149D8', display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
             {[
-              [settings.leaguePosition || '7th', 'League Position'],
+              [leaguePosition || '7th', 'League Position'],
               ['Hellenic', 'Division One'],
-              [settings.seasonYear || '2025/26', 'Season'],
+              [seasonYear || '2025/26', 'Season'],
               ['Est. 1886', 'Founded'],
             ].map(([val, label]) => (
               <div key={label} style={{ padding: '14px 36px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,.18)' }}>
@@ -169,10 +181,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      
       <NewsSection />
-
-      
 
       {/* ── SEASON TICKET PROMO ──────────────────────────────────────────── */}
       <section style={{ padding: '72px 24px', background: '#F2F2F2' }}>
