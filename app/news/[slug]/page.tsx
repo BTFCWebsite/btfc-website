@@ -65,14 +65,14 @@ export default async function ArticlePage({ params }: { params: { slug: string }
 
           {/* Hero image */}
           {article.imageUrl && (
-            <div style={{ width: '100%', maxHeight: 420, overflow: 'hidden' }}>
-              <img
-                src={article.imageUrl}
-                alt={article.title}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-              />
-            </div>
-          )}
+  <div style={{ width: '100%' }}>
+    <img
+      src={article.imageUrl}
+      alt={article.title}
+      style={{ width: '100%', height: 'auto', display: 'block' }}
+    />
+  </div>
+)}
 
           <div style={{ padding: '36px 40px' }}>
             {/* Category + date */}
