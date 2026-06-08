@@ -20,11 +20,7 @@ const CATEGORY_ICONS: Record<string, string> = {
   'Matchday': '🏟',
 }
 
-const FALLBACK_NEWS = [
-  { _id: '1', category: 'Match Report', date: '2026-05-24', title: 'Tyler Cross Hits 18 Goals for the Season', summary: 'A brace against Vale Athletic takes our top scorer to an incredible 18 league goals this season.' },
-  { _id: '2', category: 'Tickets', date: '2026-05-21', title: '2026/27 Season Tickets Now on Sale', summary: 'Season tickets for the 2026/27 campaign are now available online. Adult £89 · Concession £69.' },
-  { _id: '3', category: 'Club News', date: '2026-05-20', title: 'Brackenfern Advisory — Kit Sponsorship Confirmed', summary: 'We are delighted to confirm Brackenfern Advisory Limited as our First Team kit sponsor for 2026/27.' },
-]
+const FALLBACK_NEWS: any[] = []
 
 function formatDate(dateStr: string) {
   if (!dateStr) return ''
