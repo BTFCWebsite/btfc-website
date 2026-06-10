@@ -65,12 +65,18 @@ const teamMatch =
 }
 
   function formatDate(date: string) {
-    return new Date(date).toLocaleDateString('en-GB', {
-      weekday:'short',
-      day:'numeric',
-      month:'short',
-    })
-  }
+  if (!date) return 'Date TBC'
+
+  const d = new Date(date)
+
+  if (isNaN(d.getTime())) return 'Date TBC'
+
+  return d.toLocaleDateString('en-GB', {
+    weekday:'short',
+    day:'numeric',
+    month:'short',
+  })
+}
 
   function scoreLine(m: Fixture) {
     if (!m.played) {
