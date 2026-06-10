@@ -29,7 +29,7 @@ export async function getLatestNews() {
 
 export async function getNewsArticles() {
   return client.fetch(
-    `*[_type == "newsArticle"] | order(date desc) {
+   `*[_type == "newsArticle"] | order(date desc)[0...3] {
       _id, title, category, date, summary, body,
       "imageUrl": image.asset->url
     }`,
@@ -40,7 +40,7 @@ export async function getNewsArticles() {
 
 export async function getFixtures() {
   return client.fetch(
-    `*[_type == "fixture"] | order(date desc) {
+    `*[_type == "fixture"] | order(date asc) {
       _id, date, opponent, team, venue,
       competition, kickoff, btfcScore, opponentScore, played
     }`,
