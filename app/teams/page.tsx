@@ -7,64 +7,7 @@ const POS_COLORS: Record<string,string> = {
   RW:'#2563FF', ST:'#7f1d1d', FWD:'#7f1d1d', DEF:'#1149D8'
 }
 
-const firstTeam = [
-  { num:1,  name:'Oliver Bradbury',        pos:'GK'  },
-  { num:2,  name:'Callum Blackford',       pos:'CB'  },
-  { num:3,  name:'Jacob Chamberlain',      pos:'CB'  },
-  { num:4,  name:'Xavi Diaz-Butcher',      pos:'CB'  },
-  { num:5,  name:'Aaron Dainton',          pos:'LB'  },
-  { num:6,  name:'Ben Hall',               pos:'RB'  },
-  { num:7,  name:'Nathan Marks',           pos:'CM'  },
-  { num:8,  name:'Oliver Martin Gargett',  pos:'CM'  },
-  { num:9,  name:'Jay Griffiths',          pos:'CM'  },
-  { num:10, name:'Matthew Jones',          pos:'CAM' },
-  { num:11, name:'Thomas Kenneth Moore',   pos:'CAM' },
-  { num:14, name:'Ryan Outram',            pos:'LW'  },
-  { num:15, name:'Jonathan Peachey-Score', pos:'LW'  },
-  { num:16, name:'James Piatek',           pos:'RW'  },
-  { num:17, name:'Ben Saunders',           pos:'ST'  },
-  { num:9,  name:'Lewis Toop',             pos:'ST'  },
-  { num:18, name:'Jacob Newdick',          pos:'MID' },
-  { num:19, name:'Macauley Messenger',     pos:'ST'  },
-]
 
-const reserves = [
-  { num:1,  name:'Finley Blythe',       pos:'GK'  },
-  { num:2,  name:'Fabio Caldarone',     pos:'DEF' },
-  { num:3,  name:'Luke Mitchell',       pos:'DEF' },
-  { num:4,  name:'Kai Morris',          pos:'MID' },
-  { num:5,  name:'Thomas Wickens',      pos:'DEF' },
-  { num:6,  name:'Harry Bunn',          pos:'FWD' },
-  { num:7,  name:'Liam Dailey',         pos:'MID' },
-  { num:8,  name:'Charlie Diston',      pos:'DEF' },
-  { num:9,  name:'Tyler Jesson',        pos:'MID' },
-  { num:10, name:'Jake Meredith',       pos:'FWD' },
-  { num:11, name:'Matt Prosser',        pos:'MID' },
-  { num:12, name:'Ned Ridler-Dutton',   pos:'DEF' },
-  { num:13, name:'Tyler Stanton',       pos:'FWD' },
-  { num:14, name:'Jamie Shaw',          pos:'MID' },
-  { num:15, name:'Lennon Skinner',      pos:'MID' },
-  { num:16, name:'Luke Bishop',         pos:'GK'  },
-]
-
-const u17s = [
-  { num:1,  name:'Archie Thompson',  pos:'GK'  },
-  { num:2,  name:'Freddie Clarke',   pos:'CB'  },
-  { num:3,  name:'George Harrison',  pos:'CB'  },
-  { num:4,  name:'Harry Willis',     pos:'LB'  },
-  { num:5,  name:'Theo Barnes',      pos:'RB'  },
-  { num:6,  name:'Jack Morrison',    pos:'CM'  },
-  { num:7,  name:'Charlie Evans',    pos:'CM'  },
-  { num:8,  name:'Luca Rossi',       pos:'CM'  },
-  { num:9,  name:'Mason Webb',       pos:'CAM' },
-  { num:10, name:'Tyler Hughes',     pos:'LW'  },
-  { num:11, name:'Ethan Price',      pos:'RW'  },
-  { num:14, name:'Kai Fletcher',     pos:'ST'  },
-  { num:15, name:'Jamie Newton',     pos:'ST'  },
-  { num:16, name:'Oliver Cross',     pos:'MID' },
-  { num:17, name:'Ben Mitchell',     pos:'ST'  },
-  { num:18, name:'Sam Cooper',       pos:'MID' },
-]
 
 type Player = { num: number, name: string, pos: string }
 
