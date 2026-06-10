@@ -235,6 +235,6 @@ const teamMatch =
         </div>
 
       </div>
-    </main>
+        </main>
   )
 }
