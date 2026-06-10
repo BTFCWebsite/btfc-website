@@ -30,7 +30,13 @@ export default function FixturesPage() {
 
   const filtered = matches.filter((m) => {
     const type = m.played ? 'results' : 'upcoming'
-    const teamMatch = team === 'all' || m.team === team
+    const sanityTeam = String(m.team).toLowerCase()
+
+const teamMatch =
+  team === 'all' ||
+  (team === 'first' && (sanityTeam === 'first' || sanityTeam === 'first xi')) ||
+  (team === 'reserves' && (sanityTeam === 'reserves' || sanityTeam === 'reserve team')) ||
+  (team === 'u17s' && (sanityTeam === 'u17s' || sanityTeam === 'under 17s' || sanityTeam === "u17's"))
     const viewMatch = view === 'all' || view === type
     return teamMatch && viewMatch
   })
@@ -49,10 +55,14 @@ export default function FixturesPage() {
   ] as const
 
   function teamName(t: string) {
-    if (t === 'first') return 'First XI'
-    if (t === 'reserves') return 'Reserves'
-    return 'Under 17s'
-  }
+  const value = String(t).toLowerCase()
+
+  if (value === 'first' || value === 'first xi') return 'First XI'
+  if (value === 'reserves' || value === 'reserve team') return 'Reserves'
+  if (value === 'u17s' || value === 'under 17s' || value === "u17's") return 'Under 17s'
+
+  return 'First XI'
+}
 
   function formatDate(date: string) {
     return new Date(date).toLocaleDateString('en-GB', {
