@@ -59,3 +59,18 @@ export async function getSponsors() {
     { cache: 'no-store' }
   )
 }
+export async function getPlayers() {
+  return client.fetch(
+    `*[_type == "player" && active == true] | order(order asc, squadNumber asc) {
+      _id,
+      name,
+      squadNumber,
+      position,
+      team,
+      active,
+      order
+    }`,
+    {},
+    { cache: 'no-store' }
+  )
+}
