@@ -18,7 +18,7 @@ export async function getSiteSettings() {
 
 export async function getLatestNews() {
   return client.fetch(
-    `*[_type == "newsArticle"] | order(date desc)[0...3] {
+    `*[_type == "fixture"] | order(date asc) {
       _id, title, category, date, summary,
       "imageUrl": image.asset->url
     }`,
