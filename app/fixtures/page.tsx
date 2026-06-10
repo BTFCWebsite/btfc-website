@@ -174,15 +174,26 @@ const teamMatch =
                   {teamName(m.team)} · {m.played ? 'Result' : 'Upcoming Fixture'}
                 </div>
 
-                <div style={{
-                  fontFamily:"'Barlow Condensed',sans-serif",
-                  fontWeight:800,
-                  fontSize:26,
-                  color:'#041B5F',
-                  lineHeight:1
-                }}>
-                  {scoreLine(m)}
-                </div>
+                <div
+  style={{
+    fontFamily:"'Barlow Condensed',sans-serif",
+    fontWeight:800,
+    fontSize:26,
+    lineHeight:1,
+    display:'flex',
+    alignItems:'center',
+    gap:10,
+    flexWrap:'wrap',
+  }}
+>
+  <span style={{ color:'#1149D8' }}>BTFC</span>
+
+  <span style={{ color:'#041B5F' }}>
+    {m.played
+      ? scoreLine(m).replace(/^BTFC\s*/, '').replace(/\s*BTFC$/, '')
+      : `vs ${m.opponent}`}
+  </span>
+</div>
 
                 <div style={{
                   marginTop:6,
