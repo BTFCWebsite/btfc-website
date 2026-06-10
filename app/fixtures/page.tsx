@@ -186,15 +186,7 @@ const teamMatch =
     flexWrap:'wrap',
   }}
 >
-  <span
-  style={{
-    color:'#1149D8',
-    WebkitTextStroke:'1px #041B5F',
-    paintOrder:'stroke fill',
-  }}
->
-  BTFC
-</span>
+  <span style={{ color:'#1149D8' }}>BTFC</span>
 
   <span style={{ color:'#041B5F' }}>
     {m.played
