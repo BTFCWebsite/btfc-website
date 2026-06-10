@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getFixtures } from '@/app/lib/sanity.client'
+import { getFixtures } from '../lib/sanity.client'
 
 type TeamId = 'all' | 'first' | 'reserves' | 'u17s'
 type ViewId = 'all' | 'upcoming' | 'results'
