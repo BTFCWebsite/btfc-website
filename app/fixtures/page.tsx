@@ -11,7 +11,7 @@ type Fixture = {
   date: string
   opponent: string
   team: TeamId
-  venue: 'H' | 'A'
+  venue: 'Home' | 'Away'
   competition: string
   kickoff: string
   btfcScore?: number
