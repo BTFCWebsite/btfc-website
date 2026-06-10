@@ -82,14 +82,7 @@ const teamMatch =
     : `${opponent} ${opp}-${btfc} BTFC`
 }
 
-  function scoreLine(m: Fixture) {
-    if (!m.played) {
-      return m.venue === 'Home'
-        ? `BTFC vs ${m.opponent}`
-        : `${m.opponent} vs BTFC`
-    }
-
-    m.venue === 'Home'
+      m.venue === 'Home'
       ? `BTFC ${m.btfcScore ?? '-'}-${m.opponentScore ?? '-'} ${m.opponent}`
       : `${m.opponent} ${m.opponentScore ?? '-'}-${m.btfcScore ?? '-'} BTFC`
   }
