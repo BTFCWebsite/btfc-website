@@ -64,18 +64,22 @@ const teamMatch =
   return 'First XI'
 }
 
-  function formatDate(date: string) {
-  if (!date) return 'Date TBC'
+  function scoreLine(m: Fixture) {
+  const isHome = m.venue === 'Home'
 
-  const d = new Date(date)
+  if (!m.played) {
+    return isHome
+      ? `BTFC vs ${m.opponent || 'Fixture TBC'}`
+      : `${m.opponent || 'Fixture TBC'} vs BTFC`
+  }
 
-  if (isNaN(d.getTime())) return 'Date TBC'
+  const btfc = m.btfcScore ?? '-'
+  const opp = m.opponentScore ?? '-'
+  const opponent = m.opponent || 'Opponent TBC'
 
-  return d.toLocaleDateString('en-GB', {
-    weekday:'short',
-    day:'numeric',
-    month:'short',
-  })
+  return isHome
+    ? `BTFC ${btfc}-${opp} ${opponent}`
+    : `${opponent} ${opp}-${btfc} BTFC`
 }
 
   function scoreLine(m: Fixture) {
