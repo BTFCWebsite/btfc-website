@@ -184,7 +184,7 @@ export default function FixturesPage() {
                   flexWrap:'wrap'
                 }}>
                   <span>{m.competition}</span>
-                  <span>{m.venue === 'H' ? '🏟 Home' : '✈️ Away'}</span>
+                  <span>{m.venue === 'Home' ? '🏟 Home' : '✈️ Away'}</span>
                 </div>
               </div>
 
