@@ -189,8 +189,8 @@ const teamMatch =
   <span
   style={{
     color:'#1149D8',
-    textShadow:
-      '0.6px 0 #fff, -0.6px 0 #fff, 0 0.6px #fff, 0 -0.6px #fff'
+    WebkitTextStroke:'1px #041B5F',
+    paintOrder:'stroke fill',
   }}
 >
   BTFC
