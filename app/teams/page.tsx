@@ -182,8 +182,16 @@ export default function TeamsPage() {
           <>
             <TeamBanner title="BTFC First XI" subtitle="Uhlsport Hellenic League Division One — Manager: Tim Bond" stats={[{ v:'7th', l:'Position' }, { v:'51', l:'Points' }, { v:'15W', l:'Wins' }]} />
             <SquadGrid players={firstTeam} />
-            <StatGrid stats={[['7th','Final Position','#fff'],['51','Points','#1149D8'],['15','Wins','#22C55E'],['6','Draws','#F59E0B'],['13','Losses','#EF4444'],['+9','Goal Diff','#fff']]} />
-            <LastEightResults results={['L','W','D','L','W','W','W','W']} />
+            <StatGrid stats={[
+  ['-','Position','#fff'],
+  ['-','Points','#1149D8'],
+  ['-','Wins','#22C55E'],
+  ['-','Draws','#F59E0B'],
+  ['-','Losses','#EF4444'],
+  ['-','Goal Diff','#fff'],
+]} />
+
+<LastEightResults results={[]} />
           </>
         )}
 
@@ -191,8 +199,16 @@ export default function TeamsPage() {
           <>
             <TeamBanner title="BTFC Reserves" subtitle="Stroud & District League Division 2 — Final Position: 7th" stats={[{ v:'7th', l:'Position' }, { v:'31', l:'Points' }, { v:'10W', l:'Wins' }]} />
             <SquadGrid players={reserves} />
-            <StatGrid stats={[['7th','Final Position','#fff'],['31','Points','#1149D8'],['10','Wins','#22C55E'],['1','Draws','#F59E0B'],['15','Losses','#EF4444'],['26','Played','#fff']]} />
-            <LastEightResults results={['W','L','W','D','W','L','W','W']} />
+           <StatGrid stats={[
+  ['-','Position','#fff'],
+  ['-','Points','#1149D8'],
+  ['-','Wins','#22C55E'],
+  ['-','Draws','#F59E0B'],
+  ['-','Losses','#EF4444'],
+  ['-','Played','#fff'],
+]} />
+
+<LastEightResults results={[]} />
           </>
         )}
 
@@ -208,7 +224,7 @@ export default function TeamsPage() {
                 Stats will be updated as the season progresses
               </div>
             </div>
-            <LastEightResults results={['W','W','D','W','L','W','W','D']} />
+            <LastEightResults results={[]} />
           </>
         )}
 
