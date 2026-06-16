@@ -61,7 +61,7 @@ function PlayerCard({ p }: { p: Player }) {
 function TeamBanner({ title, subtitle, stats }: { title: string, subtitle: string, stats: { v: string, l: string }[] }) {
   return (
     <div style={{ background:'#041B5F', borderRadius:8, padding:'20px 28px', marginBottom:32, display:'flex', alignItems:'center', gap:16, flexWrap:'wrap' }}>
-      <img src="/crest.png" alt="BTFC" style={{ width:56, height:56, borderRadius:'50%', border:'2px solid #fff' }} />
+      <img src="/branding/crest.png" alt="BTFC" style={{ width:56, height:56, borderRadius:'50%', border:'2px solid #fff' }} />
       <div style={{ flex:1 }}>
         <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:26, color:'#fff', letterSpacing:'0.04em' }}>{title}</div>
         <div style={{ fontSize:12, color:'rgba(255,255,255,0.55)' }}>{subtitle}</div>
