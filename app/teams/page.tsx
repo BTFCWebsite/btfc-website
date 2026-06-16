@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { getPlayers } from '../lib/sanity.client'
+import { getFixtures } from '../lib/sanity.client'
 
 const POS_COLORS: Record<string,string> = {
   GK:'#1e3a5f', CB:'#1149D8', LB:'#1149D8', RB:'#1149D8',
@@ -131,7 +132,21 @@ function LastEightResults({ results }: { results: string[] }) {
   )
 }
 
-export default function TeamsPage() {
+export default async function TeamsPage() {
+  const fixtures = await getFixtures()
+
+const firstXiResults = fixtures
+  .filter(
+    (f: any) =>
+      f.team === 'First XI' &&
+      f.played === true
+  )
+  .sort(
+    (a: any, b: any) =>
+      new Date(b.date).getTime() -
+      new Date(a.date).getTime()
+  )
+  .slice(0, 8)
   const [team, setTeam] = useState<TeamKey>('first')
   const [players, setPlayers] = useState<Player[]>([])
 
