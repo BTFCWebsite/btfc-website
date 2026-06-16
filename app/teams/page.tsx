@@ -141,7 +141,7 @@ try {
   console.error('Failed to load fixtures', error)
 }
 
-const firstXiResults = fixtures
+const firstXiResults = (fixtures || [])
   .filter(
     (f: any) =>
       f.team === 'First XI' &&
