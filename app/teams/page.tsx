@@ -132,16 +132,26 @@ function LastEightResults({ results }: { results: string[] }) {
   )
 }
 
-export default async function TeamsPage() {
-  let fixtures = []
+export default function TeamsPage() {
 
-try {
-  fixtures = await getFixtures()
-} catch (error) {
-  console.error('Failed to load fixtures', error)
-}
+  const [fixtures, setFixtures] = useState<any[]>([])
+  const [team, setTeam] = useState<TeamKey>('first')
+  const [players, setPlayers] = useState<Player[]>([])
 
-const firstXiResults = (fixtures || [])
+  useEffect(() => {
+    async function loadFixtures() {
+      try {
+        const data = await getFixtures()
+        setFixtures(data || [])
+      } catch (error) {
+        console.error('Failed to load fixtures', error)
+      }
+    }
+
+    loadFixtures()
+  }, [])
+
+  const firstXiResults = (fixtures || [])
   .filter(
     (f: any) =>
       f.team === 'First XI' &&
@@ -153,8 +163,7 @@ const firstXiResults = (fixtures || [])
       new Date(a.date).getTime()
   )
   .slice(0, 8)
-  const [team, setTeam] = useState<TeamKey>('first')
-  const [players, setPlayers] = useState<Player[]>([])
+  
 
   useEffect(() => {
     getPlayers()
