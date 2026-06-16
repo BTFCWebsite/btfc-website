@@ -25,13 +25,27 @@ export default function FixturesPage() {
   const [matches, setMatches] = useState<Fixture[]>([])
 
   useEffect(() => {
-    async function loadFixtures() {
+  async function loadFixtures() {
+    try {
       const data = await getFixtures()
-      setMatches(data)
-    }
 
-    loadFixtures()
-  }, [])
+      setMatches(
+        (data || []).filter((m: any) =>
+          m &&
+          m.date &&
+          m.opponent &&
+          m.team &&
+          m.venue
+        )
+      )
+    } catch (error) {
+      console.error('Failed to load fixtures:', error)
+      setMatches([])
+    }
+  }
+
+  loadFixtures()
+}, [])
 
   function formatDate(date: string) {
     if (!date) return 'Date TBC'
