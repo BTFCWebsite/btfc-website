@@ -133,7 +133,13 @@ function LastEightResults({ results }: { results: string[] }) {
 }
 
 export default async function TeamsPage() {
-  const fixtures = await getFixtures()
+  let fixtures = []
+
+try {
+  fixtures = await getFixtures()
+} catch (error) {
+  console.error('Failed to load fixtures', error)
+}
 
 const firstXiResults = fixtures
   .filter(
