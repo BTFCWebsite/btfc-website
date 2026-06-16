@@ -1,7 +1,7 @@
 'use client'
+
 import { useEffect, useState } from 'react'
-import { getPlayers } from '../lib/sanity.client'
-import { getFixtures } from '../lib/sanity.client'
+import { getPlayers, getFixtures } from '../lib/sanity.client'
 
 const POS_COLORS: Record<string,string> = {
   GK:'#1e3a5f', CB:'#1149D8', LB:'#1149D8', RB:'#1149D8',
@@ -24,6 +24,22 @@ function normaliseTeam(team: string): TeamKey {
   if (t === 'reserves') return 'reserves'
   if (t === 'under 17s' || t === 'u17s' || t === "u17's") return 'u17s'
   return 'first'
+}
+
+function sanityTeamName(team: TeamKey) {
+  if (team === 'reserves') return 'Reserves'
+  if (team === 'u17s') return 'Under 17s'
+  return 'First XI'
+}
+
+function resultLetter(f: any) {
+  const btfc = Number(f.btfcScore)
+  const opp = Number(f.opponentScore)
+
+  if (isNaN(btfc) || isNaN(opp)) return null
+  if (btfc > opp) return 'W'
+  if (btfc === opp) return 'D'
+  return 'L'
 }
 
 function PlayerCard({ p }: { p: Player }) {
@@ -116,24 +132,30 @@ function LastEightResults({ results }: { results: string[] }) {
       </div>
 
       <div style={{ display:'flex', gap:8, flexWrap:'wrap', alignItems:'center' }}>
-        {results.map((r, i) => (
-          <div key={i} style={{
-            width:38, height:38, borderRadius:6,
-            background: r==='W' ? '#22C55E' : r==='D' ? '#F59E0B' : '#EF4444',
-            display:'flex', alignItems:'center', justifyContent:'center',
-            fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:17, color:'#fff'
-          }}>
-            {r}
-          </div>
-        ))}
-        <span style={{ marginLeft:8, fontSize:11, color:'#9CA3AF' }}>← Most recent</span>
+        {results.length === 0 ? (
+          <span style={{ fontSize:12, color:'#9CA3AF' }}>No results added yet.</span>
+        ) : (
+          results.map((r, i) => (
+            <div key={i} style={{
+              width:38, height:38, borderRadius:6,
+              background: r==='W' ? '#22C55E' : r==='D' ? '#F59E0B' : '#EF4444',
+              display:'flex', alignItems:'center', justifyContent:'center',
+              fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:17, color:'#fff'
+            }}>
+              {r}
+            </div>
+          ))
+        )}
+
+        {results.length > 0 && (
+          <span style={{ marginLeft:8, fontSize:11, color:'#9CA3AF' }}>← Most recent</span>
+        )}
       </div>
     </div>
   )
 }
 
 export default function TeamsPage() {
-
   const [fixtures, setFixtures] = useState<any[]>([])
   const [team, setTeam] = useState<TeamKey>('first')
   const [players, setPlayers] = useState<Player[]>([])
@@ -145,30 +167,17 @@ export default function TeamsPage() {
         setFixtures(data || [])
       } catch (error) {
         console.error('Failed to load fixtures', error)
+        setFixtures([])
       }
     }
 
     loadFixtures()
   }, [])
 
-  const firstXiResults = (fixtures || [])
-  .filter(
-    (f: any) =>
-      f.team === 'First XI' &&
-      f.played === true
-  )
-  .sort(
-    (a: any, b: any) =>
-      new Date(b.date).getTime() -
-      new Date(a.date).getTime()
-  )
-  .slice(0, 8)
-  
-
   useEffect(() => {
     getPlayers()
       .then((data) => {
-        const mapped = data.map((p: any) => ({
+        const mapped = (data || []).map((p: any) => ({
           _id: p._id,
           name: p.name,
           num: p.squadNumber,
@@ -179,6 +188,65 @@ export default function TeamsPage() {
       })
       .catch(console.error)
   }, [])
+
+  function teamResults(teamName: string) {
+    return (fixtures || [])
+      .filter((f: any) => f && f.team === teamName && f.played === true)
+      .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  }
+
+  function lastEightFor(teamName: string) {
+    return teamResults(teamName)
+      .slice(0, 8)
+      .map(resultLetter)
+      .filter(Boolean) as string[]
+  }
+
+  function statsFor(teamName: string): [string, string, string][] {
+    const results = teamResults(teamName)
+
+    let wins = 0
+    let draws = 0
+    let losses = 0
+    let gf = 0
+    let ga = 0
+
+    results.forEach((f: any) => {
+      const btfc = Number(f.btfcScore)
+      const opp = Number(f.opponentScore)
+
+      if (isNaN(btfc) || isNaN(opp)) return
+
+      gf += btfc
+      ga += opp
+
+      if (btfc > opp) wins += 1
+      else if (btfc === opp) draws += 1
+      else losses += 1
+    })
+
+    const points = wins * 3 + draws
+    const goalDiff = gf - ga
+    const gdText = goalDiff > 0 ? `+${goalDiff}` : String(goalDiff)
+
+    return [
+      ['-','Position','#fff'],
+      [String(points),'Points','#1149D8'],
+      [String(wins),'Wins','#22C55E'],
+      [String(draws),'Draws','#F59E0B'],
+      [String(losses),'Losses','#EF4444'],
+      [gdText,'Goal Diff','#fff'],
+    ]
+  }
+
+  function bannerStats(teamName: string) {
+    const stats = statsFor(teamName)
+    return [
+      { v: stats[0][0], l: 'Position' },
+      { v: stats[1][0], l: 'Points' },
+      { v: `${stats[2][0]}W`, l: 'Wins' },
+    ]
+  }
 
   const firstTeam = players.filter(p => normaliseTeam(p.team) === 'first')
   const reserves = players.filter(p => normaliseTeam(p.team) === 'reserves')
@@ -210,51 +278,28 @@ export default function TeamsPage() {
 
         {team === 'first' && (
           <>
-            <TeamBanner title="BTFC First XI" subtitle="Uhlsport Hellenic League Division One — Manager: Tim Bond" stats={[{ v:'7th', l:'Position' }, { v:'51', l:'Points' }, { v:'15W', l:'Wins' }]} />
+            <TeamBanner title="BTFC First XI" subtitle="Uhlsport Hellenic League Division One — Manager: Tim Bond" stats={bannerStats('First XI')} />
             <SquadGrid players={firstTeam} />
-            <StatGrid stats={[
-  ['-','Position','#fff'],
-  ['-','Points','#1149D8'],
-  ['-','Wins','#22C55E'],
-  ['-','Draws','#F59E0B'],
-  ['-','Losses','#EF4444'],
-  ['-','Goal Diff','#fff'],
-]} />
-
-<LastEightResults results={[]} />
+            <StatGrid stats={statsFor('First XI')} />
+            <LastEightResults results={lastEightFor('First XI')} />
           </>
         )}
 
         {team === 'reserves' && (
           <>
-            <TeamBanner title="BTFC Reserves" subtitle="Stroud & District League Division 2 — Final Position: 7th" stats={[{ v:'7th', l:'Position' }, { v:'31', l:'Points' }, { v:'10W', l:'Wins' }]} />
+            <TeamBanner title="BTFC Reserves" subtitle="Stroud & District League Division 2" stats={bannerStats('Reserves')} />
             <SquadGrid players={reserves} />
-           <StatGrid stats={[
-  ['-','Position','#fff'],
-  ['-','Points','#1149D8'],
-  ['-','Wins','#22C55E'],
-  ['-','Draws','#F59E0B'],
-  ['-','Losses','#EF4444'],
-  ['-','Played','#fff'],
-]} />
-
-<LastEightResults results={[]} />
+            <StatGrid stats={statsFor('Reserves')} />
+            <LastEightResults results={lastEightFor('Reserves')} />
           </>
         )}
 
         {team === 'u17s' && (
           <>
-            <TeamBanner title="BTFC Under 17s" subtitle="Under 17s Squad — 2025/26 Season" stats={[{ v:'TBC', l:'Position' }, { v:'TBC', l:'Points' }, { v:'TBC', l:'Wins' }]} />
+            <TeamBanner title="BTFC Under 17s" subtitle="Under 17s Squad — 2025/26 Season" stats={bannerStats('Under 17s')} />
             <SquadGrid players={u17s} />
-            <div style={{ background:'#041B5F', borderRadius:8, padding:'28px 32px', textAlign:'center', marginBottom:24 }}>
-              <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:24, color:'#fff', marginBottom:8 }}>
-                Season Stats
-              </div>
-              <div style={{ fontSize:13, color:'rgba(255,255,255,0.5)' }}>
-                Stats will be updated as the season progresses
-              </div>
-            </div>
-            <LastEightResults results={[]} />
+            <StatGrid stats={statsFor('Under 17s')} />
+            <LastEightResults results={lastEightFor('Under 17s')} />
           </>
         )}
 
