@@ -1,5 +1,18 @@
 'use client'
 
+import { client } from '@/sanity/lib/client'
+
+const officialsQuery = `
+*[_type == "clubOfficial" && active == true]
+| order(displayOrder asc)
+{
+  name,
+  role,
+  email,
+  phone
+}
+`
+
 const h2 = {
   fontFamily: "'Barlow Condensed', sans-serif",
   fontSize: 36,
@@ -57,7 +70,7 @@ const clubFacts = [
   { label: 'County', value: 'Gloucestershire' },
 ]
 
-export default function ClubPage() {
+export default async function ClubPage() {
   return (
     <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '52px 24px 90px' }}>
       <section style={{ maxWidth: 980, margin: '0 auto' }}>
