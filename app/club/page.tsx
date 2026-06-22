@@ -1,7 +1,7 @@
 import { client } from '../lib/sanity.client'
 
 const officialsQuery = `
-*[_type == "clubOfficial" && active == true]
+*[_type == "clubOfficial"]
 | order(displayOrder asc)
 {
   name,
