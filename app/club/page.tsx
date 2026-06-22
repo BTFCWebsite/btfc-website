@@ -192,7 +192,11 @@ export default function ClubPage() {
         <div style={{ marginBottom: 52 }}>
           <h2 style={h2}>Jessons Meadow</h2>
           <p style={subhead}>Home of Brimscombe & Thrupp FC since 1886</p>
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 20 }}>
+          <div style={{
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+  gap: 20
+}}>
             <div style={card}>
               <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
               <p style={{ ...body, marginBottom: 14 }}>
@@ -219,14 +223,20 @@ export default function ClubPage() {
                 { icon: '♿', label: 'Accessible', value: 'Yes' },
                 { icon: '🅿', label: 'Free Parking', value: 'Yes' },
               ].map(f => (
-                <div key={f.label} style={{
-                  ...card,
-                  padding: '14px 18px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: 10,
-                }}>
+               <div
+  key={f.label}
+  style={{
+    ...card,
+    padding: '14px 18px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+    width: '100%',
+    maxWidth: 420,
+    margin: '0 auto'
+  }}
+>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <span style={{ fontSize: 18 }}>{f.icon}</span>
                     <span style={{ ...body, color: '#374151', fontSize: 13 }}>{f.label}</span>
@@ -249,7 +259,11 @@ export default function ClubPage() {
         <div style={{ marginBottom: 52 }}>
           <h2 style={h2}>Club Honours</h2>
           <p style={subhead}>A proud record of achievement — 1886 to present</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 16 }}>
+          <div style={{
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+  gap: 16
+}}>
             {[
               {
                 era: 'Hellenic League',
