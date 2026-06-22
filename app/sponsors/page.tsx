@@ -268,7 +268,11 @@ export default function SponsorsPage() {
           {/* Club Partners */}
           <h3 style={{ ...h3, marginBottom: 6 }}>Club Partners</h3>
           <p style={{ ...subhead, marginBottom: 16 }}>Our valued club partners</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 16 }}>
+         <div style={{
+  display: 'grid',
+  gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+  gap: 20,
+}}>
             {currentSponsors.club.map(s => (
               <div key={s.name} style={{ ...card, textAlign: 'center' as const, padding: 16 }}>
                 <div style={{
