@@ -98,12 +98,22 @@ export default function NewsPage() {
 
         {/* News grid */}
         {!loading && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20 }}>
+          <div style={{
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+  gap: 20,
+  alignItems: 'stretch'
+}}>
             {filtered.map(article => (
               <Link
                 key={article._id}
                 href={article.slug ? `/news/${article.slug}` : '/news'}
-                style={{ textDecoration: 'none' }}
+                style={{
+  textDecoration: 'none',
+  width: '100%',
+  maxWidth: 360,
+  margin: '0 auto'
+}}
               >
                 <div style={{
                   background: '#fff',
