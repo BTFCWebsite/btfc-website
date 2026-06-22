@@ -320,10 +320,10 @@ minHeight: 120,
 
                 <div
                   style={{
-                    fontFamily: "'Montserrat',sans-serif",
-                    fontSize: 13,
-                    color: '#6B7280',
-                  }}
+  textAlign: 'right',
+  width: 120,
+  flexShrink: 0
+}}
                 >
                   Kick Off: {m.kickoff}
                 </div>
