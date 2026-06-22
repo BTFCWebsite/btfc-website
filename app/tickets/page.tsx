@@ -3,7 +3,7 @@
 const faqs = [
   ['Can I pay in instalments?', 'Not currently — season tickets must be paid in full at time of purchase.'],
   ['How do I get my ticket?', 'After payment you will receive your digital season ticket by email with a QR code. Save it to Apple Wallet or show it on your phone at the gate.'],
-  ['What is included?', 'Your season ticket covers all First XI home league and cup fixtures throughout the 26/27 season.'],
+  ['What is included?', 'Your season ticket covers all First XI home league and club cup fixtures throughout the 2026/27 season. Due to FA requirements, FA Vase matches are excluded and must be paid for separately on the day.'],
   ['Is my payment secure?', 'Yes. Payments are processed securely by Stripe.'],
   ['Do under 16s pay?', 'Under 16s are admitted free to all First XI matches. Proof of age may be requested.'],
   ['What about friendlies?', 'Pre-season and friendly matches are £3 for all. Season tickets do not cover friendly fixtures.'],
@@ -37,7 +37,7 @@ export default function TicketsPage() {
             </h2>
 
             <p style={{ fontFamily: "'Montserrat', sans-serif", margin: '0 0 20px', color: 'rgba(255,255,255,.7)', fontSize: 13, lineHeight: 1.7 }}>
-              All First XI home league & cup games included.<br />
+              All First XI home league &amp; club cup games included, excluding FA Vase ties.<br />
               Digital QR ticket delivered instantly by email — save to Apple Wallet for easy matchday entry.
             </p>
 
@@ -120,7 +120,7 @@ export default function TicketsPage() {
               <div style={{ height: 4, background: '#1149D8', marginBottom: 16, borderRadius: 2 }} />
 
               <h3 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 22, fontWeight: 800, color: '#2D2D2D', margin: '0 0 16px' }}>
-                League &amp; Cup
+                League &amp; Cup <span style={{ fontSize: 15, color: '#6B7280' }}>(except FA Vase)</span>
               </h3>
 
               {[
@@ -137,6 +137,10 @@ export default function TicketsPage() {
                   </span>
                 </div>
               ))}
+
+              <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: '#6B7280', lineHeight: 1.6, margin: '14px 0 0' }}>
+                FA Vase ties are excluded from season tickets and standard cup admission due to FA requirements. Admission will be charged separately on the day.
+              </p>
 
               <div style={{ marginTop: 16, background: '#F0FDF4', borderRadius: 8, border: '2px solid #86EFAC', padding: '16px 18px' }}>
                 <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 20, color: '#16a34a', marginBottom: 6 }}>
