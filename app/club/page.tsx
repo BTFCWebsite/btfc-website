@@ -71,6 +71,9 @@ const clubFacts = [
 ]
 
 export default async function ClubPage() {
+
+const officials = await client.fetch(officialsQuery)
+  
   return (
     <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '52px 24px 90px' }}>
       <section style={{ maxWidth: 980, margin: '0 auto' }}>
