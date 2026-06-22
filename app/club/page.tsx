@@ -1,5 +1,8 @@
 import { client } from '../lib/sanity.client'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 const officialsQuery = `
 *[_type == "clubOfficial"]
 | order(displayOrder asc)
