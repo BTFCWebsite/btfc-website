@@ -253,15 +253,18 @@ export default function TicketsPage() {
           }}>
             FAQs
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns:'repeat(auto-fit, minmax(260px, 1fr))', gap: 20 }}>
             {faqs.map(([title, text]) => (
               <div key={title} style={{
-                background: '#fff',
-                border: '1px solid #E5E7EB',
-                borderRadius: 8,
-                padding: 22,
-                minHeight: 150
-              }}>
+  background: '#fff',
+  border: '1px solid #E5E7EB',
+  borderRadius: 8,
+  padding: 22,
+  minHeight: 150,
+  width: '100%',
+  maxWidth: 360,
+  margin: '0 auto'
+}}>
                 <h3 style={{
                   fontFamily: "'Barlow Condensed', sans-serif",
                   fontSize: 22,
