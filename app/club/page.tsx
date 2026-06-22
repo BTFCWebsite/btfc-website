@@ -57,14 +57,11 @@ const clubFacts = [
   { label: 'County', value: 'Gloucestershire' },
 ]
 
-
-
 export default function ClubPage() {
   return (
     <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '52px 24px 90px' }}>
       <section style={{ maxWidth: 980, margin: '0 auto' }}>
 
-        {/* Hero banner */}
         <div style={{
           background: '#041B5F',
           borderRadius: 8,
@@ -83,11 +80,12 @@ export default function ClubPage() {
               fontSize: 10,
               letterSpacing: '.12em',
               opacity: .6,
-              textTransform: 'uppercase' as const,
+              textTransform: 'uppercase',
               marginBottom: 8,
             }}>
               Est. 1886 · The Lilywhites
             </div>
+
             <h2 style={{
               fontFamily: "'Barlow Condensed', sans-serif",
               fontSize: 32,
@@ -95,8 +93,9 @@ export default function ClubPage() {
               margin: '0 0 10px',
               letterSpacing: '0.03em',
             }}>
-              Brimscombe & Thrupp FC
+              Brimscombe &amp; Thrupp FC
             </h2>
+
             <p style={{
               fontFamily: "'Montserrat', sans-serif",
               fontSize: 13,
@@ -104,33 +103,43 @@ export default function ClubPage() {
               lineHeight: 1.7,
               margin: 0,
             }}>
-              One of Gloucestershire's oldest and most community-rooted football clubs.
+              One of Gloucestershire&apos;s oldest and most community-rooted football clubs.
               Based in the beautiful Cotswold valley, The Lilywhites have been part of the
               fabric of Brimscombe and Thrupp since 1886.
             </p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 12 }}>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+            gap: 12,
+            width: '100%',
+            maxWidth: 620,
+          }}>
             {clubFacts.map(f => (
               <div key={f.label} style={{
                 background: 'rgba(255,255,255,.08)',
                 borderRadius: 6,
                 padding: '10px 14px',
-                minWidth: 110,
+                minWidth: 0,
               }}>
                 <div style={{
                   fontFamily: "'Montserrat', sans-serif",
                   fontSize: 9,
                   letterSpacing: '.1em',
                   opacity: .6,
-                  textTransform: 'uppercase' as const,
+                  textTransform: 'uppercase',
                   marginBottom: 4,
                 }}>
                   {f.label}
                 </div>
+
                 <div style={{
                   fontFamily: "'Barlow Condensed', sans-serif",
                   fontSize: 18,
                   fontWeight: 800,
+                  lineHeight: 1.1,
+                  wordBreak: 'break-word',
                 }}>
                   {f.value}
                 </div>
@@ -139,18 +148,22 @@ export default function ClubPage() {
           </div>
         </div>
 
-        {/* Club History */}
         <div style={{ marginBottom: 52 }}>
           <h2 style={h2}>Club History</h2>
           <p style={subhead}>Over 130 years in the heart of the Cotswold valley</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 20 }}>
-            <div style={card}>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: 20,
+          }}>
+            <div style={{ ...card, width: '100%', maxWidth: 420, margin: '0 auto' }}>
               <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
               <h3 style={h3}>Brimscombe FC — Est. 1886</h3>
               <p style={{ ...body, marginBottom: 12 }}>
                 Brimscombe Football Club was established in 1886. They were founding members of the
                 Mid-Gloucestershire League in 1894 and played their first ever game on 29th September.
-                The club switched to the Stroud & District League in 1902 and were its inaugural champions,
+                The club switched to the Stroud &amp; District League in 1902 and were its inaugural champions,
                 going on to win the title again in 1906/07, 1907/08 and 1912/13.
               </p>
               <p style={{ ...body, marginBottom: 12 }}>
@@ -161,12 +174,13 @@ export default function ClubPage() {
               <p style={body}>
                 The club joined the Gloucestershire County League in 1968 but left after the 1972/73
                 season. Shortly after, Brimscombe FC merged with local side Thrupp FC to form
-                Brimscombe & Thrupp FC.
+                Brimscombe &amp; Thrupp FC.
               </p>
             </div>
-            <div style={card}>
+
+            <div style={{ ...card, width: '100%', maxWidth: 420, margin: '0 auto' }}>
               <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
-              <h3 style={h3}>Brimscombe & Thrupp FC</h3>
+              <h3 style={h3}>Brimscombe &amp; Thrupp FC</h3>
               <p style={{ ...body, marginBottom: 12 }}>
                 The newly formed club rejoined the County League but dropped out again in 1988/89.
                 Returning to the Gloucestershire Northern Senior League, they finished as Division 1
@@ -188,25 +202,25 @@ export default function ClubPage() {
           </div>
         </div>
 
-        {/* The Ground */}
         <div style={{ marginBottom: 52 }}>
           <h2 style={h2}>Jessons Meadow</h2>
-          <p style={subhead}>Home of Brimscombe & Thrupp FC since 1886</p>
+          <p style={subhead}>Home of Brimscombe &amp; Thrupp FC since 1886</p>
+
           <div style={{
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-  gap: 20
-}}>
-            <div style={card}>
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: 20,
+          }}>
+            <div style={{ ...card, width: '100%', maxWidth: 420, margin: '0 auto' }}>
               <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
               <p style={{ ...body, marginBottom: 14 }}>
-                Jessons Meadow has been the home of Brimscombe & Thrupp FC since the
-                club's foundation in 1886. Set in the beautiful Cotswold valley between
+                Jessons Meadow has been the home of Brimscombe &amp; Thrupp FC since the
+                club&apos;s foundation in 1886. Set in the beautiful Cotswold valley between
                 Stroud and Chalford, the ground holds 1,200 supporters with covered seating
                 in the main stand.
               </p>
               <p style={{ ...body, marginBottom: 14 }}>
-                The ground is named in recognition of Jessons Real Estate, the club's
+                The ground is named in recognition of Jessons Real Estate, the club&apos;s
                 official ground sponsor. It features a licensed clubhouse bar, pitch-side
                 kiosk, and floodlights for evening fixtures.
               </p>
@@ -215,7 +229,8 @@ export default function ClubPage() {
                 Meadow one of the most picturesque non-league grounds in Gloucestershire.
               </p>
             </div>
-            <div style={{ display: 'grid', gap: 16 }}>
+
+            <div style={{ display: 'grid', gap: 16, width: '100%' }}>
               {[
                 { icon: '🏟', label: 'Capacity', value: '1,200' },
                 { icon: '💡', label: 'Floodlights', value: 'Yes' },
@@ -223,24 +238,22 @@ export default function ClubPage() {
                 { icon: '♿', label: 'Accessible', value: 'Yes' },
                 { icon: '🅿', label: 'Free Parking', value: 'Yes' },
               ].map(f => (
-               <div
-  key={f.label}
-  style={{
-    ...card,
-    padding: '14px 18px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 10,
-    width: '100%',
-    maxWidth: 420,
-    margin: '0 auto'
-  }}
->
+                <div key={f.label} style={{
+                  ...card,
+                  padding: '14px 18px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 10,
+                  width: '100%',
+                  maxWidth: 420,
+                  margin: '0 auto',
+                }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <span style={{ fontSize: 18 }}>{f.icon}</span>
                     <span style={{ ...body, color: '#374151', fontSize: 13 }}>{f.label}</span>
                   </div>
+
                   <span style={{
                     fontFamily: "'Barlow Condensed', sans-serif",
                     fontSize: 18,
@@ -255,15 +268,15 @@ export default function ClubPage() {
           </div>
         </div>
 
-        {/* Honours */}
         <div style={{ marginBottom: 52 }}>
           <h2 style={h2}>Club Honours</h2>
           <p style={subhead}>A proud record of achievement — 1886 to present</p>
+
           <div style={{
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-  gap: 16
-}}>
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: 16,
+          }}>
             {[
               {
                 era: 'Hellenic League',
@@ -318,7 +331,12 @@ export default function ClubPage() {
                 ],
               },
             ].map(section => (
-              <div key={section.era} style={card}>
+              <div key={section.era} style={{
+                ...card,
+                width: '100%',
+                maxWidth: 380,
+                margin: '0 auto',
+              }}>
                 <div style={{ height: 4, background: '#1149D8', marginBottom: 14, borderRadius: 2 }} />
                 <h3 style={{ ...h3, fontSize: 18, marginBottom: 12 }}>{section.era}</h3>
                 {section.honours.map(h => (
@@ -329,53 +347,60 @@ export default function ClubPage() {
           </div>
         </div>
 
-        {/* Club Officials */}
         <div style={{ marginBottom: 52 }}>
           <h2 style={h2}>Club Officials</h2>
-          <p style={subhead}>The people who run Brimscombe & Thrupp FC</p>
+          <p style={subhead}>The people who run Brimscombe &amp; Thrupp FC</p>
+
           <div style={{ ...card, padding: 0, overflow: 'hidden' }}>
             <div style={{ height: 4, background: '#1149D8' }} />
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <tbody>
-                {officials.map((o, i) => (
-                  <tr key={o.role} style={{
-                    borderBottom: i < officials.length - 1 ? '1px solid #F3F4F6' : 'none',
-                    background: i % 2 === 0 ? '#fff' : '#FAFAFA',
-                  }}>
-                    <td style={{
-                      ...body,
-                      padding: '14px 24px',
-                      fontSize: 11,
-                      fontWeight: 700,
-                      color: '#9CA3AF',
-                      letterSpacing: '.08em',
-                      textTransform: 'uppercase' as const,
-                      width: '40%',
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 500 }}>
+                <tbody>
+                  {officials.map((o, i) => (
+                    <tr key={o.role} style={{
+                      borderBottom: i < officials.length - 1 ? '1px solid #F3F4F6' : 'none',
+                      background: i % 2 === 0 ? '#fff' : '#FAFAFA',
                     }}>
-                      {o.role}
-                    </td>
-                    <td style={{
-                      fontFamily: "'Barlow Condensed', sans-serif",
-                      fontSize: 20,
-                      fontWeight: 800,
-                      color: '#2D2D2D',
-                      padding: '14px 24px',
-                    }}>
-                      {o.name}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                      <td style={{
+                        ...body,
+                        padding: '14px 24px',
+                        fontSize: 11,
+                        fontWeight: 700,
+                        color: '#9CA3AF',
+                        letterSpacing: '.08em',
+                        textTransform: 'uppercase',
+                        width: '40%',
+                      }}>
+                        {o.role}
+                      </td>
+
+                      <td style={{
+                        fontFamily: "'Barlow Condensed', sans-serif",
+                        fontSize: 20,
+                        fontWeight: 800,
+                        color: '#2D2D2D',
+                        padding: '14px 24px',
+                      }}>
+                        {o.name}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
-        {/* Community */}
         <div style={{ marginBottom: 52 }}>
-          <h2 style={h2}>Community & Youth</h2>
+          <h2 style={h2}>Community &amp; Youth</h2>
           <p style={subhead}>Football for everyone in Brimscombe, Thrupp and the wider Stroud area</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20 }}>
-            <div style={card}>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: 20,
+          }}>
+            <div style={{ ...card, width: '100%', maxWidth: 380, margin: '0 auto' }}>
               <div style={{ fontSize: 28, marginBottom: 12 }}>👶</div>
               <h3 style={h3}>Youth Football</h3>
               <p style={{ ...body, marginBottom: 14 }}>
@@ -397,13 +422,14 @@ export default function ClubPage() {
               </span>
               <p style={{ ...body, marginTop: 14 }}>
                 Interested in getting involved? Whether as a player, volunteer or supporter,
-                we'd love to hear from you. Get in touch at{' '}
+                we&apos;d love to hear from you. Get in touch at{' '}
                 <a href="mailto:info@brimscombeandthruppfc.co.uk" style={{ color: '#1149D8', fontWeight: 700 }}>
                   info@brimscombeandthruppfc.co.uk
                 </a>
               </p>
             </div>
-            <div style={card}>
+
+            <div style={{ ...card, width: '100%', maxWidth: 380, margin: '0 auto' }}>
               <div style={{ fontSize: 28, marginBottom: 12 }}>🚶</div>
               <h3 style={h3}>Walking Football</h3>
               <p style={body}>
@@ -412,13 +438,14 @@ export default function ClubPage() {
                 no experience necessary. Contact us to find out more.
               </p>
             </div>
-            <div style={card}>
+
+            <div style={{ ...card, width: '100%', maxWidth: 380, margin: '0 auto' }}>
               <div style={{ fontSize: 28, marginBottom: 12 }}>🤝</div>
               <h3 style={h3}>Get Involved</h3>
               <p style={{ ...body, marginBottom: 14 }}>
-                We're always looking for volunteers, coaches, officials and supporters.
+                We&apos;re always looking for volunteers, coaches, officials and supporters.
                 Whether you want to help on matchday, behind the scenes or in a coaching
-                capacity — there's a role for you at BTFC.
+                capacity — there&apos;s a role for you at BTFC.
               </p>
               <a href="/contact" style={{
                 display: 'inline-block',
@@ -437,7 +464,6 @@ export default function ClubPage() {
           </div>
         </div>
 
-        {/* Policies */}
         <div style={{
           ...card,
           background: '#041B5F',
@@ -454,6 +480,7 @@ export default function ClubPage() {
               Safeguarding, privacy and equal opportunities policies are available on request from the club secretary.
             </p>
           </div>
+
           <a href="/contact" style={{
             background: '#1149D8',
             padding: '10px 20px',
@@ -463,7 +490,7 @@ export default function ClubPage() {
             fontWeight: 800,
             fontSize: 16,
             textDecoration: 'none',
-            whiteSpace: 'nowrap' as const,
+            whiteSpace: 'nowrap',
           }}>
             Request Policies →
           </a>
