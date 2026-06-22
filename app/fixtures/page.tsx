@@ -251,10 +251,11 @@ export default function FixturesPage() {
                 borderRadius: 8,
                 padding: '18px 22px',
                 display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                gap: 16,
+justifyContent: 'space-between',
+alignItems: 'flex-start',
+flexWrap: 'nowrap',
+gap: 16,
+minHeight: 120,
               }}
             >
               <div>
