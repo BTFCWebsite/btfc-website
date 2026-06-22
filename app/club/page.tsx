@@ -1,6 +1,4 @@
-'use client'
-
-import { client } from '@/sanity/lib/client'
+import { getClient } from '../lib/sanity.client'
 
 const officialsQuery = `
 *[_type == "clubOfficial" && active == true]
@@ -72,7 +70,7 @@ const clubFacts = [
 
 export default async function ClubPage() {
 
-const officials = await client.fetch(officialsQuery)
+const officials = await getClient().fetch(officialsQuery)
   
   return (
     <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '52px 24px 90px' }}>
