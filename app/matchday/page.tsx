@@ -36,7 +36,7 @@ const facilities = [
   {
     icon: '🎫',
     title: 'Entrance Fees',
-    text: 'League & Cup: Adult £7 · Concession (65+) £5 · Under 16 Free. Excludes FA Vase games, these will be charged on the gate at our standard pricing. This is due to FA requirements. Friendlies: £3 for all. Reserves and Under 17s fixtures are free admission for all supporters.',
+    text: 'League & Cup: Adult £7 · Concession (65+) £5 · Under 16 Free. Friendlies: £3 for all. Reserves and Under 17s fixtures are free admission for all supporters.',
   },
 ]
 
