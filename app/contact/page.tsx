@@ -55,7 +55,7 @@ const inputStyle = {
 }
 
 const contactDetails = [
-  { icon: '📍', label: 'Address', value: 'Jessons Meadow, London Road, Brimscombe, Stroud, GL5 2SH' },
+  { icon: '📍', label: 'Address', value: 'Jessons Meadow, London Road, Brimscombe, Stroud, GL5 2SD' },
   { icon: '📧', label: 'Email', value: 'info@brimscombeandthruppfc.co.uk', href: 'mailto:info@brimscombeandthruppfc.co.uk' },
   { icon: '📞', label: 'Phone', value: '07814 854108', href: 'tel:07814854108' },
   { icon: '🕐', label: 'Office Hours', value: 'Mon–Fri 9am–5pm' },
