@@ -1,4 +1,5 @@
 'use client'
+
 import { useState } from 'react'
 
 const h2 = {
@@ -164,13 +165,6 @@ const currentSponsors = {
   ],
 }
 
-const stats = [
-  { value: '2,000+', label: 'Supporters reached' },
-  { value: '14,200', label: 'Monthly website visits' },
-  { value: '1,886', label: 'Social followers' },
-  { value: '34', label: 'Home fixtures per season' },
-]
-
 export default function SponsorsPage() {
   const [submitted, setSubmitted] = useState(false)
   const [form, setForm] = useState({
@@ -188,10 +182,12 @@ export default function SponsorsPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+
     if (!form.name.trim() || !form.email.includes('@') || !form.business.trim()) {
       alert('Please fill in all required fields.')
       return
     }
+
     setSubmitted(true)
   }
 
@@ -199,16 +195,27 @@ export default function SponsorsPage() {
     <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '0 0 90px' }}>
       <section style={{ maxWidth: 980, margin: '0 auto', padding: '52px 24px' }}>
 
-        {/* Current Principal Sponsors */}
         <div style={{ marginBottom: 52 }}>
           <h2 style={h2}>Principal Sponsors</h2>
           <p style={subhead}>Our headline partners for the 2026/27 season</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 20, marginBottom: 20 }}>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: 20,
+            marginBottom: 20,
+          }}>
             {currentSponsors.principal.map(s => (
-              <div key={s.name} style={card}>
+              <div key={s.name} style={{
+                ...card,
+                width: '100%',
+                maxWidth: 420,
+                margin: '0 auto',
+              }}>
                 <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
+
                 <div style={{
-                  background: '#ffffff',
+                  background: '#fff',
                   border: '1px solid #E5E7EB',
                   borderRadius: 8,
                   height: 100,
@@ -219,7 +226,9 @@ export default function SponsorsPage() {
                 }}>
                   <img src={s.logo} alt={s.name} style={{ maxHeight: 70, maxWidth: '80%', objectFit: 'contain' }} />
                 </div>
+
                 <h3 style={h3}>{s.name}</h3>
+
                 <span style={{
                   display: 'inline-block',
                   background: '#1149D8',
@@ -230,7 +239,7 @@ export default function SponsorsPage() {
                   fontSize: 10,
                   fontWeight: 700,
                   letterSpacing: '.08em',
-                  textTransform: 'uppercase' as const,
+                  textTransform: 'uppercase',
                 }}>
                   {s.role}
                 </span>
@@ -238,12 +247,23 @@ export default function SponsorsPage() {
             ))}
           </div>
 
-          {/* Gold Partners */}
           <h3 style={{ ...h3, marginBottom: 6, marginTop: 32 }}>Gold Partners</h3>
           <p style={{ ...subhead, marginBottom: 16 }}>Supporting the club at gold level</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 16, marginBottom: 32 }}>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: 16,
+            marginBottom: 32,
+          }}>
             {currentSponsors.gold.map(s => (
-              <div key={s.name} style={{ ...card, textAlign: 'center' as const }}>
+              <div key={s.name} style={{
+                ...card,
+                textAlign: 'center',
+                width: '100%',
+                maxWidth: 320,
+                margin: '0 auto',
+              }}>
                 <div style={{
                   background: '#F8FAFF',
                   border: '1px solid #E5E7EB',
@@ -259,22 +279,30 @@ export default function SponsorsPage() {
                 }}>
                   Logo to be added
                 </div>
+
                 <p style={{ ...body, fontWeight: 700, color: '#2D2D2D', marginBottom: 4 }}>{s.name}</p>
                 <p style={{ ...body, fontSize: 11, color: '#9CA3AF' }}>{s.role}</p>
               </div>
             ))}
           </div>
 
-          {/* Club Partners */}
           <h3 style={{ ...h3, marginBottom: 6 }}>Club Partners</h3>
           <p style={{ ...subhead, marginBottom: 16 }}>Our valued club partners</p>
-         <div style={{
-  display: 'grid',
-  gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-  gap: 20,
-}}>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: 20,
+          }}>
             {currentSponsors.club.map(s => (
-              <div key={s.name} style={{ ...card, textAlign: 'center' as const, padding: 16 }}>
+              <div key={s.name} style={{
+                ...card,
+                textAlign: 'center',
+                padding: 16,
+                width: '100%',
+                maxWidth: 320,
+                margin: '0 auto',
+              }}>
                 <div style={{
                   background: '#F8FAFF',
                   border: '1px solid #E5E7EB',
@@ -290,6 +318,7 @@ export default function SponsorsPage() {
                 }}>
                   Logo
                 </div>
+
                 <p style={{ ...body, fontWeight: 700, color: '#2D2D2D', fontSize: 11, marginBottom: 2 }}>{s.name}</p>
                 <p style={{ ...body, fontSize: 10, color: '#9CA3AF' }}>{s.role}</p>
               </div>
@@ -297,19 +326,27 @@ export default function SponsorsPage() {
           </div>
         </div>
 
-        {/* Sponsorship Packages */}
         <div style={{ marginBottom: 52 }}>
           <h2 style={h2}>Sponsorship Packages</h2>
           <p style={subhead}>Available packages for the 2026/27 season — contact us for pricing</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20 }}>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: 20,
+          }}>
             {packages.filter(p => !p.taken).map(p => (
               <div key={p.tier} style={{
                 ...card,
                 border: `1px solid ${p.highlight ? '#1149D8' : '#E5E7EB'}`,
+                width: '100%',
+                maxWidth: 380,
+                margin: '0 auto',
               }}>
                 <div style={{ height: 4, background: p.color, marginBottom: 20, borderRadius: 2 }} />
                 <div style={{ fontSize: 24, marginBottom: 8 }}>{p.icon}</div>
                 <h3 style={h3}>{p.tier}</h3>
+
                 <div style={{ display: 'grid', gap: 6, marginBottom: 20 }}>
                   {p.benefits.map(b => (
                     <div key={b} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
@@ -318,6 +355,7 @@ export default function SponsorsPage() {
                     </div>
                   ))}
                 </div>
+
                 <button
                   onClick={() => {
                     setForm({ ...form, package: p.tier })
@@ -344,12 +382,13 @@ export default function SponsorsPage() {
           </div>
         </div>
 
-        {/* Enquiry Form */}
-        <div id="enquiry-form" style={{ marginBottom: 0 }}>
+        <div id="enquiry-form">
           <h2 style={h2}>Sponsorship Enquiry</h2>
           <p style={subhead}>Interested in partnering with BTFC? Get in touch and we'll be in contact within 2 working days.</p>
+
           <div style={card}>
             <div style={{ height: 4, background: '#1149D8', marginBottom: 24, borderRadius: 2 }} />
+
             {submitted ? (
               <div style={{
                 background: '#F0FDF4',
@@ -366,24 +405,33 @@ export default function SponsorsPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                  gap: 16,
+                  marginBottom: 16,
+                }}>
                   <div>
                     <label style={{ ...body, fontSize: 11, fontWeight: 700, color: '#374151', display: 'block', marginBottom: 6 }}>Your Name *</label>
                     <input name="name" value={form.name} onChange={handleChange} placeholder="Full name" style={inputStyle} required />
                   </div>
+
                   <div>
                     <label style={{ ...body, fontSize: 11, fontWeight: 700, color: '#374151', display: 'block', marginBottom: 6 }}>Business Name *</label>
                     <input name="business" value={form.business} onChange={handleChange} placeholder="Your business" style={inputStyle} required />
                   </div>
+
                   <div>
                     <label style={{ ...body, fontSize: 11, fontWeight: 700, color: '#374151', display: 'block', marginBottom: 6 }}>Email Address *</label>
                     <input name="email" type="email" value={form.email} onChange={handleChange} placeholder="your@email.com" style={inputStyle} required />
                   </div>
+
                   <div>
                     <label style={{ ...body, fontSize: 11, fontWeight: 700, color: '#374151', display: 'block', marginBottom: 6 }}>Phone Number</label>
                     <input name="phone" value={form.phone} onChange={handleChange} placeholder="Optional" style={inputStyle} />
                   </div>
                 </div>
+
                 <div style={{ marginBottom: 16 }}>
                   <label style={{ ...body, fontSize: 11, fontWeight: 700, color: '#374151', display: 'block', marginBottom: 6 }}>Package of Interest</label>
                   <select name="package" value={form.package} onChange={handleChange} style={{ ...inputStyle, cursor: 'pointer' }}>
@@ -394,10 +442,12 @@ export default function SponsorsPage() {
                     <option>Other / Not sure yet</option>
                   </select>
                 </div>
+
                 <div style={{ marginBottom: 20 }}>
                   <label style={{ ...body, fontSize: 11, fontWeight: 700, color: '#374151', display: 'block', marginBottom: 6 }}>Message</label>
-                  <textarea name="message" value={form.message} onChange={handleChange} placeholder="Tell us a bit about your business and what you're looking for..." rows={4} style={{ ...inputStyle, resize: 'vertical' as const }} />
+                  <textarea name="message" value={form.message} onChange={handleChange} placeholder="Tell us a bit about your business and what you're looking for..." rows={4} style={{ ...inputStyle, resize: 'vertical' }} />
                 </div>
+
                 <button type="submit" style={{
                   background: '#1149D8',
                   color: '#fff',
