@@ -51,12 +51,26 @@ export default function NewsSection() {
           <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 14, color: '#6B7280' }}>The latest from Brimscombe & Thrupp FC</p>
           <div style={{ width: 52, height: 4, background: '#1149D8', margin: '12px auto 0', borderRadius: 2 }} />
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 20, marginBottom: 36 }}>
+        <div style={{
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+  gap: 24,
+  alignItems: 'stretch'
+}}>
           {news.map((n: any) => {
             const color = CATEGORY_COLORS[n.category] || '#1149D8'
             const icon = CATEGORY_ICONS[n.category] || '📰'
             return (
-              <Link key={n._id} href="/news" style={{ textDecoration: 'none' }}>
+              <Link
+  key={n._id}
+  href="/news"
+  style={{
+    textDecoration: 'none',
+    width: '100%',
+    maxWidth: 360,
+    margin: '0 auto'
+  }}
+>
                 <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, overflow: 'hidden', height: '100%' }}>
                   <div style={{ height: 6, background: color }} />
                   <div style={{ padding: 20 }}>
