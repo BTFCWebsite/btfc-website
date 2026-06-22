@@ -273,16 +273,17 @@ minHeight: 120,
                 </div>
 
                 <div
-                  style={{
-                    fontFamily: "'Barlow Condensed',sans-serif",
-                    fontWeight: 800,
-                    fontSize: 26,
-                    color: '#041B5F',
-                    lineHeight: 1,
-                  }}
-                >
-                  {scoreLine(m)}
-                </div>
+  style={{
+    fontFamily: "'Barlow Condensed',sans-serif",
+    fontWeight: 800,
+    fontSize: 26,
+    color: '#041B5F',
+    lineHeight: 1.1,
+    minHeight: 60,
+  }}
+>
+  {scoreLine(m)}
+</div>
 
                 <div
                   style={{
