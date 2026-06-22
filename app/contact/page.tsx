@@ -97,7 +97,7 @@ export default function ContactPage() {
         {/* Main grid — form + contact details */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '1fr 340px',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
           gap: 28,
           marginBottom: 44,
           alignItems: 'start',
@@ -125,7 +125,11 @@ export default function ContactPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 14 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                <div style={{
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+  gap: 14
+}}>
                   <div>
                     <label style={{ ...body, fontSize: 11, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>
                       Full Name *
@@ -271,9 +275,21 @@ export default function ContactPage() {
         <div style={{ marginBottom: 44 }}>
           <h2 style={h2}>Department Contacts</h2>
           <p style={subhead}>For specific enquiries, contact the relevant department directly.</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 20 }}>
+          <div style={{
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+  gap: 20
+}}>
             {departments.map(d => (
-              <div key={d.title} style={card}>
+              <div
+  key={d.title}
+  style={{
+    ...card,
+    width: '100%',
+    maxWidth: 380,
+    margin: '0 auto'
+  }}
+>
                 <div style={{ fontSize: 24, marginBottom: 10 }}>{d.icon}</div>
                 <h3 style={h3}>{d.title}</h3>
                 <p style={{ ...body, marginBottom: 8 }}>{d.contact}</p>
