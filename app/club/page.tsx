@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 const officialsQuery = `
-*[_type == "clubOfficial"]
+*[_type == "clubOfficial" && active != false]
 | order(displayOrder asc)
 {
   name,
@@ -54,14 +54,6 @@ const subhead = {
   margin: '0 0 24px',
 } as const
 
-const officials = [
-  { role: 'Chairman', name: 'Neil Long' },
-  { role: 'Vice Chairman', name: 'Nick Wright' },
-  { role: 'Club Secretary', name: 'Clive Linehan' },
-  { role: 'First Team Manager', name: 'Tim Bond' },
-  { role: 'Welfare Officer', name: 'Neil Long' },
-]
-
 const clubFacts = [
   { label: 'Founded', value: '1886' },
   { label: 'Nickname', value: 'The Lilywhites' },
@@ -72,12 +64,11 @@ const clubFacts = [
 ]
 
 export default async function ClubPage() {
+  const officials = await client.fetch(officialsQuery)
 
-const officials = await client.fetch(officialsQuery)
-  
   return (
     <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '52px 24px 90px' }}>
-      <section style={{ maxWidth: 980, margin: '0 auto' }}>
+      <section style={{ maxWidth: 980, width: '100%', margin: '0 auto' }}>
 
         <div style={{
           background: '#041B5F',
@@ -173,8 +164,9 @@ const officials = await client.fetch(officialsQuery)
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
             gap: 20,
+            justifyItems: 'center',
           }}>
-            <div style={{ ...card, width: '100%', maxWidth: 420, margin: '0 auto' }}>
+            <div style={{ ...card, width: '100%', maxWidth: 420 }}>
               <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
               <h3 style={h3}>Brimscombe FC — Est. 1886</h3>
               <p style={{ ...body, marginBottom: 12 }}>
@@ -195,7 +187,7 @@ const officials = await client.fetch(officialsQuery)
               </p>
             </div>
 
-            <div style={{ ...card, width: '100%', maxWidth: 420, margin: '0 auto' }}>
+            <div style={{ ...card, width: '100%', maxWidth: 420 }}>
               <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
               <h3 style={h3}>Brimscombe &amp; Thrupp FC</h3>
               <p style={{ ...body, marginBottom: 12 }}>
@@ -227,8 +219,9 @@ const officials = await client.fetch(officialsQuery)
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
             gap: 20,
+            justifyItems: 'center',
           }}>
-            <div style={{ ...card, width: '100%', maxWidth: 420, margin: '0 auto' }}>
+            <div style={{ ...card, width: '100%', maxWidth: 420 }}>
               <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
               <p style={{ ...body, marginBottom: 14 }}>
                 Jessons Meadow has been the home of Brimscombe &amp; Thrupp FC since the
@@ -247,7 +240,7 @@ const officials = await client.fetch(officialsQuery)
               </p>
             </div>
 
-            <div style={{ display: 'grid', gap: 16, width: '100%' }}>
+            <div style={{ display: 'grid', gap: 16, width: '100%', maxWidth: 420 }}>
               {[
                 { icon: '🏟', label: 'Capacity', value: '1,200' },
                 { icon: '💡', label: 'Floodlights', value: 'Yes' },
@@ -263,8 +256,6 @@ const officials = await client.fetch(officialsQuery)
                   justifyContent: 'space-between',
                   gap: 10,
                   width: '100%',
-                  maxWidth: 420,
-                  margin: '0 auto',
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <span style={{ fontSize: 18 }}>{f.icon}</span>
@@ -293,6 +284,7 @@ const officials = await client.fetch(officialsQuery)
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
             gap: 16,
+            justifyItems: 'center',
           }}>
             {[
               {
@@ -352,7 +344,6 @@ const officials = await client.fetch(officialsQuery)
                 ...card,
                 width: '100%',
                 maxWidth: 380,
-                margin: '0 auto',
               }}>
                 <div style={{ height: 4, background: '#1149D8', marginBottom: 14, borderRadius: 2 }} />
                 <h3 style={{ ...h3, fontSize: 18, marginBottom: 12 }}>{section.era}</h3>
@@ -373,8 +364,8 @@ const officials = await client.fetch(officialsQuery)
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 500 }}>
                 <tbody>
-                  {officials.map((o, i) => (
-                    <tr key={o.role} style={{
+                  {officials.map((o: any, i: number) => (
+                    <tr key={`${o.role}-${o.name}`} style={{
                       borderBottom: i < officials.length - 1 ? '1px solid #F3F4F6' : 'none',
                       background: i % 2 === 0 ? '#fff' : '#FAFAFA',
                     }}>
@@ -416,8 +407,9 @@ const officials = await client.fetch(officialsQuery)
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
             gap: 20,
+            justifyItems: 'center',
           }}>
-            <div style={{ ...card, width: '100%', maxWidth: 380, margin: '0 auto' }}>
+            <div style={{ ...card, width: '100%', maxWidth: 380 }}>
               <div style={{ fontSize: 28, marginBottom: 12 }}>👶</div>
               <h3 style={h3}>Youth Football</h3>
               <p style={{ ...body, marginBottom: 14 }}>
@@ -446,7 +438,7 @@ const officials = await client.fetch(officialsQuery)
               </p>
             </div>
 
-            <div style={{ ...card, width: '100%', maxWidth: 380, margin: '0 auto' }}>
+            <div style={{ ...card, width: '100%', maxWidth: 380 }}>
               <div style={{ fontSize: 28, marginBottom: 12 }}>🚶</div>
               <h3 style={h3}>Walking Football</h3>
               <p style={body}>
@@ -456,7 +448,7 @@ const officials = await client.fetch(officialsQuery)
               </p>
             </div>
 
-            <div style={{ ...card, width: '100%', maxWidth: 380, margin: '0 auto' }}>
+            <div style={{ ...card, width: '100%', maxWidth: 380 }}>
               <div style={{ fontSize: 28, marginBottom: 12 }}>🤝</div>
               <h3 style={h3}>Get Involved</h3>
               <p style={{ ...body, marginBottom: 14 }}>
