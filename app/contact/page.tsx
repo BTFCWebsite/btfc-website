@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { client } from '@/sanity/lib/client'
+import { client } from '@/lib/sanity'
 
 const h2 = {
   fontFamily: "'Barlow Condensed', sans-serif",
