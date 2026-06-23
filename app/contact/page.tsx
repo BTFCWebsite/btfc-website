@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { client } from '@/lib/sanity'
+import { createClient } from '@sanity/client'
 
 const h2 = {
   fontFamily: "'Barlow Condensed', sans-serif",
@@ -55,6 +55,13 @@ const inputStyle = {
   boxSizing: 'border-box' as const,
   outline: 'none',
 }
+
+const client = createClient({
+  projectId: 'vm0n9zl5',
+  dataset: 'production',
+  apiVersion: '2024-01-01',
+  useCdn: true,
+})
 
 type ClubOfficial = {
   name: string
