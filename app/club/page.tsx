@@ -68,7 +68,7 @@ export default async function ClubPage() {
 
   return (
     <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '52px 24px 90px' }}>
-      <section style={{ maxWidth: 980, width: '100%', margin: '0 auto' }}>
+      <section style={{ maxWidth: 1120, width: '100%', margin: '0 auto' }}>
 
         <div style={{
           background: '#041B5F',
@@ -166,7 +166,7 @@ export default async function ClubPage() {
             gap: 20,
             justifyItems: 'center',
           }}>
-            <div style={{ ...card, width: '100%', maxWidth: 420 }}>
+            <div style={{ ...card, width: '100%', maxWidth: 460 }}>
               <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
               <h3 style={h3}>Brimscombe FC — Est. 1886</h3>
               <p style={{ ...body, marginBottom: 12 }}>
@@ -187,7 +187,7 @@ export default async function ClubPage() {
               </p>
             </div>
 
-            <div style={{ ...card, width: '100%', maxWidth: 420 }}>
+            <div style={{ ...card, width: '100%', maxWidth: 460 }}>
               <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
               <h3 style={h3}>Brimscombe &amp; Thrupp FC</h3>
               <p style={{ ...body, marginBottom: 12 }}>
@@ -221,7 +221,7 @@ export default async function ClubPage() {
             gap: 20,
             justifyItems: 'center',
           }}>
-            <div style={{ ...card, width: '100%', maxWidth: 420 }}>
+            <div style={{ ...card, width: '100%', maxWidth: 460 }}>
               <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
               <p style={{ ...body, marginBottom: 14 }}>
                 Jessons Meadow has been the home of Brimscombe &amp; Thrupp FC since the
@@ -240,7 +240,7 @@ export default async function ClubPage() {
               </p>
             </div>
 
-            <div style={{ display: 'grid', gap: 16, width: '100%', maxWidth: 420 }}>
+            <div style={{ display: 'grid', gap: 16, width: '100%', maxWidth: 460 }}>
               {[
                 { icon: '🏟', label: 'Capacity', value: '1,200' },
                 { icon: '💡', label: 'Floodlights', value: 'Yes' },
@@ -409,7 +409,7 @@ export default async function ClubPage() {
             gap: 20,
             justifyItems: 'center',
           }}>
-            <div style={{ ...card, width: '100%', maxWidth: 380 }}>
+            <div style={{ ...card, width: '100%', maxWidth: 340 }}>
               <div style={{ fontSize: 28, marginBottom: 12 }}>👶</div>
               <h3 style={h3}>Youth Football</h3>
               <p style={{ ...body, marginBottom: 14 }}>
@@ -438,7 +438,7 @@ export default async function ClubPage() {
               </p>
             </div>
 
-            <div style={{ ...card, width: '100%', maxWidth: 380 }}>
+            <div style={{ ...card, width: '100%', maxWidth: 340 }}>
               <div style={{ fontSize: 28, marginBottom: 12 }}>🚶</div>
               <h3 style={h3}>Walking Football</h3>
               <p style={body}>
@@ -448,7 +448,7 @@ export default async function ClubPage() {
               </p>
             </div>
 
-            <div style={{ ...card, width: '100%', maxWidth: 380 }}>
+            <div style={{ ...card, width: '100%', maxWidth: 340 }}>
               <div style={{ fontSize: 28, marginBottom: 12 }}>🤝</div>
               <h3 style={h3}>Get Involved</h3>
               <p style={{ ...body, marginBottom: 14 }}>
