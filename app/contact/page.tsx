@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { client } from '@/sanity/lib/client'
 
 const h2 = {
   fontFamily: "'Barlow Condensed', sans-serif",
@@ -55,6 +56,15 @@ const inputStyle = {
   outline: 'none',
 }
 
+type ClubOfficial = {
+  name: string
+  role?: string
+  email?: string
+  phone?: string
+  department?: string
+  displayOrder?: number
+}
+
 const contactDetails = [
   { icon: '📍', label: 'Address', value: 'Jessons Meadow, London Road, Brimscombe, Stroud, GL5 2SD' },
   { icon: '📧', label: 'Email', value: 'info@brimscombeandthruppfc.co.uk', href: 'mailto:info@brimscombeandthruppfc.co.uk' },
@@ -62,21 +72,35 @@ const contactDetails = [
   { icon: '🕐', label: 'Office Hours', value: 'Mon–Fri 9am–5pm' },
 ]
 
-const departments = [
-  { icon: '⚽', title: 'First Team', contact: 'Tim Bond — Manager', email: 'manager@brimscombeandthruppfc.co.uk' },
-  { icon: '🏟', title: 'Club Secretary', contact: 'Sarah Mills', email: 'secretary@brimscombeandthruppfc.co.uk' },
-  { icon: '🤝', title: 'Sponsorship', contact: 'Commercial enquiries', email: 'sponsorship@brimscombeandthruppfc.co.uk' },
-  { icon: '👶', title: 'Youth Teams', contact: 'Youth development', email: 'youth@brimscombeandthruppfc.co.uk' },
-]
-
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false)
+  const [officials, setOfficials] = useState<ClubOfficial[]>([])
+
   const [form, setForm] = useState({
     name: '',
     email: '',
     subject: 'General',
     message: '',
   })
+
+  useEffect(() => {
+    async function loadOfficials() {
+      const data = await client.fetch(`
+        *[_type == "clubOfficial" && active != false] | order(displayOrder asc) {
+          name,
+          role,
+          email,
+          phone,
+          department,
+          displayOrder
+        }
+      `)
+
+      setOfficials(data)
+    }
+
+    loadOfficials()
+  }, [])
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -250,19 +274,30 @@ export default function ContactPage() {
             gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
             gap: 20,
           }}>
-            {departments.map(d => (
-              <div key={d.title} style={{
+            {officials.map((d) => (
+              <div key={`${d.name}-${d.email}`} style={{
                 ...card,
                 width: '100%',
                 maxWidth: 380,
                 margin: '0 auto',
               }}>
-                <div style={{ fontSize: 24, marginBottom: 10 }}>{d.icon}</div>
-                <h3 style={h3}>{d.title}</h3>
-                <p style={{ ...body, marginBottom: 8 }}>{d.contact}</p>
-                <a href={`mailto:${d.email}`} style={{ ...body, color: '#1149D8', fontSize: 11, wordBreak: 'break-all' }}>
-                  {d.email}
-                </a>
+                <h3 style={h3}>{d.department || d.role || 'Club Official'}</h3>
+
+                <p style={{ ...body, marginBottom: 8 }}>
+                  {d.name}{d.role ? ` — ${d.role}` : ''}
+                </p>
+
+                {d.email && (
+                  <a href={`mailto:${d.email}`} style={{ ...body, color: '#1149D8', fontSize: 11, wordBreak: 'break-all', display: 'block' }}>
+                    {d.email}
+                  </a>
+                )}
+
+                {d.phone && (
+                  <a href={`tel:${d.phone.replace(/\s/g, '')}`} style={{ ...body, color: '#1149D8', fontSize: 11, wordBreak: 'break-all', display: 'block', marginTop: 6 }}>
+                    {d.phone}
+                  </a>
+                )}
               </div>
             ))}
           </div>
