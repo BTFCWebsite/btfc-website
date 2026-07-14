@@ -45,7 +45,6 @@ export default async function HomePage() {
     const today = new Date().toISOString().split('T')[0]
 
     const [last, next, settings] = await Promise.all([
-      // Most recent played First XI result
       client.fetch(
         `*[_type == "fixture" && team == "First XI" && played == true] | order(date desc)[0] {
           opponent, btfcScore, opponentScore, date, competition
@@ -53,7 +52,6 @@ export default async function HomePage() {
         {},
         { cache: 'no-store' }
       ),
-      // Next unplayed First XI fixture
       client.fetch(
         `*[_type == "fixture" && team == "First XI" && played != true && date >= $today] | order(date asc)[0] {
           opponent, date, competition, kickoff
@@ -61,7 +59,6 @@ export default async function HomePage() {
         { today },
         { cache: 'no-store' }
       ),
-      // Site settings for league position and season year
       client.fetch(
         `*[_type == "siteSettings"][0] { leaguePosition, seasonYear }`,
         {},
@@ -79,6 +76,32 @@ export default async function HomePage() {
 
   const lastScore = `${lastResult.btfcScore ?? 0}–${lastResult.opponentScore ?? 0}`
 
+  const fixtureCardBase = {
+    border: '1px solid rgba(255,255,255,.12)',
+    borderRadius: 8,
+    padding: '16px 22px',
+    textAlign: 'left' as const,
+    flex: '1 1 330px',
+    width: '100%',
+    maxWidth: 352,
+    minHeight: 112,
+    boxSizing: 'border-box' as const,
+    backdropFilter: 'blur(8px)',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    justifyContent: 'center',
+  }
+
+  const fixtureTitle = {
+    fontFamily: "'Barlow Condensed', sans-serif",
+    fontWeight: 800,
+    fontSize: 'clamp(18px, 2vw, 22px)',
+    color: '#fff',
+    letterSpacing: '.03em',
+    lineHeight: 1.08,
+    overflowWrap: 'anywhere' as const,
+  }
+
   return (
     <main>
       <style>{`
@@ -86,7 +109,7 @@ export default async function HomePage() {
           .news-grid { grid-template-columns: 1fr !important; }
           .fixtures-grid { grid-template-columns: 1fr !important; }
           .hero-cards { flex-direction: column; align-items: stretch; }
-          .hero-cards > div { min-width: unset !important; }
+          .hero-cards > div { min-width: unset !important; max-width: none !important; width: 100% !important; }
           .promo-inner { flex-direction: column !important; }
           .jessons-strip { flex-direction: column; gap: 8px !important; text-align: center; }
           .stats-strip > div { padding: 12px 20px !important; }
@@ -124,20 +147,20 @@ export default async function HomePage() {
           </div>
 
           {/* Result + Fixture cards */}
-          <div className="hero-cards" style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
-            <div style={{ background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.12)', borderLeft: '4px solid #EF4444', borderRadius: 8, padding: '16px 22px', textAlign: 'left', minWidth: 230, backdropFilter: 'blur(8px)' }}>
+          <div className="hero-cards" style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'stretch', width: '100%', maxWidth: 720 }}>
+            <div style={{ ...fixtureCardBase, background: 'rgba(255,255,255,.06)', borderLeft: '4px solid #EF4444' }}>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: 'rgba(255,255,255,.5)', letterSpacing: '.16em', textTransform: 'uppercase', marginBottom: 6 }}>Latest Result</div>
-              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 22, color: '#fff', letterSpacing: '.04em' }}>
+              <div style={fixtureTitle}>
                 BTFC <span style={{ color: '#EF4444' }}>{lastScore}</span> {lastResult.opponent}
               </div>
-              <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: 'rgba(255,255,255,.4)', marginTop: 4 }}>
+              <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: 'rgba(255,255,255,.4)', marginTop: 7, lineHeight: 1.35, overflowWrap: 'anywhere' }}>
                 {lastResult.date ? formatDate(lastResult.date) : ''} · {lastResult.competition}
               </div>
             </div>
-            <div style={{ background: 'rgba(17,73,216,.3)', border: '1px solid rgba(255,255,255,.12)', borderLeft: '4px solid #1149D8', borderRadius: 8, padding: '16px 22px', textAlign: 'left', minWidth: 230, backdropFilter: 'blur(8px)' }}>
+            <div style={{ ...fixtureCardBase, background: 'rgba(17,73,216,.3)', borderLeft: '4px solid #1149D8' }}>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: 'rgba(255,255,255,.5)', letterSpacing: '.16em', textTransform: 'uppercase', marginBottom: 6 }}>Next Fixture</div>
-              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 22, color: '#fff', letterSpacing: '.04em' }}>BTFC vs {nextFixture.opponent}</div>
-              <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: 'rgba(255,255,255,.4)', marginTop: 4 }}>
+              <div style={fixtureTitle}>BTFC vs {nextFixture.opponent}</div>
+              <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: 'rgba(255,255,255,.4)', marginTop: 7, lineHeight: 1.35, overflowWrap: 'anywhere' }}>
                 {nextFixture.date ? `${formatDate(nextFixture.date)}${nextFixture.kickoff ? ` · ${nextFixture.kickoff}` : ''}` : nextFixture.competition}
               </div>
             </div>
@@ -227,7 +250,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-
     </main>
   )
 }
