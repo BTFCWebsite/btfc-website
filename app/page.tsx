@@ -102,15 +102,6 @@ export default async function HomePage() {
         </div>
 
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, justifyContent: 'center', paddingBottom: 60 }}>
-          {/* First Team Sponsor */}
-          <div style={{ background: 'rgba(4,27,95,.8)', border: '1px solid rgba(255,255,255,.2)', borderRadius: 8, padding: '12px 28px', marginBottom: 36, display: 'flex', alignItems: 'center', gap: 16 }}>
-            <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 11, color: 'rgba(255,255,255,.7)', letterSpacing: '.14em', textTransform: 'uppercase' }}>First Team Sponsor</span>
-            <div style={{ width: 1, height: 24, background: 'rgba(255,255,255,.25)' }} />
-            <div style={{ background: '#fff', borderRadius: 6, padding: '8px 18px', display: 'flex', alignItems: 'center', boxShadow: '0 2px 12px rgba(0,0,0,.2)' }}>
-              <img src="/sponsors/brackenfern-logo.png" alt="Brackenfern Advisory Limited" style={{ height: 36, objectFit: 'contain' }} />
-            </div>
-          </div>
-
           {/* Crest */}
           <div style={{ width: 120, height: 120, borderRadius: '50%', border: '3px solid #fff', boxShadow: '0 0 0 3px #041B5F, 0 0 0 5px #1149D8', overflow: 'hidden', background: '#fff' }}>
             <img src="/branding/crest.png" alt="BTFC" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
