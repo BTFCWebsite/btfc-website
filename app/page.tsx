@@ -81,9 +81,8 @@ export default async function HomePage() {
     borderRadius: 8,
     padding: '16px 22px',
     textAlign: 'left' as const,
-    flex: '1 1 330px',
-    width: '100%',
-    maxWidth: 352,
+    flex: '1 1 0',
+    minWidth: 0,
     minHeight: 112,
     boxSizing: 'border-box' as const,
     backdropFilter: 'blur(8px)',
@@ -147,7 +146,7 @@ export default async function HomePage() {
           </div>
 
           {/* Result + Fixture cards */}
-          <div className="hero-cards" style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'stretch', width: '100%', maxWidth: 720 }}>
+          <div className="hero-cards" style={{ display: 'flex', gap: 16, flexWrap: 'nowrap', justifyContent: 'center', alignItems: 'stretch', width: '100%', maxWidth: 720 }}>
             <div style={{ ...fixtureCardBase, background: 'rgba(255,255,255,.06)', borderLeft: '4px solid #EF4444' }}>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: 'rgba(255,255,255,.5)', letterSpacing: '.16em', textTransform: 'uppercase', marginBottom: 6 }}>Latest Result</div>
               <div style={fixtureTitle}>
