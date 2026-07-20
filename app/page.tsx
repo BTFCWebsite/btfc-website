@@ -85,7 +85,7 @@ export default async function HomePage() {
   )
   const fixtureTitleFontSize = Math.max(
     15,
-    Math.min(22, (fixtureCardsMaxWidth - 112) / (longestFixtureTitleLength * 1.2))
+    Math.min(22, (fixtureCardsMaxWidth - 112) / (longestFixtureTitleLength * 1.35))
   )
 
   const fixtureCardBase = {
