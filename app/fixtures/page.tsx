@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react'
 import { getFixtures } from '../lib/sanity.client'
 
-type TeamId = 'all' | 'first' | 'reserves' | 'u17s'
-type ViewId = 'all' | 'upcoming' | 'results'
+type TeamId = 'first' | 'reserves' | 'u17s'
+type ViewId = 'fixtures' | 'results' | 'table'
 
 type Fixture = {
   _id: string
@@ -103,9 +103,35 @@ function FirstTeamLeagueTable() {
   )
 }
 
+function LeagueTablePlaceholder({ teamName }: { teamName: string }) {
+  return (
+    <section
+      style={{
+        background: '#fff',
+        border: '1px solid #DCE3F1',
+        borderRadius: 10,
+        overflow: 'hidden',
+        boxShadow: '0 8px 24px rgba(4,27,95,0.08)',
+      }}
+    >
+      <div style={{ background: '#041B5F', borderBottom: '5px solid #1149D8', padding: '20px 26px' }}>
+        <h2 style={{ margin: 0, fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: 30, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#fff' }}>
+          League Table
+        </h2>
+        <div style={{ marginTop: 7, fontFamily: "'Montserrat',sans-serif", fontWeight: 700, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.68)' }}>
+          {teamName}
+        </div>
+      </div>
+      <div style={{ padding: '42px 24px', textAlign: 'center', fontFamily: "'Montserrat',sans-serif", color: '#6B7280', fontSize: 13 }}>
+        The Full-Time league table will appear here once this team&apos;s code is supplied.
+      </div>
+    </section>
+  )
+}
+
 export default function FixturesPage() {
-  const [team, setTeam] = useState<TeamId>('all')
-  const [view, setView] = useState<ViewId>('all')
+  const [team, setTeam] = useState<TeamId>('first')
+  const [view, setView] = useState<ViewId>('fixtures')
   const [matches, setMatches] = useState<Fixture[]>([])
 
   useEffect(() => {
@@ -166,33 +192,31 @@ export default function FixturesPage() {
   const filtered = matches
     .filter((m) => {
       const teamMatch =
-        team === 'all' ||
         (team === 'first' && m.team === 'First XI') ||
         (team === 'reserves' && m.team === 'Reserves') ||
         (team === 'u17s' && m.team === 'Under 17s')
 
       const viewMatch =
-        view === 'all' ||
-        (view === 'upcoming' && !m.played) ||
+        (view === 'fixtures' && !m.played) ||
         (view === 'results' && m.played)
 
       return teamMatch && viewMatch
     })
     .sort((a, b) => {
-      return new Date(a.date).getTime() - new Date(b.date).getTime()
+      const dateDifference = new Date(a.date).getTime() - new Date(b.date).getTime()
+      return view === 'results' ? -dateDifference : dateDifference
     })
 
   const teamTabs = [
-    { id: 'all', label: 'All Teams' },
     { id: 'first', label: 'First XI' },
     { id: 'reserves', label: 'Reserves' },
     { id: 'u17s', label: 'Under 17s' },
   ] as const
 
   const viewTabs = [
-    { id: 'all', label: 'All Matches' },
-    { id: 'upcoming', label: 'Upcoming' },
+    { id: 'fixtures', label: 'Fixtures' },
     { id: 'results', label: 'Results' },
+    { id: 'table', label: 'League Table' },
   ] as const
 
   return (
@@ -271,6 +295,8 @@ export default function FixturesPage() {
           ))}
         </div>
 
+        {view !== 'table' && (
+          <>
         {/* Match count banner */}
         <div
           style={{
@@ -416,7 +442,14 @@ minHeight: 120,
           ))}
         </div>
 
-        {(team === 'all' || team === 'first') && <FirstTeamLeagueTable />}
+          </>
+        )}
+
+        {view === 'table' && (
+          team === 'first'
+            ? <FirstTeamLeagueTable />
+            : <LeagueTablePlaceholder teamName={team === 'reserves' ? 'BTFC Reserves' : 'BTFC Under 17s'} />
+        )}
 
       </div>
     </main>
