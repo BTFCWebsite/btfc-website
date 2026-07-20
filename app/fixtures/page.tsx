@@ -19,6 +19,70 @@ type Fixture = {
   played: boolean
 }
 
+function FirstTeamLeagueTable() {
+  useEffect(() => {
+    const fullTimeWindow = window as typeof window & { lrcode?: string }
+    fullTimeWindow.lrcode = '251176067'
+
+    const script = document.createElement('script')
+    script.type = 'text/javascript'
+    script.src = 'https://fulltime.thefa.com/client/api/cs1.js'
+    script.async = true
+    script.dataset.fullTimeWidget = 'first-team'
+    document.body.appendChild(script)
+
+    return () => {
+      script.remove()
+      delete fullTimeWindow.lrcode
+    }
+  }, [])
+
+  return (
+    <section
+      aria-labelledby="first-team-league-table"
+      style={{
+        marginTop: 40,
+        background: '#fff',
+        border: '1px solid #E5E7EB',
+        borderRadius: 8,
+        padding: '24px 20px',
+      }}
+    >
+      <h2
+        id="first-team-league-table"
+        style={{
+          margin: '0 0 20px',
+          fontFamily: "'Barlow Condensed',sans-serif",
+          fontWeight: 800,
+          fontSize: 30,
+          color: '#041B5F',
+          textAlign: 'center',
+        }}
+      >
+        First XI League Table
+      </h2>
+
+      <div style={{ width: '100%', overflowX: 'auto' }}>
+        <div
+          id="lrep251176067"
+          style={{
+            width: 600,
+            maxWidth: '100%',
+            minHeight: 120,
+            margin: '0 auto',
+          }}
+        >
+          Data loading….
+          {' '}
+          <a href="https://fulltime.thefa.com/index.html?divisionseason=320568525">
+            Hellenic League Division One
+          </a>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 export default function FixturesPage() {
   const [team, setTeam] = useState<TeamId>('all')
   const [view, setView] = useState<ViewId>('all')
@@ -331,6 +395,8 @@ minHeight: 120,
             </div>
           ))}
         </div>
+
+        {team === 'first' && <FirstTeamLeagueTable />}
 
       </div>
     </main>
