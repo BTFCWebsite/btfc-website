@@ -20,22 +20,32 @@ type Fixture = {
 }
 
 function FirstTeamLeagueTable() {
-  useEffect(() => {
-    const fullTimeWindow = window as typeof window & { lrcode?: string }
-    fullTimeWindow.lrcode = '251176067'
-
-    const script = document.createElement('script')
-    script.type = 'text/javascript'
-    script.src = 'https://fulltime.thefa.com/client/api/cs1.js'
-    script.async = true
-    script.dataset.fullTimeWidget = 'first-team'
-    document.body.appendChild(script)
-
-    return () => {
-      script.remove()
-      delete fullTimeWindow.lrcode
-    }
-  }, [])
+  const fullTimeEmbed = `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      html, body { margin: 0; padding: 0; background: #fff; }
+      #lrep251176067 { width: 600px; max-width: 100%; margin: 0 auto; }
+    </style>
+  </head>
+  <body>
+    <div id="lrep251176067">
+      Data loading….
+      <a href="https://fulltime.thefa.com/index.html?divisionseason=320568525">
+        Hellenic League Division One
+      </a>
+    </div>
+    <script type="text/javascript">
+      var lrcode = '251176067';
+    <\/script>
+    <script
+      type="text/javascript"
+      src="https://fulltime.thefa.com/client/api/cs1.js">
+    <\/script>
+  </body>
+</html>`
 
   return (
     <section
@@ -62,23 +72,17 @@ function FirstTeamLeagueTable() {
         First XI League Table
       </h2>
 
-      <div style={{ width: '100%', overflowX: 'auto' }}>
-        <div
-          id="lrep251176067"
-          style={{
-            width: 600,
-            maxWidth: '100%',
-            minHeight: 120,
-            margin: '0 auto',
-          }}
-        >
-          Data loading….
-          {' '}
-          <a href="https://fulltime.thefa.com/index.html?divisionseason=320568525">
-            Hellenic League Division One
-          </a>
-        </div>
-      </div>
+      <iframe
+        title="First XI Hellenic League Division One table"
+        srcDoc={fullTimeEmbed}
+        style={{
+          display: 'block',
+          width: '100%',
+          height: 900,
+          border: 0,
+          background: '#fff',
+        }}
+      />
     </section>
   )
 }
