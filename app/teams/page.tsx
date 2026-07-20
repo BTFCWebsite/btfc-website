@@ -116,8 +116,8 @@ function StatGrid({ stats }: { stats: [string, string, string][] }) {
     <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(120px,1fr))', gap:12, marginBottom:32 }}>
       {stats.map(([v, l, c]) => (
         <div key={l} style={{ background:'#041B5F', borderRadius:8, padding:16, textAlign:'center' }}>
-          <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:38, color:c, lineHeight:1 }}>{v}</div>
-          <div style={{ fontSize:9, color:'rgba(255,255,255,0.5)', letterSpacing:'0.1em', textTransform:'uppercase', marginTop:4 }}>{l}</div>
+          <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:38, color:'#fff', lineHeight:1 }}>{v}</div>
+          <div style={{ fontSize:9, color:'#fff', letterSpacing:'0.1em', textTransform:'uppercase', marginTop:4 }}>{l}</div>
         </div>
       ))}
     </div>
