@@ -20,33 +20,6 @@ type Fixture = {
 }
 
 function FirstTeamLeagueTable() {
-  const fullTimeEmbed = `<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <style>
-      html, body { margin: 0; padding: 0; background: #fff; }
-      #lrep251176067 { width: 600px; max-width: 100%; margin: 0 auto; }
-    </style>
-  </head>
-  <body>
-    <div id="lrep251176067">
-      Data loading….
-      <a href="https://fulltime.thefa.com/index.html?divisionseason=320568525">
-        Hellenic League Division One
-      </a>
-    </div>
-    <script type="text/javascript">
-      var lrcode = '251176067';
-    <\/script>
-    <script
-      type="text/javascript"
-      src="https://fulltime.thefa.com/client/api/cs1.js">
-    <\/script>
-  </body>
-</html>`
-
   return (
     <section
       aria-labelledby="first-team-league-table"
@@ -74,7 +47,7 @@ function FirstTeamLeagueTable() {
 
       <iframe
         title="First XI Hellenic League Division One table"
-        srcDoc={fullTimeEmbed}
+        src="/full-time/first-team.html"
         style={{
           display: 'block',
           width: '100%',
@@ -400,7 +373,7 @@ minHeight: 120,
           ))}
         </div>
 
-        {team === 'first' && <FirstTeamLeagueTable />}
+        {(team === 'all' || team === 'first') && <FirstTeamLeagueTable />}
 
       </div>
     </main>
