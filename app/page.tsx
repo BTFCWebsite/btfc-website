@@ -16,6 +16,7 @@ function formatDate(dateStr: string) {
 }
 
 const FALLBACK_LAST = {
+  _id: '',
   opponent: 'FC Stratford',
   btfcScore: 1,
   opponentScore: 2,
@@ -37,6 +38,7 @@ const FALLBACK_SETTINGS = {
 
 export default async function HomePage() {
   let lastResult = FALLBACK_LAST
+  let lastMatchReportSlug: string | null = null
   let nextFixture = FALLBACK_NEXT
   let leaguePosition = FALLBACK_SETTINGS.leaguePosition
   let seasonYear = FALLBACK_SETTINGS.seasonYear
@@ -47,7 +49,7 @@ export default async function HomePage() {
     const [last, next, settings] = await Promise.all([
       client.fetch(
         `*[_type == "fixture" && team == "First XI" && played == true] | order(date desc)[0] {
-          opponent, btfcScore, opponentScore, date, competition
+          _id, opponent, btfcScore, opponentScore, date, competition
         }`,
         {},
         { cache: 'no-store' }
@@ -66,7 +68,17 @@ export default async function HomePage() {
       ),
     ])
 
-    if (last) lastResult = last
+    if (last) {
+      lastResult = last
+      const report = await client.fetch(
+        `*[_type == "newsArticle" && category == "Match Report" && (fixture._ref == $fixtureId || (!defined(fixture) && date == $date))] | order(_updatedAt desc)[0] {
+          "slug": slug.current
+        }`,
+        { fixtureId: last._id, date: last.date },
+        { cache: 'no-store' }
+      )
+      if (report?.slug) lastMatchReportSlug = report.slug
+    }
     if (next) nextFixture = next
     if (settings?.leaguePosition) leaguePosition = settings.leaguePosition
     if (settings?.seasonYear) seasonYear = settings.seasonYear
@@ -75,6 +87,11 @@ export default async function HomePage() {
   }
 
   const lastScore = `${lastResult.btfcScore ?? 0}–${lastResult.opponentScore ?? 0}`
+  const latestResultHref = lastMatchReportSlug
+    ? `/news/${lastMatchReportSlug}`
+    : lastResult._id
+      ? `/match-report/${encodeURIComponent(lastResult._id)}`
+      : '/fixtures'
   const longestFixtureTitleLength = Math.max(
     `BTFC ${lastScore} ${lastResult.opponent}`.length,
     `BTFC vs ${nextFixture.opponent}`.length
@@ -121,7 +138,7 @@ export default async function HomePage() {
           .news-grid { grid-template-columns: 1fr !important; }
           .fixtures-grid { grid-template-columns: 1fr !important; }
           .hero-cards { flex-direction: column; align-items: stretch; }
-          .hero-cards > div { min-width: unset !important; max-width: none !important; width: 100% !important; }
+          .hero-cards > * { min-width: unset !important; max-width: none !important; width: 100% !important; }
           .promo-inner { flex-direction: column !important; }
           .jessons-strip { flex-direction: column; gap: 8px !important; text-align: center; }
           .stats-strip > div { padding: 12px 20px !important; }
@@ -160,7 +177,7 @@ export default async function HomePage() {
 
           {/* Result + Fixture cards */}
           <div className="hero-cards" style={{ display: 'flex', gap: 16, flexWrap: 'nowrap', justifyContent: 'center', alignItems: 'stretch', width: '100%', maxWidth: fixtureCardsMaxWidth }}>
-            <div style={{ ...fixtureCardBase, background: 'rgba(255,255,255,.06)', borderLeft: '4px solid #EF4444' }}>
+            <Link href={latestResultHref} aria-label="View latest match report" style={{ ...fixtureCardBase, background: 'rgba(255,255,255,.06)', borderLeft: '4px solid #EF4444', textDecoration: 'none' }}>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: 'rgba(255,255,255,.5)', letterSpacing: '.16em', textTransform: 'uppercase', marginBottom: 6 }}>Latest Result</div>
               <div style={fixtureTitle}>
                 BTFC <span style={{ color: '#EF4444' }}>{lastScore}</span> {lastResult.opponent}
@@ -168,7 +185,7 @@ export default async function HomePage() {
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: 'rgba(255,255,255,.4)', marginTop: 7, lineHeight: 1.35, overflowWrap: 'anywhere' }}>
                 {lastResult.date ? formatDate(lastResult.date) : ''} · {lastResult.competition}
               </div>
-            </div>
+            </Link>
             <div style={{ ...fixtureCardBase, background: 'rgba(17,73,216,.3)', borderLeft: '4px solid #1149D8' }}>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: 'rgba(255,255,255,.5)', letterSpacing: '.16em', textTransform: 'uppercase', marginBottom: 6 }}>Next Fixture</div>
               <div style={fixtureTitle}>BTFC vs {nextFixture.opponent}</div>
