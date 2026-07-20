@@ -278,7 +278,7 @@ export default function TeamsPage() {
 
         {team === 'first' && (
           <>
-            <TeamBanner title="BTFC First XI" subtitle="Uhlsport Hellenic League Division One — Manager: Tim Bond" stats={bannerStats('First XI')} />
+            <TeamBanner title="BTFC First XI" subtitle="Uhlsport Hellenic League Division One" stats={bannerStats('First XI')} />
             <SquadGrid players={firstTeam} />
             <StatGrid stats={statsFor('First XI')} />
             <LastEightResults results={lastEightFor('First XI')} />
@@ -296,7 +296,7 @@ export default function TeamsPage() {
 
         {team === 'u17s' && (
           <>
-            <TeamBanner title="BTFC Under 17s" subtitle="Under 17s Squad — 2025/26 Season" stats={bannerStats('Under 17s')} />
+            <TeamBanner title="BTFC Under 17s" subtitle="Cheltenham Youth Football League" stats={bannerStats('Under 17s')} />
             <SquadGrid players={u17s} />
             <StatGrid stats={statsFor('Under 17s')} />
             <LastEightResults results={lastEightFor('Under 17s')} />
