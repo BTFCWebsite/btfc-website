@@ -170,21 +170,19 @@ function Ticker() {
     }}>
       <div style={{ display: 'flex', gap: 52, whiteSpace: 'nowrap', animation: 'ticker 30s linear infinite' }}>
         {[
-          ['Jessons Real Estate', 'Official Ground Sponsor — Jessons Meadow'],
-          ['Brackenfern Advisory Limited', 'First Team Sponsor'],
-          ['Reserves Sponsor TBC', 'Reserves Sponsor — enquire now'],
-          ['U17s Sponsor TBC', 'Under 17s Sponsor — enquire now'],
-          ['Your Business Here', 'Gold Partner — enquire now'],
-          ['Jessons Real Estate', 'Official Ground Sponsor — Jessons Meadow'],
-          ['Brackenfern Advisory Limited', 'First Team Sponsor'],
-          ['Reserves Sponsor TBC', 'Reserves Sponsor — enquire now'],
-          ['U17s Sponsor TBC', 'Under 17s Sponsor — enquire now'],
-          ['Your Business Here', 'Gold Partner — enquire now'],
-        ].map(([name, role], i) => (
-          <span key={i} style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 600, fontSize: 10, color: 'rgba(255,255,255,.38)', letterSpacing: '.06em', flexShrink: 0, textTransform: 'uppercase' }}>
-            <strong style={{ color: 'rgba(255,255,255,.7)' }}>{name}</strong>
-            <span style={{ color: '#1149D8', margin: '0 6px' }}>·</span>
-            {role}
+          'Jessons Real Estate',
+          'Brackenfern Advisory Limited',
+          'Reserves Sponsor TBC',
+          'U17s Sponsor TBC',
+          'Your Business Here',
+          'Jessons Real Estate',
+          'Brackenfern Advisory Limited',
+          'Reserves Sponsor TBC',
+          'U17s Sponsor TBC',
+          'Your Business Here',
+        ].map((name, i) => (
+          <span key={i} style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 10, color: 'rgba(255,255,255,.7)', letterSpacing: '.06em', flexShrink: 0, textTransform: 'uppercase' }}>
+            {name}
           </span>
         ))}
       </div>
