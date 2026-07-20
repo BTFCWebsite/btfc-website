@@ -198,7 +198,32 @@ export default function MatchdayPage() {
 
         <div style={{ marginBottom: 44 }}>
           <h2 style={h2}>Getting Here</h2>
-          <p style={subhead}>Jessons Meadow · London Road · Brimscombe · Stroud · GL5 2SD</p>
+          <p style={{ ...subhead, marginBottom: 12 }}>Jessons Meadow · London Road · Brimscombe · Stroud · GL5 2SD</p>
+
+          <a
+            href="https://what3words.com/debit.query.solutions"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open Jessons Meadow in what3words"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              marginBottom: 24,
+              padding: '9px 14px',
+              borderRadius: 6,
+              background: '#fff',
+              border: '1px solid #D1D5DB',
+              color: '#041B5F',
+              fontFamily: "'Montserrat', sans-serif",
+              fontSize: 12,
+              fontWeight: 800,
+              textDecoration: 'none',
+            }}
+          >
+            <span style={{ color: '#E11D48', fontSize: 16 }}>///</span>
+            debit.query.solutions
+          </a>
 
           <div style={{ borderRadius: 8, overflow: 'hidden', marginBottom: 20, border: '1px solid #E5E7EB' }}>
             <iframe
