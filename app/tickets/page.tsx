@@ -1,5 +1,7 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
+
 const faqs = [
   ['Can I pay in instalments?', 'Not currently — season tickets must be paid in full at time of purchase.'],
   ['How do I get my ticket?', 'If you use an iPhone, you can add your digital season ticket to Apple Wallet. If you use Android, or would simply prefer a PDF, your ticket will be emailed to you. Both versions contain the QR code needed for entry.'],
@@ -10,6 +12,49 @@ const faqs = [
   ['Cash or card?', 'We accept both cash and card at the gate on matchday.'],
   ['When does the gate open?', 'The turnstiles open approximately one hour before kick-off.'],
 ]
+
+function TicketTailorWidget() {
+  const widgetRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const container = widgetRef.current
+    if (!container) return
+
+    container.innerHTML = `
+      <div class="tt-widget-fallback">
+        <p>
+          <a href="https://www.tickettailor.com/all-tickets/brimscombeandthruppfc/?ref=website_widget" target="_blank" rel="noopener noreferrer">
+            Click here to buy tickets
+          </a>
+        </p>
+      </div>
+    `
+
+    const script = document.createElement('script')
+    script.src = 'https://cdn.tickettailor.com/js/widgets/min/widget.js'
+    script.async = true
+    script.setAttribute('data-url', 'https://www.tickettailor.com/all-tickets/brimscombeandthruppfc/?ref=website_widget')
+    script.setAttribute('data-type', 'inline')
+    script.setAttribute('data-inline-minimal', 'false')
+    script.setAttribute('data-inline-show-logo', 'false')
+    script.setAttribute('data-inline-bg-fill', 'false')
+    script.setAttribute('data-inline-inherit-ref-from-url-param', '')
+    script.setAttribute('data-inline-ref', 'website_widget')
+    container.appendChild(script)
+
+    return () => {
+      container.innerHTML = ''
+    }
+  }, [])
+
+  return (
+    <div
+      ref={widgetRef}
+      className="tt-widget"
+      style={{ width: '100%', minHeight: 120 }}
+    />
+  )
+}
 
 export default function TicketsPage() {
   return (
@@ -127,14 +172,7 @@ export default function TicketsPage() {
             </p>
           </div>
 
-          <iframe
-            src="https://www.tickettailor.com/all-tickets/brimscombeandthruppfc/?ref=website_widget"
-            width="100%"
-            height="650"
-            frameBorder="0"
-            style={{ border: 'none', borderRadius: 8 }}
-            title="BTFC Season Tickets"
-          />
+          <TicketTailorWidget />
         </div>
 
         <div style={{ marginBottom: 52 }}>
