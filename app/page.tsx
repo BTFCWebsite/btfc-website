@@ -75,6 +75,18 @@ export default async function HomePage() {
   }
 
   const lastScore = `${lastResult.btfcScore ?? 0}–${lastResult.opponentScore ?? 0}`
+  const longestFixtureTitleLength = Math.max(
+    `BTFC ${lastScore} ${lastResult.opponent}`.length,
+    `BTFC vs ${nextFixture.opponent}`.length
+  )
+  const fixtureCardsMaxWidth = Math.min(
+    1100,
+    Math.max(900, Math.ceil(longestFixtureTitleLength * 26.4 + 112))
+  )
+  const fixtureTitleFontSize = Math.max(
+    15,
+    Math.min(22, (fixtureCardsMaxWidth - 112) / (longestFixtureTitleLength * 1.2))
+  )
 
   const fixtureCardBase = {
     border: '1px solid rgba(255,255,255,.12)',
@@ -94,7 +106,7 @@ export default async function HomePage() {
   const fixtureTitle = {
     fontFamily: "'Barlow Condensed', sans-serif",
     fontWeight: 800,
-    fontSize: 'clamp(16px, 1.6vw, 22px)',
+    fontSize: fixtureTitleFontSize,
     color: '#fff',
     letterSpacing: '.03em',
     lineHeight: 1.08,
@@ -147,7 +159,7 @@ export default async function HomePage() {
           </div>
 
           {/* Result + Fixture cards */}
-          <div className="hero-cards" style={{ display: 'flex', gap: 16, flexWrap: 'nowrap', justifyContent: 'center', alignItems: 'stretch', width: '100%', maxWidth: 900 }}>
+          <div className="hero-cards" style={{ display: 'flex', gap: 16, flexWrap: 'nowrap', justifyContent: 'center', alignItems: 'stretch', width: '100%', maxWidth: fixtureCardsMaxWidth }}>
             <div style={{ ...fixtureCardBase, background: 'rgba(255,255,255,.06)', borderLeft: '4px solid #EF4444' }}>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: 'rgba(255,255,255,.5)', letterSpacing: '.16em', textTransform: 'uppercase', marginBottom: 6 }}>Latest Result</div>
               <div style={fixtureTitle}>
