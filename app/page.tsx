@@ -180,7 +180,7 @@ export default async function HomePage() {
         </div>
 
         {/* Jessons Meadow + Stats */}
-        <div style={{ position: 'relative', zIndex: 1, width: '100%' }}>
+        <div style={{ position: 'relative', zIndex: 1, width: 'calc(100% + 48px)', marginLeft: -24, marginRight: -24 }}>
           <div className="jessons-strip" style={{ background: 'rgba(4,27,95,.95)', borderTop: '1px solid rgba(255,255,255,.08)', padding: '16px 40px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
             <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 10, color: 'rgba(255,255,255,.4)', letterSpacing: '.15em', textTransform: 'uppercase' }}>Home of BTFC</span>
             <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,.15)' }} />
