@@ -26,36 +26,79 @@ function FirstTeamLeagueTable() {
       style={{
         marginTop: 40,
         background: '#fff',
-        border: '1px solid #E5E7EB',
-        borderRadius: 8,
-        padding: '24px 20px',
+        border: '1px solid #DCE3F1',
+        borderRadius: 10,
+        overflow: 'hidden',
+        boxShadow: '0 8px 24px rgba(4,27,95,0.08)',
       }}
     >
-      <h2
-        id="first-team-league-table"
+      <div
         style={{
-          margin: '0 0 20px',
-          fontFamily: "'Barlow Condensed',sans-serif",
-          fontWeight: 800,
-          fontSize: 30,
-          color: '#041B5F',
-          textAlign: 'center',
+          background: '#041B5F',
+          borderBottom: '5px solid #1149D8',
+          padding: '20px 26px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 16,
         }}
       >
-        First XI League Table
-      </h2>
+        <img
+          src="/branding/crest.png"
+          alt=""
+          style={{
+            width: 50,
+            height: 50,
+            borderRadius: '50%',
+            border: '2px solid #fff',
+            flexShrink: 0,
+          }}
+        />
 
-      <iframe
-        title="First XI Hellenic League Division One table"
-        src="/full-time/first-team.html"
-        style={{
-          display: 'block',
-          width: '100%',
-          height: 900,
-          border: 0,
-          background: '#fff',
-        }}
-      />
+        <div>
+          <h2
+            id="first-team-league-table"
+            style={{
+              margin: 0,
+              fontFamily: "'Barlow Condensed',sans-serif",
+              fontWeight: 800,
+              fontSize: 30,
+              lineHeight: 1,
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase',
+              color: '#fff',
+            }}
+          >
+            League Table
+          </h2>
+          <div
+            style={{
+              marginTop: 7,
+              fontFamily: "'Montserrat',sans-serif",
+              fontWeight: 700,
+              fontSize: 11,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: 'rgba(255,255,255,0.68)',
+            }}
+          >
+            First XI · Hellenic League Division One
+          </div>
+        </div>
+      </div>
+
+      <div style={{ padding: '18px 20px 8px' }}>
+        <iframe
+          title="First XI Hellenic League Division One table"
+          src="/full-time/first-team.html"
+          style={{
+            display: 'block',
+            width: '100%',
+            height: 820,
+            border: 0,
+            background: '#fff',
+          }}
+        />
+      </div>
     </section>
   )
 }
