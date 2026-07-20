@@ -2,7 +2,7 @@
 
 const faqs = [
   ['Can I pay in instalments?', 'Not currently — season tickets must be paid in full at time of purchase.'],
-  ['How do I get my ticket?', 'After payment you will receive your digital season ticket by email with a QR code. Save it to Apple Wallet or show it on your phone at the gate.'],
+  ['How do I get my ticket?', 'If you use an iPhone, you can add your digital season ticket to Apple Wallet. If you use Android, or would simply prefer a PDF, your ticket will be emailed to you. Both versions contain the QR code needed for entry.'],
   ['What is included?', 'Your season ticket covers all First XI home league and club cup fixtures throughout the 2026/27 season. Due to FA requirements, FA Vase matches are excluded and must be paid for separately on the day.'],
   ['Is my payment secure?', 'Yes. Payments are processed securely by Stripe.'],
   ['Do under 16s pay?', 'Under 16s are admitted free to all First XI matches. Proof of age may be requested.'],
@@ -38,7 +38,7 @@ export default function TicketsPage() {
 
             <p style={{ fontFamily: "'Montserrat', sans-serif", margin: '0 0 20px', color: 'rgba(255,255,255,.7)', fontSize: 13, lineHeight: 1.7 }}>
               All First XI home league &amp; club cup games included, excluding FA Vase ties.<br />
-              Digital QR ticket delivered instantly by email — save to Apple Wallet for easy matchday entry.
+              Digital QR season ticket — add it to Apple Wallet on iPhone, or receive it as a PDF by email.
             </p>
 
             <div style={{
@@ -88,8 +88,44 @@ export default function TicketsPage() {
           </h2>
 
           <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 12, color: '#6B7280', margin: '0 0 20px' }}>
-            Select your ticket type below. Your QR code season ticket will be emailed to you instantly on payment.
+            Select your ticket type below and complete your purchase.
           </p>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))',
+              gap: 12,
+              marginBottom: 24,
+              padding: 18,
+              background: '#EEF4FF',
+              border: '1px solid #BFDBFE',
+              borderLeft: '5px solid #1149D8',
+              borderRadius: 8,
+            }}
+          >
+            <div>
+              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 19, fontWeight: 800, color: '#041B5F', marginBottom: 5 }}>
+                🍎 Using an iPhone?
+              </div>
+              <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 12, color: '#374151', lineHeight: 1.6, margin: 0 }}>
+                You can add your digital season ticket to <strong>Apple Wallet</strong> for quick and easy access at the turnstile.
+              </p>
+            </div>
+
+            <div>
+              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 19, fontWeight: 800, color: '#041B5F', marginBottom: 5 }}>
+                📧 Using Android or prefer a PDF?
+              </div>
+              <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 12, color: '#374151', lineHeight: 1.6, margin: 0 }}>
+                We will email your season ticket to you as a <strong>PDF</strong>. Simply open it on your phone and show the QR code at the gate.
+              </p>
+            </div>
+
+            <p style={{ gridColumn: '1 / -1', fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: '#6B7280', lineHeight: 1.5, margin: 0 }}>
+              Both formats contain the same QR code and are equally valid for matchday entry.
+            </p>
+          </div>
 
           <iframe
             src="https://www.tickettailor.com/all-tickets/brimscombeandthruppfc/?ref=website_widget"
