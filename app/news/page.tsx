@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
-const CATEGORIES = ['All', 'Match Report', 'Club News', 'Tickets', 'Announcement', 'Youth', 'Matchday']
+const CATEGORIES = ['Club News', 'Match Report']
 
 const categoryColor: Record<string, string> = {
   'Match Report': '#1149D8',
@@ -37,12 +37,12 @@ const body = {
 } as const
 
 export default function NewsPage() {
-  const [active, setActive] = useState('All')
+  const [active, setActive] = useState('Club News')
   const [articles, setArticles] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const query = encodeURIComponent(`*[_type == "newsArticle"] | order(date desc) { _id, title, category, date, summary, "slug": slug.current }`)
+    const query = encodeURIComponent(`*[_type == "newsArticle" && category in ["Club News", "Match Report"]] | order(date desc) { _id, title, category, date, summary, "slug": slug.current }`)
     fetch(`https://vm0n9zl5.api.sanity.io/v2024-01-01/data/query/production?query=${query}`)
       .then(r => r.json())
       .then(data => {
@@ -52,7 +52,7 @@ export default function NewsPage() {
       .catch(() => setLoading(false))
   }, [])
 
-  const filtered = active === 'All' ? articles : articles.filter(n => n.category === active)
+  const filtered = articles.filter(n => n.category === active)
 
   return (
     <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '0 0 90px' }}>
@@ -92,7 +92,7 @@ export default function NewsPage() {
         {!loading && (
           <p style={{ ...body, fontSize: 11, color: '#9CA3AF', marginBottom: 20 }}>
             {filtered.length} {filtered.length === 1 ? 'article' : 'articles'}
-            {active !== 'All' ? ` in ${active}` : ''}
+            {` in ${active}`}
           </p>
         )}
 
