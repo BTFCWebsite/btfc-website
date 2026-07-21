@@ -6,8 +6,42 @@ import { getPlayers, getFixtures } from '../lib/sanity.client'
 const POS_COLORS: Record<string,string> = {
   GK:'#1e3a5f', CB:'#1149D8', LB:'#1149D8', RB:'#1149D8',
   CM:'#041B5F', CAM:'#2563FF', MID:'#1149D8', LW:'#2563FF',
-  RW:'#2563FF', ST:'#7f1d1d', FWD:'#7f1d1d', DEF:'#1149D8'
+  RW:'#2563FF', WINGER:'#2563FF', 'WINGER / ST':'#7f1d1d',
+  ST:'#7f1d1d', FWD:'#7f1d1d', DEF:'#1149D8'
 }
+
+const FIRST_TEAM_ROSTER: Player[] = [
+  { num:0, name:'Oli Gargett', pos:'GK', team:'First XI' },
+  { num:0, name:'Travis Wood', pos:'GK', team:'First XI' },
+  { num:0, name:'Lewis Toop', pos:'RB', team:'First XI' },
+  { num:0, name:'Matthew Jones', pos:'RB', team:'First XI' },
+  { num:0, name:'Aaron Dainton', pos:'CB', team:'First XI' },
+  { num:0, name:'Ben Saunders', pos:'CB', team:'First XI' },
+  { num:0, name:'Robbie James', pos:'CB', team:'First XI' },
+  { num:0, name:'Jamie Lock', pos:'LB', team:'First XI' },
+  { num:0, name:'Ryan Outram', pos:'LB', team:'First XI' },
+  { num:0, name:'Biagio Mazzotta', pos:'CM', team:'First XI' },
+  { num:0, name:'Dom Kent', pos:'CM', team:'First XI' },
+  { num:0, name:'Tom Moore', pos:'CM', team:'First XI' },
+  { num:0, name:'Ben Hall', pos:'CM', team:'First XI' },
+  { num:0, name:'James Piatek', pos:'CM', team:'First XI' },
+  { num:0, name:'Chalmers Phin', pos:'CAM', team:'First XI' },
+  { num:0, name:'Callum Blackford', pos:'CAM', team:'First XI' },
+  { num:0, name:'Zac Berry', pos:'Winger', team:'First XI' },
+  { num:0, name:'Jake Love', pos:'Winger', team:'First XI' },
+  { num:0, name:'Xavi Diaz Butcher', pos:'Winger', team:'First XI' },
+  { num:0, name:'Jai Griffiths', pos:'Winger', team:'First XI' },
+  { num:0, name:'Jacob Newdick', pos:'Winger / ST', team:'First XI' },
+  { num:0, name:'Oliver Bradbury', pos:'ST', team:'First XI' },
+  { num:0, name:'Macca Messenger', pos:'ST', team:'First XI' },
+]
+
+const FIRST_TEAM_STAFF = [
+  { name:'Tim Bond', role:'Manager' },
+  { name:'Ant Brown', role:'Assistant Manager' },
+  { name:'Nathan Marks', role:'CB · Player/Coach' },
+  { name:'Lola Preston', role:'Physio' },
+]
 
 type TeamKey = 'first' | 'reserves' | 'u17s'
 
@@ -50,7 +84,9 @@ function PlayerCard({ p }: { p: Player }) {
     <div style={{ background:'#fff', border:'2px solid #E5E7EB', borderLeft:`4px solid ${col}`, borderRadius:8, overflow:'hidden', position:'relative' }}>
       <div style={{ height:6, background:col }} />
       <div style={{ padding:'18px 14px 16px', textAlign:'center', position:'relative' }}>
-        <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:52, lineHeight:1, marginBottom:-8, color:'rgba(17,73,216,0.07)', letterSpacing:'0.02em' }}>{num}</div>
+        {p.num > 0 && (
+          <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:52, lineHeight:1, marginBottom:-8, color:'rgba(17,73,216,0.07)', letterSpacing:'0.02em' }}>{num}</div>
+        )}
         <span style={{ display:'inline-block', padding:'3px 10px', borderRadius:4, fontSize:10, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', color:'#fff', background:col, margin:'8px 0 8px', position:'relative', zIndex:1 }}>{p.pos}</span>
         <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:16, letterSpacing:'0.03em', lineHeight:1.1, color:'#2D2D2D', position:'relative', zIndex:1 }}>{p.name}</div>
       </div>
@@ -108,6 +144,24 @@ function SquadGrid({ players }: { players: Player[] }) {
         )}
       </div>
     </>
+  )
+}
+
+function ManagementTeam() {
+  return (
+    <section style={{ marginBottom:48 }}>
+      <h2 style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:26, color:'#041B5F', letterSpacing:'0.04em', textTransform:'uppercase', margin:'0 0 16px' }}>
+        Management Team
+      </h2>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))', gap:14 }}>
+        {FIRST_TEAM_STAFF.map((member) => (
+          <div key={member.name} style={{ background:'#041B5F', borderRadius:8, padding:'20px 18px', textAlign:'center', borderTop:'6px solid #1149D8' }}>
+            <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:20, color:'#fff', letterSpacing:'0.03em' }}>{member.name}</div>
+            <div style={{ marginTop:5, fontSize:10, fontWeight:700, color:'rgba(255,255,255,0.7)', letterSpacing:'0.1em', textTransform:'uppercase' }}>{member.role}</div>
+          </div>
+        ))}
+      </div>
+    </section>
   )
 }
 
@@ -248,7 +302,20 @@ export default function TeamsPage() {
     ]
   }
 
-  const firstTeam = players.filter(p => normaliseTeam(p.team) === 'first')
+  const sanityFirstTeam = players.filter(p => normaliseTeam(p.team) === 'first')
+  const firstTeam = [
+    ...FIRST_TEAM_ROSTER.map((listedPlayer) => {
+      const sanityPlayer = sanityFirstTeam.find(
+        (p) => p.name.trim().toLowerCase() === listedPlayer.name.toLowerCase()
+      )
+      return sanityPlayer ? { ...listedPlayer, ...sanityPlayer } : listedPlayer
+    }),
+    ...sanityFirstTeam.filter(
+      (p) => !FIRST_TEAM_ROSTER.some(
+        (listedPlayer) => listedPlayer.name.toLowerCase() === p.name.trim().toLowerCase()
+      )
+    ),
+  ]
   const reserves = players.filter(p => normaliseTeam(p.team) === 'reserves')
   const u17s = players.filter(p => normaliseTeam(p.team) === 'u17s')
 
@@ -280,6 +347,7 @@ export default function TeamsPage() {
           <>
             <TeamBanner title="BTFC First XI" subtitle="Uhlsport Hellenic League Division One" stats={bannerStats('First XI')} />
             <SquadGrid players={firstTeam} />
+            <ManagementTeam />
             <StatGrid stats={statsFor('First XI')} />
             <LastEightResults results={lastEightFor('First XI')} />
           </>
