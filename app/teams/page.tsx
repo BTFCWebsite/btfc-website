@@ -62,6 +62,22 @@ function PlayerCard({ p }: { p: Player }) {
   )
 }
 
+const positionGroups = [
+  { key: 'goalkeepers', label: 'Goalkeepers' },
+  { key: 'defenders', label: 'Defenders' },
+  { key: 'midfielders', label: 'Midfielders' },
+  { key: 'forwards', label: 'Forwards' },
+] as const
+
+function positionGroup(position: string) {
+  const value = String(position || '').toLowerCase()
+  if (value.includes('goal') || value === 'gk') return 'goalkeepers'
+  if (value.includes('def') || value.includes('back')) return 'defenders'
+  if (value.includes('mid')) return 'midfielders'
+  if (value.includes('wing') || value.includes('strik') || value.includes('forward')) return 'forwards'
+  return 'midfielders'
+}
+
 function TeamBanner({ title, subtitle, stats }: { title: string, subtitle: string, stats: { v: string, l: string }[] }) {
   return (
     <div style={{ background:'#041B5F', borderRadius:8, padding:'20px 28px', marginBottom:32, display:'flex', alignItems:'center', gap:16, flexWrap:'wrap' }}>
@@ -83,35 +99,26 @@ function TeamBanner({ title, subtitle, stats }: { title: string, subtitle: strin
 }
 
 function SquadGrid({ players }: { players: Player[] }) {
-  const [filter, setFilter] = useState('All')
-  const positions = ['All', ...Array.from(new Set(players.map(p => p.pos).filter(Boolean)))]
-  const filtered = filter === 'All' ? players : players.filter(p => p.pos === filter)
-
   return (
-    <>
-      <div style={{ display:'flex', gap:8, flexWrap:'wrap', justifyContent:'center', marginBottom:24 }}>
-        {positions.map(pos => (
-          <button key={pos} onClick={() => setFilter(pos)} style={{
-            padding:'6px 16px', borderRadius:6, cursor:'pointer',
-            fontFamily:"'Montserrat',sans-serif", fontWeight:700, fontSize:11,
-            letterSpacing:'0.08em', textTransform:'uppercase',
-            background: filter===pos ? '#1149D8' : '#fff',
-            color: filter===pos ? '#fff' : '#6B7280',
-            border: `1px solid ${filter===pos ? '#1149D8' : '#E5E7EB'}`
-          }}>{pos}</button>
-        ))}
-      </div>
-
-      <div className="squad-shirt-grid">
-        {filtered.length === 0 ? (
-          <div style={{ gridColumn:'1 / -1', background:'#fff', border:'1px solid #E5E7EB', borderRadius:8, padding:28, textAlign:'center', color:'#9CA3AF', fontFamily:"'Montserrat',sans-serif", fontSize:13 }}>
+    <div className="squad-pitch">
+      {players.length === 0 ? (
+          <div className="squad-empty">
             No active players added in Sanity for this squad yet.
           </div>
-        ) : (
-          filtered.map((p) => <PlayerCard key={p._id || `${p.name}-${p.num}`} p={p} />)
-        )}
-      </div>
-    </>
+      ) : positionGroups.map(({ key, label }) => {
+        const group = players.filter(player => positionGroup(player.pos) === key)
+        if (group.length === 0) return null
+
+        return (
+          <section className="squad-position-line" key={key} aria-labelledby={`squad-${key}`}>
+            <h3 id={`squad-${key}`}>{label}</h3>
+            <div className="squad-shirt-grid">
+              {group.map((p) => <PlayerCard key={p._id || `${p.name}-${p.num}`} p={p} />)}
+            </div>
+          </section>
+        )
+      })}
+    </div>
   )
 }
 
@@ -209,7 +216,7 @@ export default function TeamsPage() {
           _id: p._id,
           name: p.name,
           num: p.squadNumber,
-          pos: p.position,
+          pos: p.name === 'Jacob Newdick' ? 'Striker' : p.position,
           team: p.team,
         }))
         setPlayers(mapped)
