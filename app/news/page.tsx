@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { getNewsArticles } from '../lib/sanity.client'
 
 const CATEGORIES = ['Club News', 'Match Report']
 
@@ -42,14 +43,10 @@ export default function NewsPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const query = encodeURIComponent(`*[_type == "newsArticle" && category in ["Club News", "Match Report"]] | order(date desc) { _id, title, category, date, summary, "slug": slug.current }`)
-    fetch(`https://vm0n9zl5.api.sanity.io/v2024-01-01/data/query/production?query=${query}`)
-      .then(r => r.json())
-      .then(data => {
-        if (data.result) setArticles(data.result)
-        setLoading(false)
-      })
-      .catch(() => setLoading(false))
+    getNewsArticles()
+      .then(data => setArticles((data || []).filter((article: any) => CATEGORIES.includes(article.category))))
+      .catch(error => console.error('Failed to load news:', error))
+      .finally(() => setLoading(false))
   }, [])
 
   const filtered = articles.filter(n => n.category === active)
