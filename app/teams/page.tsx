@@ -86,9 +86,19 @@ const positionGroups = [
 ] as const
 
 function positionGroup(position: string) {
-  const value = String(position || '').toLowerCase()
-  if (value.includes('goal') || value === 'gk') return 'goalkeepers'
-  if (value.includes('def') || value.includes('back')) return 'defenders'
+  const value = String(position || '').toLowerCase().trim()
+  const positionCodes = value.split(/[\\s/,&+()-]+/).filter(Boolean)
+
+  if (value.includes('goal') || positionCodes.includes('gk')) return 'goalkeepers'
+  if (
+    value.includes('def') ||
+    value.includes('back') ||
+    value.includes('centre half') ||
+    value.includes('center half') ||
+    value.includes('sweeper') ||
+    value.includes('stopper') ||
+    positionCodes.some(code => ['cb', 'lb', 'rb', 'lcb', 'rcb', 'lwb', 'rwb'].includes(code))
+  ) return 'defenders'
   if (value.includes('mid')) return 'midfielders'
   if (value.includes('wing') || value.includes('strik') || value.includes('forward')) return 'forwards'
   return 'midfielders'
