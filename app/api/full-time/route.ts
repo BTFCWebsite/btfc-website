@@ -90,7 +90,10 @@ function parseTable(html: string) {
 
   return Array.from(body.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)).flatMap(row => {
     const cells = Array.from(row[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)).map(cell => textFromHtml(cell[1]))
-    if (cells.length < 8) return []
+    if (cells.length < 7) return []
+
+    // Adult tables normally include goal difference; some youth leagues do not.
+    const hasGoalDifference = cells.length >= 8
     return [{
       position: Number(cells[0]),
       team: cells[1],
@@ -98,8 +101,8 @@ function parseTable(html: string) {
       won: Number(cells[3]),
       drawn: Number(cells[4]),
       lost: Number(cells[5]),
-      goalDifference: Number(cells[6]),
-      points: Number(cells[7]),
+      goalDifference: hasGoalDifference ? Number(cells[6]) : 0,
+      points: Number(cells[hasGoalDifference ? 7 : 6]),
     }]
   })
 }
