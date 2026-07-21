@@ -151,10 +151,7 @@ img {
   width: min(100%, 170px);
   aspect-ratio: 1.08 / 1;
   color: #041b5f;
-  background:
-    linear-gradient(145deg, #1546ad 0 18%, transparent 18%) left top / 50% 46% no-repeat,
-    linear-gradient(215deg, #1546ad 0 18%, transparent 18%) right top / 50% 46% no-repeat,
-    #fff;
+  background: #1550bd;
   clip-path: polygon(24% 7%, 39% 0, 61% 0, 76% 7%, 100% 24%, 86% 44%, 76% 37%, 79% 100%, 21% 100%, 24% 37%, 14% 44%, 0 24%);
   filter: drop-shadow(0 6px 5px rgba(4, 27, 95, 0.18));
 }
@@ -163,17 +160,22 @@ img {
   content: '';
   position: absolute;
   z-index: 1;
-  inset: 4% 0 auto;
-  height: 39%;
+  inset: 3% 0 auto;
+  height: 43%;
   background:
-    radial-gradient(ellipse at 10% 55%, rgba(255,255,255,.9) 0 2%, transparent 2.6%),
-    radial-gradient(ellipse at 16% 69%, rgba(255,255,255,.72) 0 1.8%, transparent 2.5%),
-    radial-gradient(ellipse at 88% 52%, rgba(255,255,255,.9) 0 2%, transparent 2.6%),
-    radial-gradient(ellipse at 82% 72%, rgba(255,255,255,.72) 0 1.8%, transparent 2.5%),
-    repeating-linear-gradient(165deg, transparent 0 7px, rgba(255,255,255,.65) 7px 9px, transparent 9px 13px) left / 24% 100% no-repeat,
-    repeating-linear-gradient(195deg, transparent 0 7px, rgba(255,255,255,.65) 7px 9px, transparent 9px 13px) right / 24% 100% no-repeat;
-  -webkit-mask-image: linear-gradient(90deg, #000 0 23%, transparent 23% 77%, #000 77%);
-  mask-image: linear-gradient(90deg, #000 0 23%, transparent 23% 77%, #000 77%);
+    repeating-linear-gradient(145deg, transparent 0 6px, rgba(255,255,255,.72) 6px 8px, transparent 8px 12px) left / 27% 100% no-repeat,
+    repeating-linear-gradient(215deg, transparent 0 6px, rgba(255,255,255,.72) 6px 8px, transparent 8px 12px) right / 27% 100% no-repeat;
+  -webkit-mask-image: linear-gradient(90deg, #000 0 28%, transparent 28% 72%, #000 72%);
+  mask-image: linear-gradient(90deg, #000 0 28%, transparent 28% 72%, #000 72%);
+}
+
+.player-shirt::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  background: #fff;
+  clip-path: polygon(39% 0, 61% 0, 70% 15%, 76% 37%, 79% 100%, 21% 100%, 24% 37%, 30% 15%);
 }
 
 .player-shirt-collar {
@@ -204,7 +206,7 @@ img {
 .player-shirt-details {
   position: absolute;
   z-index: 4;
-  inset: 25% 20% 9%;
+  inset: 31% 22% 8%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -224,9 +226,9 @@ img {
 
 .player-shirt-name {
   width: 100%;
-  padding: 5px 3px;
-  background: #041b5f;
-  border-radius: 3px;
+  padding: 3px 2px;
+  background: transparent;
+  color: #041b5f;
   font-family: 'Barlow Condensed', sans-serif;
   font-size: clamp(13px, 1.25vw, 16px);
   font-weight: 800;
@@ -238,7 +240,7 @@ img {
 .player-shirt-position {
   margin-top: 5px;
   padding: 2px 7px;
-  background: #fff;
+  background: transparent;
   color: #041b5f;
   font-size: 9px;
   font-weight: 800;
