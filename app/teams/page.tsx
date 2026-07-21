@@ -50,6 +50,7 @@ function PlayerCard({ p }: { p: Player }) {
     <div className="player-shirt-card">
       <div className="player-shirt" aria-hidden="true">
         <div className="player-shirt-collar" />
+        <img className="player-shirt-crest" src="/branding/crest.png" alt="" />
         <div className="player-shirt-details">
           {num && <div className="player-shirt-number">{num}</div>}
           <div className="player-shirt-name">{p.name}</div>
