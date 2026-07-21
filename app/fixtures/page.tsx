@@ -18,6 +18,20 @@ type Fixture = {
   btfcScore?: number
   opponentScore?: number
   played: boolean
+  sourceUrl?: string
+  source?: string
+  location?: string
+}
+
+type LeagueRow = {
+  position: number
+  team: string
+  played: number
+  won: number
+  drawn: number
+  lost: number
+  goalDifference: number
+  points: number
 }
 
 const teamDetails = {
@@ -38,7 +52,7 @@ const teamDetails = {
   },
 } as const
 
-function FirstTeamFullTime() {
+function FirstTeamLeagueTable({ rows }: { rows: LeagueRow[] }) {
   return (
     <section
       aria-labelledby="first-team-full-time"
@@ -85,7 +99,7 @@ function FirstTeamFullTime() {
               color: '#fff',
             }}
           >
-            Fixtures, Results &amp; League Table
+            League Table
           </h2>
           <div
             style={{
@@ -102,18 +116,21 @@ function FirstTeamFullTime() {
           </div>
         </div>
       </div>
-      <div style={{ padding: '18px 20px 8px' }}>
-        <iframe
-          title="First XI fixtures, results and Hellenic League Division One table"
-          src="/full-time/first-team.html"
-          style={{
-            display: 'block',
-            width: '100%',
-            height: 1400,
-            border: 0,
-            background: '#fff',
-          }}
-        />
+      <div className="league-table-scroll" style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', minWidth: 650, borderCollapse: 'collapse', fontFamily: "'Montserrat',sans-serif", color: '#172554' }}>
+          <thead><tr style={{ background: '#EEF3FC' }}>
+            {['Pos', 'Team', 'P', 'W', 'D', 'L', 'GD', 'Pts'].map((heading, index) => <th key={heading} style={{ padding: '14px 12px', textAlign: index === 1 ? 'left' : 'center', color: '#041B5F', fontSize: 12, fontWeight: 800, textTransform: 'uppercase' }}>{heading}</th>)}
+          </tr></thead>
+          <tbody>{rows.map(row => {
+            const isBtfc = row.team === 'Brimscombe & Thrupp'
+            return <tr key={row.team} style={{ background: isBtfc ? '#E8F0FF' : '#fff', borderBottom: '1px solid #DCE3F1' }}>
+              <td style={{ padding: '13px 12px', textAlign: 'center', fontWeight: 800 }}>{row.position}</td>
+              <td style={{ padding: '13px 12px', fontWeight: isBtfc ? 900 : 700, color: isBtfc ? '#1149D8' : '#172554' }}>{row.team}</td>
+              {[row.played, row.won, row.drawn, row.lost, row.goalDifference, row.points].map((value, index) => <td key={index} style={{ padding: '13px 12px', textAlign: 'center', fontWeight: index === 5 ? 900 : 600 }}>{value}</td>)}
+            </tr>
+          })}</tbody>
+        </table>
+        {rows.length === 0 && <div style={{ padding: '42px 24px', textAlign: 'center', color: '#6B7280', fontFamily: "'Montserrat',sans-serif", fontSize: 13 }}>The league table is temporarily unavailable.</div>}
       </div>
     </section>
   )
@@ -177,6 +194,8 @@ export default function FixturesPage() {
   const [team, setTeam] = useState<TeamId>('first')
   const [view, setView] = useState<ViewId>('matches')
   const [matches, setMatches] = useState<Fixture[]>([])
+  const [fullTimeMatches, setFullTimeMatches] = useState<Fixture[]>([])
+  const [leagueTable, setLeagueTable] = useState<LeagueRow[]>([])
 
   useEffect(() => {
     async function loadFixtures() {
@@ -198,11 +217,21 @@ export default function FixturesPage() {
     }
 
     loadFixtures()
+
+    fetch('/api/full-time')
+      .then(response => response.ok ? response.json() : Promise.reject(new Error('Full-Time request failed')))
+      .then(data => {
+        setFullTimeMatches(data.matches || [])
+        setLeagueTable(data.table || [])
+      })
+      .catch(error => console.error('Failed to load Full-Time data:', error))
   }, [])
 
   const selectedTeam = teamDetails[team]
-  const teamMatches = matches
+  const combinedMatches = team === 'first' ? [...matches, ...fullTimeMatches] : matches
+  const teamMatches = combinedMatches
     .filter((match) => match.team === selectedTeam.sanityName)
+    .filter((match, index, all) => all.findIndex(candidate => candidate._id === match._id || (candidate.date === match.date && candidate.opponent === match.opponent)) === index)
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
   const matchesByMonth = teamMatches.reduce<Record<string, Fixture[]>>((groups, match) => {
@@ -220,7 +249,7 @@ export default function FixturesPage() {
 
   const viewTabs = [
     { id: 'matches', label: 'Fixtures & Results' },
-    { id: 'table', label: 'Full-Time' },
+    { id: 'table', label: 'League Table' },
   ] as const
 
   return (
@@ -399,7 +428,7 @@ export default function FixturesPage() {
 
         {view === 'table' && (
           team === 'first'
-            ? <FirstTeamFullTime />
+            ? <FirstTeamLeagueTable rows={leagueTable} />
             : <LeagueTablePlaceholder teamName={selectedTeam.heading} />
         )}
       </div>
@@ -433,9 +462,9 @@ function MobileFixtureCard({ match }: { match: Fixture }) {
         </div>
       </div>
       {match.played && (
-        <Link href={'/match-report/' + encodeURIComponent(match._id)} style={{ display: 'inline-block', marginTop: 13, color: '#1149D8', fontFamily: "'Montserrat',sans-serif", fontSize: 11, fontWeight: 800, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          Match Report →
-        </Link>
+        match.sourceUrl
+          ? <a href={match.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: 13, color: '#1149D8', fontFamily: "'Montserrat',sans-serif", fontSize: 11, fontWeight: 800, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Full-Time details →</a>
+          : <Link href={'/match-report/' + encodeURIComponent(match._id)} style={{ display: 'inline-block', marginTop: 13, color: '#1149D8', fontFamily: "'Montserrat',sans-serif", fontSize: 11, fontWeight: 800, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Match Report →</Link>
       )}
     </article>
   )
@@ -497,12 +526,9 @@ function FragmentRows({ month, matches }: { month: string; matches: Fixture[] })
             </td>
             <td style={cellStyle}>
               {match.played ? (
-                <Link
-                  href={'/match-report/' + encodeURIComponent(match._id)}
-                  style={{ color: '#1149D8', fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}
-                >
-                  Match Report
-                </Link>
+                match.sourceUrl
+                  ? <a href={match.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#1149D8', fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}>Full-Time details</a>
+                  : <Link href={'/match-report/' + encodeURIComponent(match._id)} style={{ color: '#1149D8', fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}>Match Report</Link>
               ) : '—'}
             </td>
           </tr>
