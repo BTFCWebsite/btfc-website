@@ -299,6 +299,17 @@ img {
   box-shadow: 0 8px 20px rgba(4, 27, 95, .24);
 }
 
+.management-profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 230px));
+  justify-content: center;
+  gap: 20px;
+}
+
+.management-profile-card .player-profile-photo {
+  aspect-ratio: 4 / 5;
+}
+
 .player-profile-photo {
   position: relative;
   aspect-ratio: 4 / 5;
@@ -393,6 +404,7 @@ img {
 
 @media (max-width: 480px) {
   .squad-player-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .management-profile-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .player-profile-identity { padding: 30px 10px 10px; }
   .player-profile-identity h4 { font-size: 19px; }
   .player-sponsor-panel { min-height: 68px; padding: 10px 7px; }
