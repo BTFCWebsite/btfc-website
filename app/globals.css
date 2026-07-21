@@ -283,3 +283,118 @@ img {
     font-size: 13px;
   }
 }
+
+/* Photographic squad panels */
+.squad-player-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 230px));
+  justify-content: center;
+  gap: 20px;
+}
+
+.player-profile-card {
+  overflow: hidden;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(4, 27, 95, .24);
+}
+
+.player-profile-photo {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: linear-gradient(145deg, #0c43b5, #041b5f);
+}
+
+.player-profile-photo > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.player-photo-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: radial-gradient(circle at 50% 35%, #1d5bd5 0, #0b3a9f 45%, #041b5f 100%);
+  color: rgba(255, 255, 255, .72);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.player-photo-placeholder img { width: 76px; opacity: .28; }
+
+.player-squad-number {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  min-width: 34px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #fff;
+  color: #041b5f;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+}
+
+.player-profile-identity {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 38px 15px 14px;
+  background: linear-gradient(transparent, rgba(4, 27, 95, .96) 55%);
+  color: #fff;
+}
+
+.player-profile-identity h4 {
+  margin: 0;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 25px;
+  font-weight: 900;
+  line-height: .95;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+
+.player-profile-identity p {
+  margin: 6px 0 0;
+  color: rgba(255, 255, 255, .76);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.player-sponsor-panel {
+  min-height: 76px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-top: 4px solid #1149d8;
+  color: #041b5f;
+}
+
+.player-sponsor-panel img { max-width: 105px; max-height: 30px; margin-bottom: 5px; object-fit: contain; }
+.player-sponsor-panel span { font-size: 8px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #718096; }
+.player-sponsor-panel strong { margin-top: 4px; font-family: 'Barlow Condensed', sans-serif; font-size: 16px; line-height: 1; text-transform: uppercase; }
+.player-sponsor-panel:not(.has-sponsor) { background: #f2f5fb; }
+
+@media (max-width: 480px) {
+  .squad-player-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .player-profile-identity { padding: 30px 10px 10px; }
+  .player-profile-identity h4 { font-size: 19px; }
+  .player-sponsor-panel { min-height: 68px; padding: 10px 7px; }
+  .player-sponsor-panel strong { font-size: 14px; }
+}
