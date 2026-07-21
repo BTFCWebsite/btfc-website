@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { getSponsors } from '../lib/sanity.client'
 
 const h2 = {
   fontFamily: "'Barlow Condensed', sans-serif",
@@ -166,6 +167,7 @@ const currentSponsors = {
 }
 
 export default function SponsorsPage() {
+  const [sponsors, setSponsors] = useState<any[]>([])
   const [submitted, setSubmitted] = useState(false)
   const [form, setForm] = useState({
     name: '',
@@ -175,6 +177,16 @@ export default function SponsorsPage() {
     package: 'Gold Partner',
     message: '',
   })
+
+  useEffect(() => {
+    getSponsors().then((data) => setSponsors(data || [])).catch(console.error)
+  }, [])
+
+  const displayedSponsors = sponsors.length ? {
+    principal: sponsors.filter((s) => s.tier === 'principal'),
+    gold: sponsors.filter((s) => s.tier === 'official'),
+    club: sponsors.filter((s) => s.tier === 'club'),
+  } : currentSponsors
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -205,7 +217,7 @@ export default function SponsorsPage() {
             gap: 20,
             marginBottom: 20,
           }}>
-            {currentSponsors.principal.map(s => (
+            {displayedSponsors.principal.map(s => (
               <div key={s.name} style={{
                 ...card,
                 width: '100%',
@@ -224,7 +236,7 @@ export default function SponsorsPage() {
                   justifyContent: 'center',
                   marginBottom: 16,
                 }}>
-                  <img src={s.logo} alt={s.name} style={{ maxHeight: 70, maxWidth: '80%', objectFit: 'contain' }} />
+                  <img src={'logoUrl' in s ? s.logoUrl : s.logo} alt={s.name} style={{ maxHeight: 70, maxWidth: '80%', objectFit: 'contain' }} />
                 </div>
 
                 <h3 style={h3}>{s.name}</h3>
@@ -256,7 +268,7 @@ export default function SponsorsPage() {
             gap: 16,
             marginBottom: 32,
           }}>
-            {currentSponsors.gold.map(s => (
+            {displayedSponsors.gold.map(s => (
               <div key={s.name} style={{
                 ...card,
                 textAlign: 'center',
@@ -294,7 +306,7 @@ export default function SponsorsPage() {
             gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
             gap: 20,
           }}>
-            {currentSponsors.club.map(s => (
+            {displayedSponsors.club.map(s => (
               <div key={s.name} style={{
                 ...card,
                 textAlign: 'center',
