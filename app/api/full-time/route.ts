@@ -6,7 +6,7 @@ const FALLBACK_DIVISION_SEASON = '320568525'
 const BTFC = 'Brimscombe & Thrupp'
 
 export const dynamic = 'force-dynamic'
-export const maxDuration = 60
+export const runtime = 'edge'
 
 function textFromHtml(value: string) {
   return value
