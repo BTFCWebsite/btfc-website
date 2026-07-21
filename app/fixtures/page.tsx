@@ -218,11 +218,20 @@ export default function FixturesPage() {
         if (widgetCode) params.set('widget', widgetCode)
         if (divisionSeason) params.set('division', divisionSeason)
 
-        const response = await fetch(`/api/full-time?${params.toString()}`)
-        if (!response.ok) throw new Error('Full-Time request failed')
-        const fullTimeData = await response.json()
-        setFullTimeMatches(fullTimeData.matches || [])
-        setLeagueTable(fullTimeData.table || [])
+        const [matchesResponse, tableResponse] = await Promise.all([
+          fetch(`/api/full-time?${params.toString()}&kind=matches`),
+          fetch(`/api/full-time?${params.toString()}&kind=table`),
+        ])
+
+        if (matchesResponse.ok) {
+          const fullTimeData = await matchesResponse.json()
+          setFullTimeMatches(fullTimeData.matches || [])
+        }
+        if (tableResponse.ok) {
+          const fullTimeData = await tableResponse.json()
+          setLeagueTable(fullTimeData.table || [])
+        }
+        if (!matchesResponse.ok && !tableResponse.ok) throw new Error('Full-Time requests failed')
       } catch (error) {
         console.error('Failed to load fixtures:', error)
       }
