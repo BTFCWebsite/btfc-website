@@ -1,5 +1,8 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+import { getFixtures } from '../lib/sanity.client'
+
 const NEXT_HOME_GAME = {
   opponent: 'Fixture TBC',
   date: 'TBC — fixtures released July 2026',
@@ -108,6 +111,24 @@ const subhead = {
 } as const
 
 export default function MatchdayPage() {
+  const [nextHomeGame, setNextHomeGame] = useState(NEXT_HOME_GAME)
+
+  useEffect(() => {
+    getFixtures().then((fixtures) => {
+      const today = new Date().toISOString().slice(0, 10)
+      const next = (fixtures || []).find((fixture: any) =>
+        fixture.team === 'First XI' && fixture.venue === 'Home' && fixture.date >= today && !fixture.played
+      )
+      if (next) {
+        setNextHomeGame({
+          opponent: next.opponent,
+          date: new Date(`${next.date}T12:00:00`).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' }),
+          time: next.kickoff || '15:00',
+          competition: next.competition || 'First XI',
+        })
+      }
+    }).catch(console.error)
+  }, [])
   return (
     <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '0 0 90px' }}>
       <section style={{ maxWidth: 980, margin: '0 auto', padding: '52px 24px' }}>
@@ -143,7 +164,7 @@ export default function MatchdayPage() {
               margin: '0 0 6px',
               letterSpacing: '0.03em',
             }}>
-              BTFC vs {NEXT_HOME_GAME.opponent}
+              BTFC vs {nextHomeGame.opponent}
             </h2>
 
             <p style={{
@@ -153,7 +174,7 @@ export default function MatchdayPage() {
               fontSize: 13,
               lineHeight: 1.6,
             }}>
-              📅 {NEXT_HOME_GAME.date} · ⏰ {NEXT_HOME_GAME.time} · 📍 Jessons Meadow · {NEXT_HOME_GAME.competition}
+              📅 {nextHomeGame.date} · ⏰ {nextHomeGame.time} · 📍 Jessons Meadow · {nextHomeGame.competition}
             </p>
           </div>
 
