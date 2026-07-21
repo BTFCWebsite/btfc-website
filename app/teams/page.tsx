@@ -82,25 +82,34 @@ const positionGroups = [
   { key: 'goalkeepers', label: 'Goalkeepers' },
   { key: 'defenders', label: 'Defenders' },
   { key: 'midfielders', label: 'Midfielders' },
-  { key: 'forwards', label: 'Forwards' },
+  { key: 'strikers', label: 'Strikers' },
 ] as const
 
 function positionGroup(position: string) {
-  const value = String(position || '').toLowerCase().trim()
-  const positionCodes = value.split(/[\\s/,&+()-]+/).filter(Boolean)
+  const value = String(position || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
+  const roles = new Set(value.split(/\s+/).filter(Boolean))
 
-  if (value.includes('goal') || positionCodes.includes('gk')) return 'goalkeepers'
+  if (roles.has('gk') || value.includes('goalkeeper')) return 'goalkeepers'
+
+  // Attacking roles take priority for mixed descriptions such as
+  // "Striker / Winger", so those players remain in the Strikers group.
   if (
-    value.includes('def') ||
-    value.includes('back') ||
-    value.includes('centre half') ||
-    value.includes('center half') ||
-    value.includes('sweeper') ||
-    value.includes('stopper') ||
-    positionCodes.some(code => ['cb', 'lb', 'rb', 'lcb', 'rcb', 'lwb', 'rwb'].includes(code))
+    roles.has('st') || roles.has('cf') || roles.has('lw') || roles.has('rw') ||
+    value.includes('striker') || value.includes('forward') || value.includes('winger')
+  ) return 'strikers'
+
+  if (
+    roles.has('rb') || roles.has('lb') || roles.has('cb') || roles.has('rwb') || roles.has('lwb') ||
+    value.includes('defender') || value.includes('centre back') || value.includes('center back') ||
+    value.includes('centre half') || value.includes('center half') || value.includes('full back') ||
+    value.includes('wing back')
   ) return 'defenders'
-  if (value.includes('mid')) return 'midfielders'
-  if (value.includes('wing') || value.includes('strik') || value.includes('forward')) return 'forwards'
+
+  if (
+    roles.has('cm') || roles.has('cam') || roles.has('cdm') || roles.has('dm') || roles.has('am') ||
+    roles.has('lm') || roles.has('rm') || value.includes('midfielder') || value.includes('midfield')
+  ) return 'midfielders'
+
   return 'midfielders'
 }
 
@@ -242,7 +251,7 @@ export default function TeamsPage() {
           _id: p._id,
           name: p.name,
           num: p.squadNumber,
-          pos: p.name === 'Jacob Newdick' ? 'Striker' : p.position,
+          pos: p.name === 'Jacob Newdick' ? 'Striker / Winger' : p.position,
           team: p.team,
           imageUrl: p.imageUrl,
           sponsorName: p.sponsorName,
