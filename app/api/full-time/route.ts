@@ -114,11 +114,19 @@ function parseTable(html: string) {
 
 export async function GET() {
   try {
-    const feed = await client.fetch<MatchFeed | null>(
-      `*[_type == "matchFeed" && active == true && team == "First XI"] | order(order asc)[0] { snippet }`,
-      {},
-      { cache: 'no-store' }
-    )
+    let feed: MatchFeed | null = null
+    try {
+      feed = await Promise.race([
+        client.fetch<MatchFeed | null>(
+          `*[_type == "matchFeed" && active == true && team == "First XI"] | order(order asc)[0] { snippet }`,
+          {},
+          { cache: 'no-store' }
+        ),
+        new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500)),
+      ])
+    } catch (error) {
+      console.error('Unable to read Full-Time configuration from Sanity; using confirmed fallback codes:', error)
+    }
     const { widgetCode, divisionSeason } = feedCodes(feed?.snippet)
 
     const requestOptions = {
