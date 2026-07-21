@@ -11,6 +11,9 @@ type Player = {
   name: string
   pos: string
   team: string
+  imageUrl?: string
+  sponsorName?: string
+  sponsorLogoUrl?: string
 }
 
 type TeamStaff = {
@@ -47,18 +50,31 @@ function PlayerCard({ p }: { p: Player }) {
   const num = p.num > 0 ? String(p.num) : null
 
   return (
-    <div className="player-shirt-card">
-      <div className="player-shirt" aria-hidden="true">
-        <div className="player-shirt-collar" />
-        <img className="player-shirt-crest" src="/branding/crest.png" alt="" />
-        <div className="player-shirt-details">
-          {num && <div className="player-shirt-number">{num}</div>}
-          <div className="player-shirt-name">{p.name}</div>
-          <div className="player-shirt-position">{p.pos}</div>
+    <article className="player-profile-card">
+      <div className={`player-profile-photo${p.imageUrl ? '' : ' is-placeholder'}`}>
+        {p.imageUrl ? (
+          <img src={p.imageUrl} alt={`${p.name}, ${p.pos}`} loading="lazy" />
+        ) : (
+          <div className="player-photo-placeholder" aria-label="Player photograph to follow">
+            <img src="/branding/crest.png" alt="" />
+            <span>Photo to follow</span>
+          </div>
+        )}
+        {num && <span className="player-squad-number">{num}</span>}
+        <div className="player-profile-identity">
+          <h4>{p.name}</h4>
+          <p>{p.pos}</p>
         </div>
       </div>
-      <span className="sr-only">{p.name}, {p.pos}{num ? `, squad number ${num}` : ''}</span>
-    </div>
+      <div className={`player-sponsor-panel${p.sponsorName || p.sponsorLogoUrl ? ' has-sponsor' : ''}`}>
+        {p.sponsorLogoUrl && <img src={p.sponsorLogoUrl} alt={p.sponsorName || `${p.name}'s sponsor`} loading="lazy" />}
+        {p.sponsorName ? (
+          <><span>Sponsored by</span><strong>{p.sponsorName}</strong></>
+        ) : (
+          <><span>Player sponsorship</span><strong>Sponsor this player</strong></>
+        )}
+      </div>
+    </article>
   )
 }
 
@@ -112,7 +128,7 @@ function SquadGrid({ players }: { players: Player[] }) {
         return (
           <section className="squad-position-line" key={key} aria-labelledby={`squad-${key}`}>
             <h3 id={`squad-${key}`}>{label}</h3>
-            <div className="squad-shirt-grid">
+            <div className="squad-player-grid">
               {group.map((p) => <PlayerCard key={p._id || `${p.name}-${p.num}`} p={p} />)}
             </div>
           </section>
@@ -218,6 +234,9 @@ export default function TeamsPage() {
           num: p.squadNumber,
           pos: p.name === 'Jacob Newdick' ? 'Striker' : p.position,
           team: p.team,
+          imageUrl: p.imageUrl,
+          sponsorName: p.sponsorName,
+          sponsorLogoUrl: p.sponsorLogoUrl,
         }))
         setPlayers(mapped)
       })
