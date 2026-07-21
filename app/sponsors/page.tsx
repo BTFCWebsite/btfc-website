@@ -213,7 +213,7 @@ export default function SponsorsPage() {
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
             gap: 20,
             marginBottom: 20,
           }}>
@@ -264,7 +264,7 @@ export default function SponsorsPage() {
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))',
             gap: 16,
             marginBottom: 32,
           }}>
@@ -303,7 +303,7 @@ export default function SponsorsPage() {
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))',
             gap: 20,
           }}>
             {displayedSponsors.club.map(s => (
@@ -344,7 +344,7 @@ export default function SponsorsPage() {
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
             gap: 20,
           }}>
             {packages.filter(p => !p.taken).map(p => (
@@ -419,7 +419,7 @@ export default function SponsorsPage() {
               <form onSubmit={handleSubmit}>
                 <div style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
                   gap: 16,
                   marginBottom: 16,
                 }}>
