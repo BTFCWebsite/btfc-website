@@ -162,6 +162,17 @@ function LeagueTablePlaceholder({ teamName }: { teamName: string }) {
   )
 }
 
+function OfficialFullTimeWidget({ title }: { title: string }) {
+  return (
+    <section style={{ marginTop: 24 }} aria-label={title}>
+      <h2 style={{ margin: '0 0 12px', color: '#041B5F', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 26, fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+        {title}
+      </h2>
+      <iframe src="/full-time/first-team.html" title={title} style={{ width: '100%', minHeight: 1400, border: 0, background: '#fff', borderRadius: 10 }} />
+    </section>
+  )
+}
+
 function fixtureMonth(date: string) {
   const parsed = new Date(date)
   if (Number.isNaN(parsed.getTime())) return 'Date TBC'
@@ -196,6 +207,7 @@ export default function FixturesPage() {
   const [matches, setMatches] = useState<Fixture[]>([])
   const [fullTimeMatches, setFullTimeMatches] = useState<Fixture[]>([])
   const [leagueTable, setLeagueTable] = useState<LeagueRow[]>([])
+  const [useOfficialWidget, setUseOfficialWidget] = useState(false)
 
   useEffect(() => {
     async function loadFixtures() {
@@ -234,6 +246,7 @@ export default function FixturesPage() {
         if (!matchesResponse.ok && !tableResponse.ok) throw new Error('Full-Time requests failed')
       } catch (error) {
         console.error('Failed to load fixtures:', error)
+        setUseOfficialWidget(true)
       }
     }
 
@@ -436,12 +449,15 @@ export default function FixturesPage() {
                 </div>
               )}
             </div>
+            {team === 'first' && useOfficialWidget && <OfficialFullTimeWidget title="Official League Fixtures & Results" />}
           </section>
         )}
 
         {view === 'table' && (
           team === 'first'
-            ? <FirstTeamLeagueTable rows={leagueTable} />
+            ? (useOfficialWidget || leagueTable.length === 0
+              ? <OfficialFullTimeWidget title="Official League Table" />
+              : <FirstTeamLeagueTable rows={leagueTable} />)
             : <LeagueTablePlaceholder teamName={selectedTeam.heading} />
         )}
       </div>
