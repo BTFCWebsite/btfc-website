@@ -52,6 +52,21 @@ const teamDetails = {
   },
 } as const
 
+// Verified opening table for U17 Division 1 (Full-Time division 761524402).
+// Used only when Full-Time blocks the live server request; live rows take priority.
+const under17OpeningTable: LeagueRow[] = [
+  { position: 1, team: 'Brimscombe & Thrupp U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
+  { position: 2, team: 'FC Lakeside Youth U17 Whites', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
+  { position: 3, team: 'Kempsey Colts U17 Falcons', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
+  { position: 4, team: 'Leckhampton Rovers Youth U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
+  { position: 5, team: 'Longlevens Youth U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
+  { position: 6, team: 'Perdiswell Colts U17 Tigers', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
+  { position: 7, team: 'Prestbury Phantoms Youth U17 Jets', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
+  { position: 8, team: 'Southside Star Youth U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
+  { position: 9, team: 'Stonehouse Town Youth U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
+  { position: 10, team: 'Westfields Youth U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
+]
+
 function LeagueTable({ rows, teamName }: { rows: LeagueRow[]; teamName: string }) {
   return (
     <section
@@ -277,6 +292,12 @@ export default function FixturesPage() {
   }, [])
 
   const selectedTeam = teamDetails[team]
+  const liveLeagueRows = leagueTables[selectedTeam.sanityName] || []
+  const displayedLeagueRows = liveLeagueRows.length
+    ? liveLeagueRows
+    : selectedTeam.sanityName === 'Under 17s'
+      ? under17OpeningTable
+      : []
   const combinedMatches = [...matches, ...fullTimeMatches]
   const teamMatches = combinedMatches
     .filter((match) => match.team === selectedTeam.sanityName)
@@ -479,11 +500,11 @@ export default function FixturesPage() {
         )}
 
         {view === 'table' && (
-          feedSnippets[selectedTeam.sanityName]
-            ? (officialWidgetFallbacks[selectedTeam.sanityName]?.table || !(leagueTables[selectedTeam.sanityName] || []).length
+          displayedLeagueRows.length
+            ? <LeagueTable rows={displayedLeagueRows} teamName={selectedTeam.heading} />
+            : feedSnippets[selectedTeam.sanityName]
               ? <OfficialFullTimeWidget title="Official League Table" snippet={feedSnippets[selectedTeam.sanityName]} />
-              : <LeagueTable rows={leagueTables[selectedTeam.sanityName]} teamName={selectedTeam.heading} />)
-            : <LeagueTablePlaceholder teamName={selectedTeam.heading} />
+              : <LeagueTablePlaceholder teamName={selectedTeam.heading} />
         )}
       </div>
     </main>
