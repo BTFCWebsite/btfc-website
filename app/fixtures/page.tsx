@@ -52,7 +52,7 @@ const teamDetails = {
   },
 } as const
 
-function FirstTeamLeagueTable({ rows }: { rows: LeagueRow[] }) {
+function LeagueTable({ rows, teamName }: { rows: LeagueRow[]; teamName: string }) {
   return (
     <section
       aria-labelledby="first-team-full-time"
@@ -112,7 +112,7 @@ function FirstTeamLeagueTable({ rows }: { rows: LeagueRow[] }) {
               color: 'rgba(255,255,255,0.68)',
             }}
           >
-            First XI · Hellenic League Division One
+            {teamName}
           </div>
         </div>
       </div>
@@ -162,13 +162,14 @@ function LeagueTablePlaceholder({ teamName }: { teamName: string }) {
   )
 }
 
-function OfficialFullTimeWidget({ title }: { title: string }) {
+function OfficialFullTimeWidget({ title, snippet }: { title: string; snippet: string }) {
+  const document = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;background:#fff;font-family:Arial,sans-serif}#full-time-widget{width:100%;overflow-x:auto}</style></head><body><div id="full-time-widget">${snippet}</div></body></html>`
   return (
     <section style={{ marginTop: 24 }} aria-label={title}>
       <h2 style={{ margin: '0 0 12px', color: '#041B5F', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 26, fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
         {title}
       </h2>
-      <iframe src="/full-time/first-team.html" title={title} style={{ width: '100%', minHeight: 1400, border: 0, background: '#fff', borderRadius: 10 }} />
+      <iframe srcDoc={document} title={title} style={{ width: '100%', minHeight: 1400, border: 0, background: '#fff', borderRadius: 10 }} />
     </section>
   )
 }
@@ -206,8 +207,9 @@ export default function FixturesPage() {
   const [view, setView] = useState<ViewId>('matches')
   const [matches, setMatches] = useState<Fixture[]>([])
   const [fullTimeMatches, setFullTimeMatches] = useState<Fixture[]>([])
-  const [leagueTable, setLeagueTable] = useState<LeagueRow[]>([])
-  const [useOfficialWidget, setUseOfficialWidget] = useState(false)
+  const [leagueTables, setLeagueTables] = useState<Record<string, LeagueRow[]>>({})
+  const [feedSnippets, setFeedSnippets] = useState<Record<string, string>>({})
+  const [useOfficialWidget, setUseOfficialWidget] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     async function loadFixtures() {
@@ -223,30 +225,43 @@ export default function FixturesPage() {
           )
         )
 
-        const firstTeamSnippet = feeds?.find((feed: any) => feed?.team === 'First XI')?.snippet || ''
-        const widgetCode = firstTeamSnippet.match(/\blrcode\s*=\s*['\"](\d+)['\"]/i)?.[1]
-        const divisionSeason = firstTeamSnippet.match(/[?&]divisionseason=(\d+)/i)?.[1]
-        const params = new URLSearchParams()
-        if (widgetCode) params.set('widget', widgetCode)
-        if (divisionSeason) params.set('division', divisionSeason)
-
-        const [matchesResponse, tableResponse] = await Promise.all([
-          fetch(`/api/full-time?${params.toString()}&kind=matches`),
-          fetch(`/api/full-time?${params.toString()}&kind=table`),
-        ])
-
-        if (matchesResponse.ok) {
-          const fullTimeData = await matchesResponse.json()
-          setFullTimeMatches(fullTimeData.matches || [])
+        const canonicalTeam = (value = '') => {
+          const normalised = value.toLowerCase().replace(/[^a-z0-9]/g, '')
+          if (normalised.includes('u17') || normalised.includes('under17')) return 'Under 17s'
+          if (normalised.includes('reserve')) return 'Reserves'
+          if (normalised.includes('first')) return 'First XI'
+          return value
         }
-        if (tableResponse.ok) {
-          const fullTimeData = await tableResponse.json()
-          setLeagueTable(fullTimeData.table || [])
-        }
-        if (!matchesResponse.ok && !tableResponse.ok) throw new Error('Full-Time requests failed')
+        const activeFeeds = (feeds || [])
+          .map((feed: any) => ({ team: canonicalTeam(feed?.team), snippet: feed?.snippet || '' }))
+          .filter((feed: any) => feed.team && feed.snippet)
+        setFeedSnippets(Object.fromEntries(activeFeeds.map((feed: any) => [feed.team, feed.snippet])))
+
+        const results = await Promise.all(activeFeeds.map(async (feed: any) => {
+          const widgetCode = feed.snippet.match(/\blrcode\s*=\s*['\"](\d+)['\"]/i)?.[1]
+          const divisionSeason = feed.snippet.match(/[?&]divisionseason=(\d+)/i)?.[1]
+          const params = new URLSearchParams({ team: feed.team })
+          if (widgetCode) params.set('widget', widgetCode)
+          if (divisionSeason) params.set('division', divisionSeason)
+          const [matchesResponse, tableResponse] = await Promise.all([
+            fetch(`/api/full-time?${params.toString()}&kind=matches`),
+            fetch(`/api/full-time?${params.toString()}&kind=table`),
+          ])
+          const matchData = matchesResponse.ok ? await matchesResponse.json() : { matches: [] }
+          const tableData = tableResponse.ok ? await tableResponse.json() : { table: [] }
+          return {
+            team: feed.team,
+            matches: matchData.matches || [],
+            table: tableData.table || [],
+            fallback: !matchesResponse.ok || !tableResponse.ok,
+          }
+        }))
+        setFullTimeMatches(results.flatMap(result => result.matches))
+        setLeagueTables(Object.fromEntries(results.map(result => [result.team, result.table])))
+        setUseOfficialWidget(Object.fromEntries(results.map(result => [result.team, result.fallback])))
       } catch (error) {
         console.error('Failed to load fixtures:', error)
-        setUseOfficialWidget(true)
+        setUseOfficialWidget({ 'First XI': true, Reserves: true, 'Under 17s': true })
       }
     }
 
@@ -254,7 +269,7 @@ export default function FixturesPage() {
   }, [])
 
   const selectedTeam = teamDetails[team]
-  const combinedMatches = team === 'first' ? [...matches, ...fullTimeMatches] : matches
+  const combinedMatches = [...matches, ...fullTimeMatches]
   const teamMatches = combinedMatches
     .filter((match) => match.team === selectedTeam.sanityName)
     .filter((match, index, all) => all.findIndex(candidate => candidate._id === match._id || (candidate.date === match.date && candidate.opponent === match.opponent)) === index)
@@ -449,15 +464,17 @@ export default function FixturesPage() {
                 </div>
               )}
             </div>
-            {team === 'first' && useOfficialWidget && <OfficialFullTimeWidget title="Official League Fixtures & Results" />}
+            {useOfficialWidget[selectedTeam.sanityName] && feedSnippets[selectedTeam.sanityName] && (
+              <OfficialFullTimeWidget title="Official League Fixtures & Results" snippet={feedSnippets[selectedTeam.sanityName]} />
+            )}
           </section>
         )}
 
         {view === 'table' && (
-          team === 'first'
-            ? (useOfficialWidget || leagueTable.length === 0
-              ? <OfficialFullTimeWidget title="Official League Table" />
-              : <FirstTeamLeagueTable rows={leagueTable} />)
+          feedSnippets[selectedTeam.sanityName]
+            ? (useOfficialWidget[selectedTeam.sanityName] || !(leagueTables[selectedTeam.sanityName] || []).length
+              ? <OfficialFullTimeWidget title="Official League Table" snippet={feedSnippets[selectedTeam.sanityName]} />
+              : <LeagueTable rows={leagueTables[selectedTeam.sanityName]} teamName={selectedTeam.heading} />)
             : <LeagueTablePlaceholder teamName={selectedTeam.heading} />
         )}
       </div>
