@@ -2,7 +2,67 @@
   box-sizing: border-box;
 }
 
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+body {
+  margin: 0;
+}
+
+/* Allow responsive flex/grid children to shrink inside the phone viewport. */
+main,
+main section,
+main div,
+main article,
+main form,
+main table,
+header,
+footer,
+nav {
+  min-width: 0;
+}
+
+p,
+li,
+a,
+h1,
+h2,
+h3,
+h4,
+td,
+th {
+  overflow-wrap: anywhere;
+}
+
 img {
   max-width: 100%;
   height: auto;
+}
+
+.fixtures-mobile-list {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .fixtures-desktop-table {
+    display: none;
+  }
+
+  .fixtures-mobile-list {
+    display: block;
+  }
+
+  /* Keep controls and media within narrow devices without changing desktop. */
+  main input,
+  main textarea,
+  main select,
+  main button,
+  main iframe,
+  main video {
+    max-width: 100%;
+  }
 }
