@@ -8,12 +8,21 @@ export const client = createClient({
   token: undefined,
 })
 
+async function fetchContent<T>(type: string): Promise<T> {
+  if (typeof window === 'undefined') {
+    throw new Error('The same-origin content endpoint is intended for browser requests')
+  }
+
+  const response = await fetch(`/api/content?type=${encodeURIComponent(type)}`, {
+    cache: 'no-store',
+  })
+
+  if (!response.ok) throw new Error(`Content request failed (${response.status})`)
+  return response.json()
+}
+
 export async function getSiteSettings() {
-  return client.fetch(
-    `*[_type == "siteSettings"][0]`,
-    {},
-    { cache: 'no-store' }
-  )
+  return fetchContent<any>('settings')
 }
 
 export async function getLatestNews() {
@@ -28,64 +37,20 @@ export async function getLatestNews() {
 }
 
 export async function getNewsArticles() {
-  return client.fetch(
-   `*[_type == "newsArticle"] | order(date desc)[0...3] {
-      _id, title, category, date, summary, body,
-      "imageUrl": image.asset->url
-    }`,
-    {},
-    { cache: 'no-store' }
-  )
+  return fetchContent<any[]>('news')
 }
 
 export async function getFixtures() {
-  return client.fetch(
-    `*[_type == "fixture"] | order(date asc) {
-      _id, date, opponent, team, venue,
-      competition, kickoff, btfcScore, opponentScore, played
-    }`,
-    {},
-    { cache: 'no-store' }
-  )
+  return fetchContent<any[]>('fixtures')
 }
 
 export async function getSponsors() {
-  return client.fetch(
-    `*[_type == "sponsor"] | order(order asc) {
-      _id, name, tier, role, website,
-      "logoUrl": logo.asset->url
-    }`,
-    {},
-    { cache: 'no-store' }
-  )
+  return fetchContent<any[]>('sponsors')
 }
 export async function getPlayers() {
-  return client.fetch(
-    `*[_type == "player" && active == true] | order(order asc, squadNumber asc) {
-      _id,
-      name,
-      squadNumber,
-      position,
-      team,
-      active,
-      order
-    }`,
-    {},
-    { cache: 'no-store' }
-  )
+  return fetchContent<any[]>('players')
 }
 
 export async function getTeamStaff() {
-  return client.fetch(
-    `*[_type == "teamStaff" && active == true] | order(order asc, name asc) {
-      _id,
-      name,
-      role,
-      team,
-      active,
-      order
-    }`,
-    {},
-    { cache: 'no-store' }
-  )
+  return fetchContent<any[]>('staff')
 }
