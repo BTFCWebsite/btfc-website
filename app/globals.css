@@ -66,3 +66,135 @@ img {
     max-width: 100%;
   }
 }
+/* Player shirts */
+.squad-shirt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 18px 14px;
+  margin-bottom: 48px;
+}
+
+.player-shirt-card {
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  padding: 4px 0;
+}
+
+.player-shirt {
+  position: relative;
+  width: min(100%, 170px);
+  aspect-ratio: 1.08 / 1;
+  color: #fff;
+  background:
+    linear-gradient(90deg,
+      #1149d8 0 31%,
+      #fff 31% 42%,
+      #1149d8 42% 58%,
+      #fff 58% 69%,
+      #1149d8 69% 100%);
+  clip-path: polygon(24% 7%, 39% 0, 61% 0, 76% 7%, 100% 24%, 86% 44%, 76% 37%, 79% 100%, 21% 100%, 24% 37%, 14% 44%, 0 24%);
+  filter: drop-shadow(0 6px 5px rgba(4, 27, 95, 0.18));
+}
+
+.player-shirt::before,
+.player-shirt::after {
+  content: '';
+  position: absolute;
+  top: 8%;
+  width: 24%;
+  height: 31%;
+  background: linear-gradient(180deg, rgba(255,255,255,.3), rgba(255,255,255,0));
+  z-index: 1;
+}
+
+.player-shirt::before { left: 3%; transform: rotate(-35deg); }
+.player-shirt::after { right: 3%; transform: rotate(35deg); }
+
+.player-shirt-collar {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  left: 50%;
+  width: 25%;
+  height: 15%;
+  transform: translateX(-50%);
+  border-radius: 0 0 50% 50%;
+  background: #041b5f;
+  border: 4px solid #fff;
+  border-top: 0;
+}
+
+.player-shirt-details {
+  position: absolute;
+  z-index: 4;
+  inset: 20% 20% 10%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.player-shirt-number {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: 36px;
+  line-height: .85;
+  color: #fff;
+  text-shadow: 0 2px 0 #041b5f;
+  margin-bottom: 8px;
+}
+
+.player-shirt-name {
+  width: 100%;
+  padding: 5px 3px;
+  background: #041b5f;
+  border-radius: 3px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(13px, 1.25vw, 16px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: .02em;
+  overflow-wrap: anywhere;
+}
+
+.player-shirt-position {
+  margin-top: 5px;
+  padding: 2px 7px;
+  border-radius: 99px;
+  background: #fff;
+  color: #041b5f;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 480px) {
+  .squad-shirt-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 8px;
+  }
+
+  .player-shirt {
+    width: min(100%, 158px);
+  }
+
+  .player-shirt-name {
+    font-size: 13px;
+  }
+}
