@@ -10,7 +10,9 @@ const queries: Record<string, string> = {
     btfcScore, opponentScore, played
   }`,
   players: `*[_type == "player" && active == true] | order(order asc, squadNumber asc) {
-    _id, name, squadNumber, position, team, active, order
+    _id, name, squadNumber, position, team, active, order,
+    "imageUrl": image.asset->url, sponsorName,
+    "sponsorLogoUrl": sponsorLogo.asset->url
   }`,
   staff: `*[_type == "teamStaff" && active == true] | order(order asc, name asc) {
     _id, name, role, team, active, order
