@@ -44,6 +44,10 @@ export async function getFixtures() {
   return fetchContent<any[]>('fixtures')
 }
 
+export async function getMatchFeeds() {
+  return fetchContent<any[]>('matchFeeds')
+}
+
 export async function getSponsors() {
   return fetchContent<any[]>('sponsors')
 }
