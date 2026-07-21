@@ -67,15 +67,77 @@ img {
   }
 }
 /* Player shirts — inspired by the current BTFC blue-to-white home shirt. */
-.squad-shirt-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 22px 14px;
+.squad-pitch {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   margin-bottom: 48px;
+  padding: 28px 20px 34px;
+  border: 4px solid #fff;
+  border-radius: 12px;
+  background:
+    linear-gradient(rgba(255,255,255,.18) 2px, transparent 2px) center / 100% 50%,
+    repeating-linear-gradient(90deg, #258447 0 11%, #2b9150 11% 22%);
+  box-shadow: 0 8px 24px rgba(4,27,95,.16);
+}
+
+.squad-pitch::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  left: 50%;
+  width: 150px;
+  height: 150px;
+  border: 2px solid rgba(255,255,255,.42);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.squad-pitch::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 14px;
+  border: 2px solid rgba(255,255,255,.42);
+  pointer-events: none;
+}
+
+.squad-position-line + .squad-position-line { margin-top: 24px; }
+
+.squad-position-line h3 {
+  margin: 0 0 12px;
+  color: rgba(255,255,255,.88);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-align: center;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(0,0,0,.2);
+}
+
+.squad-empty {
+  position: relative;
+  z-index: 1;
+  padding: 28px;
+  border-radius: 8px;
+  background: rgba(255,255,255,.94);
+  color: #6b7280;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  text-align: center;
+}
+.squad-shirt-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 18px 14px;
 }
 
 .player-shirt-card {
-  min-width: 0;
+  flex: 0 1 158px;
+  min-width: 130px;
   display: flex;
   justify-content: center;
   padding: 4px 0;
@@ -184,7 +246,6 @@ img {
 .player-shirt-position {
   margin-top: 4px;
   padding: 2px 7px;
-  border-radius: 99px;
   background: #0873c4;
   color: #fff;
   font-size: 9px;
@@ -207,9 +268,17 @@ img {
 }
 
 @media (max-width: 480px) {
+  .squad-pitch {
+    padding: 22px 8px 28px;
+  }
+
   .squad-shirt-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px 8px;
+  }
+
+  .player-shirt-card {
+    flex-basis: calc(50% - 4px);
+    min-width: 0;
   }
 
   .player-shirt {
