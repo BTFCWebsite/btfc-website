@@ -209,7 +209,7 @@ export default function FixturesPage() {
   const [fullTimeMatches, setFullTimeMatches] = useState<Fixture[]>([])
   const [leagueTables, setLeagueTables] = useState<Record<string, LeagueRow[]>>({})
   const [feedSnippets, setFeedSnippets] = useState<Record<string, string>>({})
-  const [useOfficialWidget, setUseOfficialWidget] = useState<Record<string, boolean>>({})
+  const [officialWidgetFallbacks, setOfficialWidgetFallbacks] = useState<Record<string, { matches: boolean; table: boolean }>>({})
 
   useEffect(() => {
     async function loadFixtures() {
@@ -253,15 +253,23 @@ export default function FixturesPage() {
             team: feed.team,
             matches: matchData.matches || [],
             table: tableData.table || [],
-            fallback: !matchesResponse.ok || !tableResponse.ok,
+            matchesFallback: !matchesResponse.ok,
+            tableFallback: !tableResponse.ok,
           }
         }))
         setFullTimeMatches(results.flatMap(result => result.matches))
         setLeagueTables(Object.fromEntries(results.map(result => [result.team, result.table])))
-        setUseOfficialWidget(Object.fromEntries(results.map(result => [result.team, result.fallback])))
+        setOfficialWidgetFallbacks(Object.fromEntries(results.map(result => [result.team, {
+          matches: result.matchesFallback,
+          table: result.tableFallback,
+        }])))
       } catch (error) {
         console.error('Failed to load fixtures:', error)
-        setUseOfficialWidget({ 'First XI': true, Reserves: true, 'Under 17s': true })
+        setOfficialWidgetFallbacks({
+          'First XI': { matches: true, table: true },
+          Reserves: { matches: true, table: true },
+          'Under 17s': { matches: true, table: true },
+        })
       }
     }
 
@@ -464,7 +472,7 @@ export default function FixturesPage() {
                 </div>
               )}
             </div>
-            {useOfficialWidget[selectedTeam.sanityName] && feedSnippets[selectedTeam.sanityName] && (
+            {officialWidgetFallbacks[selectedTeam.sanityName]?.matches && feedSnippets[selectedTeam.sanityName] && (
               <OfficialFullTimeWidget title="Official League Fixtures & Results" snippet={feedSnippets[selectedTeam.sanityName]} />
             )}
           </section>
@@ -472,7 +480,7 @@ export default function FixturesPage() {
 
         {view === 'table' && (
           feedSnippets[selectedTeam.sanityName]
-            ? (useOfficialWidget[selectedTeam.sanityName] || !(leagueTables[selectedTeam.sanityName] || []).length
+            ? (officialWidgetFallbacks[selectedTeam.sanityName]?.table || !(leagueTables[selectedTeam.sanityName] || []).length
               ? <OfficialFullTimeWidget title="Official League Table" snippet={feedSnippets[selectedTeam.sanityName]} />
               : <LeagueTable rows={leagueTables[selectedTeam.sanityName]} teamName={selectedTeam.heading} />)
             : <LeagueTablePlaceholder teamName={selectedTeam.heading} />
