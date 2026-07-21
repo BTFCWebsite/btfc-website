@@ -52,21 +52,6 @@ const teamDetails = {
   },
 } as const
 
-// Verified opening table for U17 Division 1 (Full-Time division 761524402).
-// Used only when Full-Time blocks the live server request; live rows take priority.
-const under17OpeningTable: LeagueRow[] = [
-  { position: 1, team: 'Brimscombe & Thrupp U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
-  { position: 2, team: 'FC Lakeside Youth U17 Whites', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
-  { position: 3, team: 'Kempsey Colts U17 Falcons', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
-  { position: 4, team: 'Leckhampton Rovers Youth U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
-  { position: 5, team: 'Longlevens Youth U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
-  { position: 6, team: 'Perdiswell Colts U17 Tigers', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
-  { position: 7, team: 'Prestbury Phantoms Youth U17 Jets', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
-  { position: 8, team: 'Southside Star Youth U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
-  { position: 9, team: 'Stonehouse Town Youth U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
-  { position: 10, team: 'Westfields Youth U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
-]
-
 function LeagueTable({ rows, teamName }: { rows: LeagueRow[]; teamName: string }) {
   return (
     <section
@@ -130,6 +115,9 @@ function LeagueTable({ rows, teamName }: { rows: LeagueRow[]; teamName: string }
             {teamName}
           </div>
         </div>
+      </div>
+      <div className="league-table-scroll-hint" aria-hidden="true">
+        Scroll <span>→</span>
       </div>
       <div className="league-table-scroll" style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', minWidth: 650, borderCollapse: 'collapse', fontFamily: "'Montserrat',sans-serif", color: '#172554' }}>
@@ -224,7 +212,7 @@ export default function FixturesPage() {
   const [fullTimeMatches, setFullTimeMatches] = useState<Fixture[]>([])
   const [leagueTables, setLeagueTables] = useState<Record<string, LeagueRow[]>>({})
   const [feedSnippets, setFeedSnippets] = useState<Record<string, string>>({})
-  const [officialWidgetFallbacks, setOfficialWidgetFallbacks] = useState<Record<string, { matches: boolean; table: boolean }>>({})
+  const [useOfficialWidget, setUseOfficialWidget] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     async function loadFixtures() {
@@ -268,23 +256,15 @@ export default function FixturesPage() {
             team: feed.team,
             matches: matchData.matches || [],
             table: tableData.table || [],
-            matchesFallback: !matchesResponse.ok,
-            tableFallback: !tableResponse.ok,
+            fallback: !matchesResponse.ok || !tableResponse.ok,
           }
         }))
         setFullTimeMatches(results.flatMap(result => result.matches))
         setLeagueTables(Object.fromEntries(results.map(result => [result.team, result.table])))
-        setOfficialWidgetFallbacks(Object.fromEntries(results.map(result => [result.team, {
-          matches: result.matchesFallback,
-          table: result.tableFallback,
-        }])))
+        setUseOfficialWidget(Object.fromEntries(results.map(result => [result.team, result.fallback])))
       } catch (error) {
         console.error('Failed to load fixtures:', error)
-        setOfficialWidgetFallbacks({
-          'First XI': { matches: true, table: true },
-          Reserves: { matches: true, table: true },
-          'Under 17s': { matches: true, table: true },
-        })
+        setUseOfficialWidget({ 'First XI': true, Reserves: true, 'Under 17s': true })
       }
     }
 
@@ -292,12 +272,6 @@ export default function FixturesPage() {
   }, [])
 
   const selectedTeam = teamDetails[team]
-  const liveLeagueRows = leagueTables[selectedTeam.sanityName] || []
-  const displayedLeagueRows = liveLeagueRows.length
-    ? liveLeagueRows
-    : selectedTeam.sanityName === 'Under 17s'
-      ? under17OpeningTable
-      : []
   const combinedMatches = [...matches, ...fullTimeMatches]
   const teamMatches = combinedMatches
     .filter((match) => match.team === selectedTeam.sanityName)
@@ -493,18 +467,18 @@ export default function FixturesPage() {
                 </div>
               )}
             </div>
-            {officialWidgetFallbacks[selectedTeam.sanityName]?.matches && feedSnippets[selectedTeam.sanityName] && (
+            {useOfficialWidget[selectedTeam.sanityName] && feedSnippets[selectedTeam.sanityName] && (
               <OfficialFullTimeWidget title="Official League Fixtures & Results" snippet={feedSnippets[selectedTeam.sanityName]} />
             )}
           </section>
         )}
 
         {view === 'table' && (
-          displayedLeagueRows.length
-            ? <LeagueTable rows={displayedLeagueRows} teamName={selectedTeam.heading} />
-            : feedSnippets[selectedTeam.sanityName]
+          feedSnippets[selectedTeam.sanityName]
+            ? (useOfficialWidget[selectedTeam.sanityName] || !(leagueTables[selectedTeam.sanityName] || []).length
               ? <OfficialFullTimeWidget title="Official League Table" snippet={feedSnippets[selectedTeam.sanityName]} />
-              : <LeagueTablePlaceholder teamName={selectedTeam.heading} />
+              : <LeagueTable rows={leagueTables[selectedTeam.sanityName]} teamName={selectedTeam.heading} />)
+            : <LeagueTablePlaceholder teamName={selectedTeam.heading} />
         )}
       </div>
     </main>
