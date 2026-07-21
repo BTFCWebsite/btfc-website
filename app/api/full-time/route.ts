@@ -106,37 +106,30 @@ export async function GET(request: NextRequest) {
     const divisionParam = request.nextUrl.searchParams.get('division') || ''
     const widgetCode = /^\d+$/.test(widgetParam) ? widgetParam : FALLBACK_WIDGET_CODE
     const divisionSeason = /^\d+$/.test(divisionParam) ? divisionParam : FALLBACK_DIVISION_SEASON
+    const kind = request.nextUrl.searchParams.get('kind')
 
     const requestOptions = {
       headers: { 'User-Agent': 'BTFCWebsite/1.0 (+https://btfc-website.vercel.app)' },
       next: { revalidate: 1800 },
     } as const
 
-    const [widgetResult, tableResult] = await Promise.allSettled([
-      fetch(`${FULL_TIME_ORIGIN}/js/cs1.html?cs=${widgetCode}`, requestOptions),
-      fetch(`${FULL_TIME_ORIGIN}/table.html?divisionseason=${divisionSeason}`, requestOptions),
-    ])
-
     let matches: ReturnType<typeof parseMatches> = []
     let table: ReturnType<typeof parseTable> = []
-    const errors: string[] = []
 
-    if (widgetResult.status === 'fulfilled' && widgetResult.value.ok) {
-      matches = parseMatches(await widgetResult.value.text())
+    if (kind === 'matches') {
+      const response = await fetch(`${FULL_TIME_ORIGIN}/js/cs1.html?cs=${widgetCode}`, requestOptions)
+      if (!response.ok) throw new Error('Full-Time fixtures request failed')
+      matches = parseMatches(await response.text())
+    } else if (kind === 'table') {
+      const response = await fetch(`${FULL_TIME_ORIGIN}/table.html?divisionseason=${divisionSeason}`, requestOptions)
+      if (!response.ok) throw new Error('Full-Time table request failed')
+      table = parseTable(await response.text())
     } else {
-      errors.push('fixtures')
+      throw new Error('A Full-Time data kind is required')
     }
-
-    if (tableResult.status === 'fulfilled' && tableResult.value.ok) {
-      table = parseTable(await tableResult.value.text())
-    } else {
-      errors.push('league table')
-    }
-
-    if (errors.length === 2) throw new Error('Both Full-Time requests failed')
 
     return NextResponse.json(
-      { matches, table, partial: errors.length ? `Unable to refresh ${errors.join(' and ')}.` : undefined },
+      { matches, table },
       { headers: { 'Cache-Control': 'public, s-maxage=1800, stale-while-revalidate=86400' } }
     )
   } catch (error) {
