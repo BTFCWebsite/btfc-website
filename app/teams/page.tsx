@@ -21,6 +21,7 @@ type TeamStaff = {
   name: string
   role: string
   team: string
+  imageUrl?: string
 }
 
 function normaliseTeam(team: string): TeamKey {
@@ -163,12 +164,24 @@ function ManagementTeam({ staff }: { staff: TeamStaff[] }) {
       <h2 style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:26, color:'#041B5F', letterSpacing:'0.04em', textTransform:'uppercase', margin:'0 0 16px' }}>
         Management Team
       </h2>
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))', gap:14 }}>
+      <div className="management-profile-grid">
         {staff.map((member) => (
-          <div key={member.name} style={{ background:'#041B5F', borderRadius:8, padding:'20px 18px', textAlign:'center', borderTop:'6px solid #1149D8' }}>
-            <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:20, color:'#fff', letterSpacing:'0.03em' }}>{member.name}</div>
-            <div style={{ marginTop:5, fontSize:10, fontWeight:700, color:'rgba(255,255,255,0.7)', letterSpacing:'0.1em', textTransform:'uppercase' }}>{member.role}</div>
-          </div>
+          <article className="player-profile-card management-profile-card" key={member._id || member.name}>
+            <div className={`player-profile-photo${member.imageUrl ? '' : ' is-placeholder'}`}>
+              {member.imageUrl ? (
+                <img src={member.imageUrl} alt={`${member.name}, ${member.role}`} loading="lazy" />
+              ) : (
+                <div className="player-photo-placeholder" aria-label="Management photograph to follow">
+                  <img src="/branding/crest.png" alt="" />
+                  <span>Photo to follow</span>
+                </div>
+              )}
+              <div className="player-profile-identity">
+                <h4>{member.name}</h4>
+                <p>{member.role}</p>
+              </div>
+            </div>
+          </article>
         ))}
       </div>
     </section>
@@ -328,7 +341,20 @@ export default function TeamsPage() {
   }
 
   const firstTeam = players.filter(p => normaliseTeam(p.team) === 'first')
+  const firstTeamPlayers = players.filter(p => normaliseTeam(p.team) === 'first')
+  const nathanPlayer = firstTeamPlayers.find(player => player.name.toLowerCase() === 'nathan marks')
   const firstTeamStaff = staff.filter(member => normaliseTeam(member.team) === 'first')
+  const managementTeam: TeamStaff[] = firstTeamStaff.some(member => member.name.toLowerCase() === 'nathan marks')
+    ? firstTeamStaff.map(member => member.name.toLowerCase() === 'nathan marks'
+      ? { ...member, role: 'Player Coach', imageUrl: member.imageUrl || nathanPlayer?.imageUrl }
+      : member)
+    : [...firstTeamStaff, {
+        _id: 'nathan-marks-player-coach',
+        name: 'Nathan Marks',
+        role: 'Player Coach',
+        team: 'First XI',
+        imageUrl: nathanPlayer?.imageUrl,
+      }]
   const reserves = players.filter(p => normaliseTeam(p.team) === 'reserves')
   const u17s = players.filter(p => normaliseTeam(p.team) === 'u17s')
 
@@ -360,7 +386,7 @@ export default function TeamsPage() {
           <>
             <TeamBanner title={settings.firstTeamName || 'BTFC First XI'} subtitle={settings.firstTeamLeague || 'Uhlsport Hellenic League Division One'} stats={bannerStats('First XI')} />
             <SquadGrid players={firstTeam} />
-            <ManagementTeam staff={firstTeamStaff} />
+            <ManagementTeam staff={managementTeam} />
             <StatGrid stats={statsFor('First XI')} />
             <LastEightResults results={lastEightFor('First XI')} />
           </>
