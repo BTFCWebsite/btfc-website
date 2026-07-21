@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getPlayers, getFixtures, getTeamStaff } from '../lib/sanity.client'
+import { getPlayers, getFixtures, getTeamStaff, getSiteSettings } from '../lib/sanity.client'
 
 const POS_COLORS: Record<string,string> = {
   GK:'#1e3a5f', CB:'#1149D8', LB:'#1149D8', RB:'#1149D8',
@@ -189,6 +189,7 @@ export default function TeamsPage() {
   const [team, setTeam] = useState<TeamKey>('first')
   const [players, setPlayers] = useState<Player[]>([])
   const [staff, setStaff] = useState<TeamStaff[]>([])
+  const [settings, setSettings] = useState<any>({})
 
   useEffect(() => {
     async function loadFixtures() {
@@ -202,6 +203,10 @@ export default function TeamsPage() {
     }
 
     loadFixtures()
+  }, [])
+
+  useEffect(() => {
+    getSiteSettings().then((data) => setSettings(data || {})).catch(console.error)
   }, [])
 
   useEffect(() => {
@@ -315,7 +320,7 @@ export default function TeamsPage() {
 
         {team === 'first' && (
           <>
-            <TeamBanner title="BTFC First XI" subtitle="Uhlsport Hellenic League Division One" stats={bannerStats('First XI')} />
+            <TeamBanner title={settings.firstTeamName || 'BTFC First XI'} subtitle={settings.firstTeamLeague || 'Uhlsport Hellenic League Division One'} stats={bannerStats('First XI')} />
             <SquadGrid players={firstTeam} />
             <ManagementTeam staff={firstTeamStaff} />
             <StatGrid stats={statsFor('First XI')} />
@@ -325,7 +330,7 @@ export default function TeamsPage() {
 
         {team === 'reserves' && (
           <>
-            <TeamBanner title="BTFC Reserves" subtitle="Stroud & District League Division 2" stats={bannerStats('Reserves')} />
+            <TeamBanner title={settings.reservesName || 'BTFC Reserves'} subtitle={settings.reservesLeague || 'Stroud & District League Division 2'} stats={bannerStats('Reserves')} />
             <SquadGrid players={reserves} />
             <StatGrid stats={statsFor('Reserves')} />
             <LastEightResults results={lastEightFor('Reserves')} />
@@ -334,7 +339,7 @@ export default function TeamsPage() {
 
         {team === 'u17s' && (
           <>
-            <TeamBanner title="BTFC Under 17s" subtitle="Cheltenham Youth Football League" stats={bannerStats('Under 17s')} />
+            <TeamBanner title={settings.u17Name || 'BTFC Under 17s'} subtitle={settings.u17League || 'Cheltenham Youth Football League'} stats={bannerStats('Under 17s')} />
             <SquadGrid players={u17s} />
             <StatGrid stats={statsFor('Under 17s')} />
             <LastEightResults results={lastEightFor('Under 17s')} />
