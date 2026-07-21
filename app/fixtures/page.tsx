@@ -38,10 +38,10 @@ const teamDetails = {
   },
 } as const
 
-function FirstTeamLeagueTable() {
+function FirstTeamFullTime() {
   return (
     <section
-      aria-labelledby="first-team-league-table"
+      aria-labelledby="first-team-full-time"
       style={{
         background: '#fff',
         border: '1px solid #DCE3F1',
@@ -73,7 +73,7 @@ function FirstTeamLeagueTable() {
         />
         <div>
           <h2
-            id="first-team-league-table"
+            id="first-team-full-time"
             style={{
               margin: 0,
               fontFamily: "'Barlow Condensed',sans-serif",
@@ -85,7 +85,7 @@ function FirstTeamLeagueTable() {
               color: '#fff',
             }}
           >
-            League Table
+            Fixtures, Results &amp; League Table
           </h2>
           <div
             style={{
@@ -104,12 +104,12 @@ function FirstTeamLeagueTable() {
       </div>
       <div style={{ padding: '18px 20px 8px' }}>
         <iframe
-          title="First XI Hellenic League Division One table"
+          title="First XI fixtures, results and Hellenic League Division One table"
           src="/full-time/first-team.html"
           style={{
             display: 'block',
             width: '100%',
-            height: 820,
+            height: 1400,
             border: 0,
             background: '#fff',
           }}
@@ -220,7 +220,7 @@ export default function FixturesPage() {
 
   const viewTabs = [
     { id: 'matches', label: 'Fixtures & Results' },
-    { id: 'table', label: 'League Table' },
+    { id: 'table', label: 'Full-Time' },
   ] as const
 
   return (
@@ -399,7 +399,7 @@ export default function FixturesPage() {
 
         {view === 'table' && (
           team === 'first'
-            ? <FirstTeamLeagueTable />
+            ? <FirstTeamFullTime />
             : <LeagueTablePlaceholder teamName={selectedTeam.heading} />
         )}
       </div>
