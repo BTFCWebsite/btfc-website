@@ -31,7 +31,11 @@ function hrefFromHtml(value: string) {
   return match[1].startsWith('http') ? match[1] : FULL_TIME_ORIGIN + match[1]
 }
 
-function parseMatches(script: string) {
+function isBtfcTeam(value: string) {
+  return value.toLowerCase().includes(BTFC.toLowerCase())
+}
+
+function parseMatches(script: string, team: string) {
   const matches = []
   const rowPattern = /<tr[^>]*>\s*<td[^>]*colspan="7"[^>]*>([\s\S]*?)<\/td>\s*<\/tr>\s*<tr[^>]*>([\s\S]*?)<\/tr>/gi
   let row: RegExpExecArray | null
@@ -51,8 +55,8 @@ function parseMatches(script: string) {
     const awayScore = textFromHtml(cells[4])
     const awayTeam = textFromHtml(cells[5])
     const location = textFromHtml(cells[6])
-    const isHome = homeTeam === BTFC
-    const isAway = awayTeam === BTFC
+    const isHome = isBtfcTeam(homeTeam)
+    const isAway = isBtfcTeam(awayTeam)
     if (!isHome && !isAway) continue
 
     const played = separator === '-' && /^\d+$/.test(homeScore) && /^\d+$/.test(awayScore)
@@ -62,7 +66,7 @@ function parseMatches(script: string) {
       _id: sourceUrl?.match(/[?&]id=(\d+)/)?.[1] ? `full-time-${sourceUrl.match(/[?&]id=(\d+)/)![1]}` : `full-time-${date.getTime()}`,
       date: date.toISOString(),
       opponent: isHome ? awayTeam : homeTeam,
-      team: 'First XI',
+      team,
       venue: isHome ? 'Home' : 'Away',
       competition: competition || 'Hellenic League Division One',
       kickoff: date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/London' }),
@@ -107,6 +111,8 @@ export async function GET(request: NextRequest) {
     const widgetCode = /^\d+$/.test(widgetParam) ? widgetParam : FALLBACK_WIDGET_CODE
     const divisionSeason = /^\d+$/.test(divisionParam) ? divisionParam : FALLBACK_DIVISION_SEASON
     const kind = request.nextUrl.searchParams.get('kind')
+    const requestedTeam = request.nextUrl.searchParams.get('team') || 'First XI'
+    const team = ['First XI', 'Reserves', 'Under 17s'].includes(requestedTeam) ? requestedTeam : 'First XI'
 
     const requestOptions = {
       headers: { 'User-Agent': 'BTFCWebsite/1.0 (+https://btfc-website.vercel.app)' },
@@ -119,7 +125,7 @@ export async function GET(request: NextRequest) {
     if (kind === 'matches') {
       const response = await fetch(`${FULL_TIME_ORIGIN}/js/cs1.html?cs=${widgetCode}`, requestOptions)
       if (!response.ok) throw new Error('Full-Time fixtures request failed')
-      matches = parseMatches(await response.text())
+      matches = parseMatches(await response.text(), team)
     } else if (kind === 'table') {
       const response = await fetch(`${FULL_TIME_ORIGIN}/table.html?divisionseason=${divisionSeason}`, requestOptions)
       if (!response.ok) throw new Error('Full-Time table request failed')
