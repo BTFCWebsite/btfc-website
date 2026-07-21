@@ -1,5 +1,8 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+import { getSiteSettings } from '../lib/sanity.client'
+
 const faqs = [
   ['Can I pay in instalments?', 'Not currently — season tickets must be paid in full at time of purchase.'],
   ['How do I get my ticket?', 'If you use an iPhone, you can add your digital season ticket to Apple Wallet. If you use Android, or would simply prefer a PDF, your ticket will be emailed to you. Both versions contain the QR code needed for entry.'],
@@ -12,6 +15,23 @@ const faqs = [
 ]
 
 export default function TicketsPage() {
+  const [settings, setSettings] = useState<any>({})
+
+  useEffect(() => {
+    getSiteSettings().then((data) => setSettings(data || {})).catch(console.error)
+  }, [])
+
+  const season = settings.seasonYear || '2026/27'
+  const seasonPrices = [
+    ['Adult', settings.seasonTicketAdult || '£89'],
+    ['Concession', settings.seasonTicketConcession || '£69'],
+    ['Under 16', settings.seasonTicketJunior || 'Free'],
+  ]
+  const admissionPrices = [
+    { label: 'Adult', price: settings.admissionAdult || '£7' },
+    { label: 'Concession (65+)', price: settings.admissionConcession || '£5' },
+    { label: 'Under 16', price: settings.admissionJunior || 'Free' },
+  ]
   return (
     <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '0 0 90px' }}>
       <section style={{ maxWidth: 980, margin: '0 auto', padding: '52px 24px' }}>
@@ -33,7 +53,7 @@ export default function TicketsPage() {
             </span>
 
             <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 34, fontWeight: 800, margin: '0 0 10px', letterSpacing: '0.03em', lineHeight: 1 }}>
-              2026/27 Season Tickets
+              {season} Season Tickets
             </h2>
 
             <p style={{ fontFamily: "'Montserrat', sans-serif", margin: '0 0 20px', color: 'rgba(255,255,255,.7)', fontSize: 13, lineHeight: 1.7 }}>
@@ -47,7 +67,7 @@ export default function TicketsPage() {
               gap: 12,
               maxWidth: 420,
             }}>
-              {[['Adult', '£89'], ['Concession', '£69'], ['Under 16', 'Free']].map(([label, price]) => (
+              {seasonPrices.map(([label, price]) => (
                 <div key={label} style={{
                   background: 'rgba(255,255,255,.08)',
                   border: '1px solid rgba(255,255,255,.15)',
@@ -129,7 +149,7 @@ export default function TicketsPage() {
 
           <div style={{ textAlign: 'center', padding: '10px 0 4px' }}>
             <a
-              href="https://www.tickettailor.com/all-tickets/brimscombeandthruppfc/?ref=website_widget"
+              href={settings.ticketPurchaseUrl || 'https://www.tickettailor.com/all-tickets/brimscombeandthruppfc/?ref=website_widget'}
               target="_blank"
               rel="noopener noreferrer"
               style={{
@@ -176,11 +196,7 @@ export default function TicketsPage() {
                 League &amp; Cup <span style={{ fontSize: 15, color: '#6B7280' }}>(except FA Vase)</span>
               </h3>
 
-              {[
-                { label: 'Adult', price: '£7' },
-                { label: 'Concession (65+)', price: '£5' },
-                { label: 'Under 16', price: 'Free' },
-              ].map(row => (
+              {admissionPrices.map(row => (
                 <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #F3F4F6' }}>
                   <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 13, color: '#374151' }}>
                     {row.label}
@@ -217,7 +233,7 @@ export default function TicketsPage() {
                   Everyone
                 </span>
                 <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 22, fontWeight: 800, color: '#1149D8' }}>
-                  £3
+                  {settings.friendlyAdmission || '£3'}
                 </span>
               </div>
 
