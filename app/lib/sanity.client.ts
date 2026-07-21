@@ -74,3 +74,18 @@ export async function getPlayers() {
     { cache: 'no-store' }
   )
 }
+
+export async function getTeamStaff() {
+  return client.fetch(
+    `*[_type == "teamStaff" && active == true] | order(order asc, name asc) {
+      _id,
+      name,
+      role,
+      team,
+      active,
+      order
+    }`,
+    {},
+    { cache: 'no-store' }
+  )
+}
