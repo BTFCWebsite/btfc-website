@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { getFixtures } from '../lib/sanity.client'
+import { getFixtures, getMatchFeeds } from '../lib/sanity.client'
 
 type TeamId = 'first' | 'reserves' | 'u17s'
 type ViewId = 'matches' | 'table'
@@ -200,7 +200,7 @@ export default function FixturesPage() {
   useEffect(() => {
     async function loadFixtures() {
       try {
-        const data = await getFixtures()
+        const [data, feeds] = await Promise.all([getFixtures(), getMatchFeeds()])
         setMatches(
           (data || []).filter((match: any) =>
             match &&
@@ -210,21 +210,25 @@ export default function FixturesPage() {
             match.venue
           )
         )
+
+        const firstTeamSnippet = feeds?.find((feed: any) => feed?.team === 'First XI')?.snippet || ''
+        const widgetCode = firstTeamSnippet.match(/\blrcode\s*=\s*['\"](\d+)['\"]/i)?.[1]
+        const divisionSeason = firstTeamSnippet.match(/[?&]divisionseason=(\d+)/i)?.[1]
+        const params = new URLSearchParams()
+        if (widgetCode) params.set('widget', widgetCode)
+        if (divisionSeason) params.set('division', divisionSeason)
+
+        const response = await fetch(`/api/full-time?${params.toString()}`)
+        if (!response.ok) throw new Error('Full-Time request failed')
+        const fullTimeData = await response.json()
+        setFullTimeMatches(fullTimeData.matches || [])
+        setLeagueTable(fullTimeData.table || [])
       } catch (error) {
         console.error('Failed to load fixtures:', error)
-        setMatches([])
       }
     }
 
     loadFixtures()
-
-    fetch('/api/full-time')
-      .then(response => response.ok ? response.json() : Promise.reject(new Error('Full-Time request failed')))
-      .then(data => {
-        setFullTimeMatches(data.matches || [])
-        setLeagueTable(data.table || [])
-      })
-      .catch(error => console.error('Failed to load Full-Time data:', error))
   }, [])
 
   const selectedTeam = teamDetails[team]
