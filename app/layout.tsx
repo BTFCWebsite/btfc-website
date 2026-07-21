@@ -262,7 +262,7 @@ function Footer() {
 const PAGE_HEADERS: Record<string, { title: string; subtitle: string }> = {
   '/news':     { title: 'Club News',          subtitle: 'The latest from Brimscombe & Thrupp FC' },
   '/teams':    { title: 'Our Teams',           subtitle: 'First XI · Reserves · Under 17s' },
-  '/fixtures': { title: 'Fixtures & Results',  subtitle: '2025/26 Season' },
+  '/fixtures': { title: 'Fixtures & Results',  subtitle: '2026/27 Season' },
   '/tickets':  { title: 'Tickets',             subtitle: 'Season tickets and matchday admission' },
   '/matchday': { title: 'Matchday',            subtitle: 'Everything you need for Jessons Meadow' },
   '/sponsors': { title: 'Sponsors',            subtitle: 'Our valued club partners' },
