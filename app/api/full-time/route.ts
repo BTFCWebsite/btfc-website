@@ -7,6 +7,7 @@ const FALLBACK_DIVISION_SEASON = '320568525'
 const BTFC = 'Brimscombe & Thrupp'
 
 export const dynamic = 'force-dynamic'
+export const maxDuration = 60
 
 type MatchFeed = {
   snippet?: string
@@ -120,15 +121,38 @@ export async function GET() {
     )
     const { widgetCode, divisionSeason } = feedCodes(feed?.snippet)
 
-    const [widgetResponse, tableResponse] = await Promise.all([
-      fetch(`${FULL_TIME_ORIGIN}/js/cs1.html?cs=${widgetCode}`, { next: { revalidate: 1800 } }),
-      fetch(`${FULL_TIME_ORIGIN}/table.html?divisionseason=${divisionSeason}`, { next: { revalidate: 1800 } }),
+    const requestOptions = {
+      headers: { 'User-Agent': 'BTFCWebsite/1.0 (+https://btfc-website.vercel.app)' },
+      next: { revalidate: 1800 },
+    } as const
+
+    const [widgetResult, tableResult] = await Promise.allSettled([
+      fetch(`${FULL_TIME_ORIGIN}/js/cs1.html?cs=${widgetCode}`, requestOptions),
+      fetch(`${FULL_TIME_ORIGIN}/table.html?divisionseason=${divisionSeason}`, requestOptions),
     ])
 
-    if (!widgetResponse.ok || !tableResponse.ok) throw new Error('Full-Time returned an unsuccessful response')
+    let matches: ReturnType<typeof parseMatches> = []
+    let table: ReturnType<typeof parseTable> = []
+    const errors: string[] = []
 
-    const [widgetScript, tableHtml] = await Promise.all([widgetResponse.text(), tableResponse.text()])
-    return NextResponse.json({ matches: parseMatches(widgetScript), table: parseTable(tableHtml) })
+    if (widgetResult.status === 'fulfilled' && widgetResult.value.ok) {
+      matches = parseMatches(await widgetResult.value.text())
+    } else {
+      errors.push('fixtures')
+    }
+
+    if (tableResult.status === 'fulfilled' && tableResult.value.ok) {
+      table = parseTable(await tableResult.value.text())
+    } else {
+      errors.push('league table')
+    }
+
+    if (errors.length === 2) throw new Error('Both Full-Time requests failed')
+
+    return NextResponse.json(
+      { matches, table, partial: errors.length ? `Unable to refresh ${errors.join(' and ')}.` : undefined },
+      { headers: { 'Cache-Control': 'public, s-maxage=1800, stale-while-revalidate=86400' } }
+    )
   } catch (error) {
     console.error('Unable to refresh Full-Time data:', error)
     return NextResponse.json({ matches: [], table: [], error: 'Full-Time data is temporarily unavailable.' }, { status: 502 })
