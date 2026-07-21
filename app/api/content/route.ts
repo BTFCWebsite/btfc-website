@@ -9,6 +9,9 @@ const queries: Record<string, string> = {
     _id, date, opponent, team, venue, competition, kickoff,
     btfcScore, opponentScore, played
   }`,
+  matchFeeds: `*[_type == "matchFeed" && active == true] | order(order asc) {
+    team, snippet
+  }`,
   players: `*[_type == "player" && active == true] | order(order asc, squadNumber asc) {
     _id, name, squadNumber, position, team, active, order,
     "imageUrl": image.asset->url, sponsorName,
