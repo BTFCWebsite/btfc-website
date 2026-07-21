@@ -1,5 +1,4 @@
-import { NextResponse } from 'next/server'
-import { client } from '../../lib/sanity.client'
+import { NextRequest, NextResponse } from 'next/server'
 
 const FULL_TIME_ORIGIN = 'https://fulltime.thefa.com'
 const FALLBACK_WIDGET_CODE = '969980533'
@@ -8,17 +7,6 @@ const BTFC = 'Brimscombe & Thrupp'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
-
-type MatchFeed = {
-  snippet?: string
-}
-
-function feedCodes(snippet = '') {
-  return {
-    widgetCode: snippet.match(/\blrcode\s*=\s*['\"](\d+)['\"]/i)?.[1] || FALLBACK_WIDGET_CODE,
-    divisionSeason: snippet.match(/[?&]divisionseason=(\d+)/i)?.[1] || FALLBACK_DIVISION_SEASON,
-  }
-}
 
 function textFromHtml(value: string) {
   return value
@@ -112,22 +100,12 @@ function parseTable(html: string) {
   })
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    let feed: MatchFeed | null = null
-    try {
-      feed = await Promise.race([
-        client.fetch<MatchFeed | null>(
-          `*[_type == "matchFeed" && active == true && team == "First XI"] | order(order asc)[0] { snippet }`,
-          {},
-          { cache: 'no-store' }
-        ),
-        new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500)),
-      ])
-    } catch (error) {
-      console.error('Unable to read Full-Time configuration from Sanity; using confirmed fallback codes:', error)
-    }
-    const { widgetCode, divisionSeason } = feedCodes(feed?.snippet)
+    const widgetParam = request.nextUrl.searchParams.get('widget') || ''
+    const divisionParam = request.nextUrl.searchParams.get('division') || ''
+    const widgetCode = /^\d+$/.test(widgetParam) ? widgetParam : FALLBACK_WIDGET_CODE
+    const divisionSeason = /^\d+$/.test(divisionParam) ? divisionParam : FALLBACK_DIVISION_SEASON
 
     const requestOptions = {
       headers: { 'User-Agent': 'BTFCWebsite/1.0 (+https://btfc-website.vercel.app)' },
