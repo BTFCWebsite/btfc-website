@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { getNewsArticles } from './lib/sanity.client'
 
 const CATEGORY_COLORS: Record<string, string> = {
   'Match Report': '#1149D8',
@@ -32,15 +33,9 @@ export default function NewsSection() {
   const [news, setNews] = useState<any[]>(FALLBACK_NEWS)
 
   useEffect(() => {
-    const query = encodeURIComponent(`*[_type == "newsArticle"] | order(date desc)[0...3] { _id, title, category, date, summary }`)
-    fetch(`https://vm0n9zl5.api.sanity.io/v2024-01-01/data/query/production?query=${query}`)
-      .then(r => r.json())
-      .then(data => {
-        if (data.result && data.result.length > 0) {
-          setNews(data.result)
-        }
-      })
-      .catch(() => {})
+    getNewsArticles()
+      .then(data => setNews((data || []).slice(0, 3)))
+      .catch(error => console.error('Failed to load latest news:', error))
   }, [])
 
   return (
