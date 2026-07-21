@@ -357,6 +357,18 @@ export default function TeamsPage() {
       }]
   const reserves = players.filter(p => normaliseTeam(p.team) === 'reserves')
   const u17s = players.filter(p => normaliseTeam(p.team) === 'u17s')
+  const u17Staff = staff.filter(member => normaliseTeam(member.team) === 'u17s')
+  const u17ManagementPosts: TeamStaff[] = [
+    { _id: 'clive-boulton-u17-manager', name: 'Clive Boulton', role: 'Manager', team: 'Under 17s' },
+    { _id: 'andy-holmes-u17-coach', name: 'Andy Holmes', role: 'Coach', team: 'Under 17s' },
+    { _id: 'chris-lugg-u17-coach', name: 'Chris Lugg', role: 'Coach', team: 'Under 17s' },
+  ]
+  const u17ManagementTeam = [
+    ...u17Staff,
+    ...u17ManagementPosts.filter(post =>
+      !u17Staff.some(member => member.name.toLowerCase() === post.name.toLowerCase())
+    ),
+  ]
 
   const tabs: { id: TeamKey, label: string }[] = [
     { id:'first', label:'⚽ First XI' },
@@ -405,6 +417,7 @@ export default function TeamsPage() {
           <>
             <TeamBanner title={settings.u17Name || 'BTFC Under 17s'} subtitle={settings.u17League || 'Cheltenham Youth Football League'} stats={bannerStats('Under 17s')} />
             <SquadGrid players={u17s} />
+            <ManagementTeam staff={u17ManagementTeam} />
             <StatGrid stats={statsFor('Under 17s')} />
             <LastEightResults results={lastEightFor('Under 17s')} />
           </>
