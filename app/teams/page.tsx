@@ -3,14 +3,6 @@
 import { useEffect, useState } from 'react'
 import { getPlayers, getFixtures, getTeamStaff, getSiteSettings } from '../lib/sanity.client'
 
-const POS_COLORS: Record<string,string> = {
-  GK:'#1e3a5f', CB:'#1149D8', LB:'#1149D8', RB:'#1149D8',
-  CM:'#041B5F', CAM:'#2563FF', MID:'#1149D8', LW:'#2563FF',
-  RW:'#2563FF', WINGER:'#2563FF', 'WINGER / ST':'#7f1d1d',
-  ST:'#7f1d1d', FWD:'#7f1d1d', DEF:'#1149D8'
-}
-
-
 type TeamKey = 'first' | 'reserves' | 'u17s'
 
 type Player = {
@@ -52,19 +44,19 @@ function resultLetter(f: any) {
 }
 
 function PlayerCard({ p }: { p: Player }) {
-  const col = POS_COLORS[p.pos] || '#1149D8'
-  const num = String(p.num || 0).padStart(2, '0')
+  const num = p.num > 0 ? String(p.num) : null
 
   return (
-    <div style={{ background:'#fff', border:'2px solid #E5E7EB', borderLeft:`4px solid ${col}`, borderRadius:8, overflow:'hidden', position:'relative' }}>
-      <div style={{ height:6, background:col }} />
-      <div style={{ padding:'18px 14px 16px', textAlign:'center', position:'relative' }}>
-        {p.num > 0 && (
-          <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:52, lineHeight:1, marginBottom:-8, color:'rgba(17,73,216,0.07)', letterSpacing:'0.02em' }}>{num}</div>
-        )}
-        <span style={{ display:'inline-block', padding:'3px 10px', borderRadius:4, fontSize:10, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', color:'#fff', background:col, margin:'8px 0 8px', position:'relative', zIndex:1 }}>{p.pos}</span>
-        <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:800, fontSize:16, letterSpacing:'0.03em', lineHeight:1.1, color:'#2D2D2D', position:'relative', zIndex:1 }}>{p.name}</div>
+    <div className="player-shirt-card">
+      <div className="player-shirt" aria-hidden="true">
+        <div className="player-shirt-collar" />
+        <div className="player-shirt-details">
+          {num && <div className="player-shirt-number">{num}</div>}
+          <div className="player-shirt-name">{p.name}</div>
+          <div className="player-shirt-position">{p.pos}</div>
+        </div>
       </div>
+      <span className="sr-only">{p.name}, {p.pos}{num ? `, squad number ${num}` : ''}</span>
     </div>
   )
 }
@@ -109,7 +101,7 @@ function SquadGrid({ players }: { players: Player[] }) {
         ))}
       </div>
 
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(155px,1fr))', gap:14, marginBottom:48 }}>
+      <div className="squad-shirt-grid">
         {filtered.length === 0 ? (
           <div style={{ gridColumn:'1 / -1', background:'#fff', border:'1px solid #E5E7EB', borderRadius:8, padding:28, textAlign:'center', color:'#9CA3AF', fontFamily:"'Montserrat',sans-serif", fontSize:13 }}>
             No active players added in Sanity for this squad yet.
