@@ -114,7 +114,7 @@ export default function TicketsPage() {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
               gap: 12,
               marginBottom: 24,
               padding: 18,
