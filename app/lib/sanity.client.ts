@@ -52,7 +52,7 @@ export async function getFixtures() {
 export async function getSponsors() {
   return client.fetch(
     `*[_type == "sponsor"] | order(order asc) {
-      _id, name, role, website,
+      _id, name, tier, role, website,
       "logoUrl": logo.asset->url
     }`,
     {},
