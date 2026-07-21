@@ -15,7 +15,8 @@ const queries: Record<string, string> = {
     "sponsorLogoUrl": sponsorLogo.asset->url
   }`,
   staff: `*[_type == "teamStaff" && active == true] | order(order asc, name asc) {
-    _id, name, role, team, active, order
+    _id, name, role, team, active, order,
+    "imageUrl": image.asset->url
   }`,
   news: `*[_type == "newsArticle"] | order(date desc) {
     _id, title, category, date, summary, body,
