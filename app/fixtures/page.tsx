@@ -322,6 +322,7 @@ export default function FixturesPage() {
             </div>
 
             <div
+              className="fixtures-desktop-table"
               style={{
                 background: '#fff',
                 border: '1px solid #DCE3F1',
@@ -375,6 +376,24 @@ export default function FixturesPage() {
                 </div>
               )}
             </div>
+
+            <div className="fixtures-mobile-list">
+              {Object.entries(matchesByMonth).map(([month, monthMatches]) => (
+                <section key={month} style={{ marginBottom: 22 }}>
+                  <h2 style={{ margin: '0 0 10px', color: '#041B5F', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 21, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                    {month}
+                  </h2>
+                  <div style={{ display: 'grid', gap: 10 }}>
+                    {monthMatches.map(match => <MobileFixtureCard key={match._id} match={match} />)}
+                  </div>
+                </section>
+              ))}
+              {teamMatches.length === 0 && (
+                <div style={{ padding: '34px 20px', textAlign: 'center', background: '#fff', border: '1px solid #DCE3F1', borderRadius: 8, fontFamily: "'Montserrat',sans-serif", fontSize: 13, color: '#6B7280' }}>
+                  No fixtures have been published for this team yet.
+                </div>
+              )}
+            </div>
           </section>
         )}
 
@@ -385,6 +404,40 @@ export default function FixturesPage() {
         )}
       </div>
     </main>
+  )
+}
+
+function MobileFixtureCard({ match }: { match: Fixture }) {
+  const form = formFor(match)
+  const formColour = form === 'W' ? '#22C55E' : form === 'L' ? '#EF4444' : '#F59E0B'
+
+  return (
+    <article style={{ background: '#fff', border: '1px solid #DCE3F1', borderLeft: '5px solid #1149D8', borderRadius: 8, padding: 16, boxShadow: '0 5px 16px rgba(4,27,95,0.06)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+        <div>
+          <div style={{ color: '#6B7280', fontFamily: "'Montserrat',sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+            {fixtureDay(match.date)} · {match.kickoff || 'TBC'} · {match.venue}
+          </div>
+          <h3 style={{ margin: '6px 0 3px', color: '#041B5F', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 22, fontWeight: 800, lineHeight: 1.05 }}>
+            {match.opponent}
+          </h3>
+          <div style={{ color: '#6B7280', fontFamily: "'Montserrat',sans-serif", fontSize: 11, lineHeight: 1.35 }}>
+            {match.competition || 'Competition TBC'}
+          </div>
+        </div>
+        <div style={{ flexShrink: 0, textAlign: 'center' }}>
+          <div style={{ color: '#041B5F', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 25, fontWeight: 800, lineHeight: 1 }}>
+            {resultFor(match)}
+          </div>
+          {form && <span style={{ display: 'inline-flex', width: 28, height: 28, marginTop: 7, alignItems: 'center', justifyContent: 'center', background: formColour, color: '#fff', borderRadius: 4, fontFamily: "'Montserrat',sans-serif", fontSize: 12, fontWeight: 800 }}>{form}</span>}
+        </div>
+      </div>
+      {match.played && (
+        <Link href={'/match-report/' + encodeURIComponent(match._id)} style={{ display: 'inline-block', marginTop: 13, color: '#1149D8', fontFamily: "'Montserrat',sans-serif", fontSize: 11, fontWeight: 800, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          Match Report →
+        </Link>
+      )}
+    </article>
   )
 }
 
