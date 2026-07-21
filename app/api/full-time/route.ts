@@ -134,6 +134,11 @@ export async function GET(request: NextRequest) {
     )
   } catch (error) {
     console.error('Unable to refresh Full-Time data:', error)
-    return NextResponse.json({ matches: [], table: [], error: 'Full-Time data is temporarily unavailable.' }, { status: 502 })
+    return NextResponse.json({
+      matches: [],
+      table: [],
+      error: 'Full-Time data is temporarily unavailable.',
+      upstreamError: error instanceof Error ? error.message : 'Unknown upstream error',
+    }, { status: 502 })
   }
 }
