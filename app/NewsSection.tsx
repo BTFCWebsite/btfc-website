@@ -46,7 +46,7 @@ export default function NewsSection() {
           <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 14, color: '#6B7280' }}>The latest from Brimscombe & Thrupp FC</p>
           <div style={{ width: 52, height: 4, background: '#1149D8', margin: '12px auto 0', borderRadius: 2 }} />
         </div>
-        <div style={{
+        <div className="mobile-card-grid" style={{
   display: 'grid',
   gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
   gap: 24,
@@ -56,7 +56,7 @@ export default function NewsSection() {
             const color = CATEGORY_COLORS[n.category] || '#1149D8'
             const icon = CATEGORY_ICONS[n.category] || '📰'
             return (
-              <Link
+              <Link className="mobile-full-card"
   key={n._id}
   href="/news"
   style={{
