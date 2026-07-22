@@ -95,14 +95,14 @@ export default function NewsPage() {
 
         {/* News grid */}
         {!loading && (
-          <div style={{
+          <div className="mobile-card-grid" style={{
   display: 'grid',
   gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
   gap: 20,
   alignItems: 'stretch'
 }}>
             {filtered.map(article => (
-              <Link
+              <Link className="mobile-full-card"
                 key={article._id}
                 href={article.slug ? `/news/${article.slug}` : '/news'}
                 style={{
