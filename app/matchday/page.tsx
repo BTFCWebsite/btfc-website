@@ -133,7 +133,7 @@ export default function MatchdayPage() {
     <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '0 0 90px' }}>
       <section style={{ maxWidth: 980, margin: '0 auto', padding: '52px 24px' }}>
 
-        <div style={{
+        <div className="mobile-feature-card" style={{
           background: '#041B5F',
           borderRadius: 8,
           padding: '22px 28px',
@@ -145,7 +145,7 @@ export default function MatchdayPage() {
           flexWrap: 'wrap',
           marginBottom: 44,
         }}>
-          <div>
+          <div className="matchday-fixture-copy">
             <div style={{
               fontFamily: "'Montserrat', sans-serif",
               fontSize: 10,
@@ -157,7 +157,7 @@ export default function MatchdayPage() {
               Next Home Game
             </div>
 
-            <h2 style={{
+            <h2 className="matchday-fixture-title" style={{
               fontFamily: "'Barlow Condensed', sans-serif",
               fontSize: 28,
               fontWeight: 800,
@@ -178,7 +178,7 @@ export default function MatchdayPage() {
             </p>
           </div>
 
-          <a href="/tickets" style={{
+          <a className="matchday-fixture-button" href="/tickets" style={{
             background: '#1149D8',
             padding: '12px 22px',
             borderRadius: 6,
@@ -194,14 +194,14 @@ export default function MatchdayPage() {
           </a>
         </div>
 
-        <div style={{
+        <div className="mobile-card-grid" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
           gap: 20,
           marginBottom: 52,
         }}>
           {facilities.map(f => (
-            <div key={f.title} style={{
+            <div className="mobile-full-card" key={f.title} style={{
               background: '#fff',
               border: '1px solid #E5E7EB',
               borderRadius: 8,
@@ -259,13 +259,13 @@ export default function MatchdayPage() {
             />
           </div>
 
-          <div style={{
+          <div className="mobile-card-grid" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
             gap: 20,
           }}>
             {gettingHere.map(g => (
-              <div key={g.title} style={{
+              <div className="mobile-full-card" key={g.title} style={{
                 ...card,
                 width: '100%',
                 maxWidth: 360,
