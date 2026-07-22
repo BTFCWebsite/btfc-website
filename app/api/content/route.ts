@@ -14,7 +14,7 @@ const queries: Record<string, string> = {
   }`,
   players: `*[_type == "player" && active == true] | order(order asc, squadNumber asc) {
     _id, name, squadNumber, position, team, active, order,
-    "imageUrl": image.asset->url, sponsorName,
+    "imageUrl": coalesce(photo.asset->url, image.asset->url), sponsorName,
     "sponsorLogoUrl": sponsorLogo.asset->url
   }`,
   staff: `*[_type == "teamStaff" && active == true] | order(order asc, name asc) {
