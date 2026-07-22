@@ -52,6 +52,36 @@ img {
 }
 
 @media (max-width: 700px) {
+  /* Keep repeated content cards aligned to one consistent mobile column. */
+  .mobile-card-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .mobile-full-card {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .mobile-feature-card {
+    padding: 20px !important;
+  }
+
+  .matchday-fixture-copy {
+    width: 100%;
+  }
+
+  .matchday-fixture-title {
+    font-size: clamp(24px, 7vw, 28px) !important;
+    line-height: 1.08;
+    overflow-wrap: normal;
+  }
+
+  .matchday-fixture-button {
+    width: 100%;
+  }
+
   .fixtures-desktop-table {
     display: none;
   }
