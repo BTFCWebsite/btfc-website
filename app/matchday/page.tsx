@@ -164,7 +164,7 @@ export default function MatchdayPage() {
               margin: '0 0 6px',
               letterSpacing: '0.03em',
             }}>
-              BTFC vs {nextHomeGame.opponent}
+              vs {nextHomeGame.opponent}
             </h2>
 
             <p style={{
