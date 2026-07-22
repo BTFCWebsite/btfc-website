@@ -164,7 +164,7 @@ export default function MatchdayPage() {
               margin: '0 0 6px',
               letterSpacing: '0.03em',
             }}>
-              vs {nextHomeGame.opponent}
+              {nextHomeGame.opponent}
             </h2>
 
             <p style={{
