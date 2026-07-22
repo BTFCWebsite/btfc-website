@@ -140,8 +140,23 @@ export default async function HomePage() {
           .hero-cards { flex-direction: column; align-items: stretch; }
           .hero-cards > * { min-width: unset !important; max-width: none !important; width: 100% !important; }
           .promo-inner { flex-direction: column !important; }
-          .jessons-strip { flex-direction: column; gap: 8px !important; text-align: center; }
-          .stats-strip > div { padding: 12px 20px !important; }
+          .jessons-strip { flex-direction: column; gap: 6px !important; padding: 12px 20px !important; text-align: center; }
+          .jessons-divider { display: none; }
+          .stats-strip { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .stats-strip > div {
+            width: 100%;
+            min-width: 0;
+            padding: 14px 8px !important;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid rgba(255,255,255,.18);
+            border-bottom: 1px solid rgba(255,255,255,.18);
+          }
+          .stats-strip > div:nth-child(2n) { border-right: 0 !important; }
+          .stats-strip > div:nth-last-child(-n+2) { border-bottom: 0; }
         }
       `}</style>
 
@@ -200,9 +215,9 @@ export default async function HomePage() {
         <div style={{ position: 'relative', zIndex: 1, width: 'calc(100% + 48px)', marginLeft: -24, marginRight: -24 }}>
           <div className="jessons-strip" style={{ background: 'rgba(4,27,95,.95)', borderTop: '1px solid rgba(255,255,255,.08)', padding: '16px 40px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
             <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 10, color: 'rgba(255,255,255,.4)', letterSpacing: '.15em', textTransform: 'uppercase' }}>Home of BTFC</span>
-            <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,.15)' }} />
+            <div className="jessons-divider" style={{ width: 1, height: 18, background: 'rgba(255,255,255,.15)' }} />
             <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 20, color: '#fff', letterSpacing: '.06em' }}>JESSONS MEADOW</span>
-            <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,.15)' }} />
+            <div className="jessons-divider" style={{ width: 1, height: 18, background: 'rgba(255,255,255,.15)' }} />
             <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 10, color: 'rgba(255,255,255,.4)', letterSpacing: '.12em', textTransform: 'uppercase' }}>Ground Sponsor</span>
             <div style={{ background: '#fff', borderRadius: 4, padding: '3px 10px', display: 'flex', alignItems: 'center' }}>
               <img src="/sponsors/jessons-logo.png" alt="Jessons Real Estate" style={{ height: 22, objectFit: 'contain' }} />
