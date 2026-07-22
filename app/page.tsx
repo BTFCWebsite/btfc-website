@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import Link from 'next/link'
 import { client } from './lib/sanity.client'
 import NewsSection from './NewsSection'
+import LeaguePosition from './LeaguePosition'
 
 const SPONSORS = [
   { name: 'Jessons Real Estate', role: 'Ground Sponsor', logo: '/sponsors/jessons-logo.png' },
@@ -225,13 +226,13 @@ export default async function HomePage() {
           </div>
           <div className="stats-strip" style={{ background: '#1149D8', display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
             {[
-              [leaguePosition || '7th', 'League Position'],
-              ['Hellenic', 'Division One'],
-              [seasonYear || '2025/26', 'Season'],
-              ['Est. 1886', 'Founded'],
-            ].map(([val, label]) => (
+              { value: <LeaguePosition fallback={leaguePosition || '7th'} />, label: 'League Position' },
+              { value: 'Hellenic', label: 'Division One' },
+              { value: seasonYear || '2025/26', label: 'Season' },
+              { value: 'Est. 1886', label: 'Founded' },
+            ].map(({ value, label }) => (
               <div key={label} style={{ padding: '14px 36px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,.18)' }}>
-                <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 26, color: '#fff', letterSpacing: '.04em' }}>{val}</div>
+                <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 26, color: '#fff', letterSpacing: '.04em' }}>{value}</div>
                 <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 600, fontSize: 9, color: 'rgba(255,255,255,.65)', letterSpacing: '.12em', textTransform: 'uppercase', marginTop: 2 }}>{label}</div>
               </div>
             ))}
