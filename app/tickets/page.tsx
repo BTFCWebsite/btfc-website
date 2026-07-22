@@ -183,7 +183,7 @@ export default function TicketsPage() {
             Pay on the gate — First XI matches only. All other fixtures are free to attend.
           </p>
 
-          <div style={{
+          <div className="mobile-card-grid" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
             gap: 20,
@@ -249,13 +249,13 @@ export default function TicketsPage() {
             FAQs
           </h2>
 
-          <div style={{
+          <div className="mobile-card-grid" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
             gap: 20,
           }}>
             {faqs.map(([title, text]) => (
-              <div key={title} style={{
+              <div className="mobile-full-card" key={title} style={{
                 background: '#fff',
                 border: '1px solid #E5E7EB',
                 borderRadius: 8,
