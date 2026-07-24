@@ -405,6 +405,7 @@ export default async function ClubPage() {
                         letterSpacing: '.08em',
                         textTransform: 'uppercase',
                         width: '40%',
+                        whiteSpace: 'nowrap',
                       }}>
                         {o.role}
                       </td>
