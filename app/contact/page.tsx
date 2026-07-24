@@ -108,15 +108,19 @@ export default function ContactPage() {
         official.role?.trim().toLowerCase() !== 'club secretary'
       )
 
-      setOfficials([
-        ...otherOfficials,
-        {
-          name: 'Matt Watson',
-          role: 'Club Secretary',
-          department: 'Club Secretary',
-          phone: '07718586808',
-        },
-      ])
+      const mattWatson: ClubOfficial = {
+        name: 'Matt Watson',
+        role: 'Club Secretary',
+        department: 'Club Secretary',
+        phone: '07718586808',
+      }
+      const nickIndex = otherOfficials.findIndex((official: ClubOfficial) =>
+        official.name?.trim().toLowerCase() === 'nick wright'
+      )
+      const orderedOfficials = [...otherOfficials]
+
+      orderedOfficials.splice(nickIndex >= 0 ? nickIndex + 1 : orderedOfficials.length, 0, mattWatson)
+      setOfficials(orderedOfficials)
     }
 
     loadOfficials()
