@@ -103,7 +103,19 @@ export default function ContactPage() {
         }
       `)
 
-      setOfficials(data)
+      const otherOfficials = data.filter((official: ClubOfficial) =>
+        official.name?.trim().toLowerCase() !== 'matt watson' &&
+        official.role?.trim().toLowerCase() !== 'club secretary'
+      )
+
+      setOfficials([
+        ...otherOfficials,
+        {
+          name: 'Matt Watson',
+          role: 'Club Secretary',
+          department: 'Club Secretary',
+        },
+      ])
     }
 
     loadOfficials()
