@@ -51,6 +51,23 @@ img {
   display: none;
 }
 
+/* Keep the Club page community tiles balanced on desktop. */
+@media (min-width: 701px) {
+  .community-youth-grid {
+    grid-template-columns: repeat(2, minmax(0, 340px)) !important;
+    justify-content: center;
+  }
+
+  .community-get-involved-card {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .community-walking-card {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (max-width: 700px) {
   /* Keep repeated content cards aligned to one consistent mobile column. */
   .mobile-card-grid {
