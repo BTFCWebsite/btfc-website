@@ -415,6 +415,12 @@ export default async function ClubPage() {
               <p style={{ ...body, marginBottom: 14 }}>
                 BTFC Under 17s will compete for the first time in the 2026/27 season — our inaugural youth team, managed by Clive Boulton. The U17s provide a pathway for young local players to develop their football and progress towards the first team.
               </p>
+              <p style={{ ...body, marginBottom: 14 }}>
+                <strong>Contact: Clive Boulton</strong><br />
+                <a href="tel:+447973571081" style={{ color: '#1149D8', fontWeight: 700 }}>
+                  07973 571081
+                </a>
+              </p>
               <span style={{
                 display: 'inline-block',
                 background: '#F0F4FF',
