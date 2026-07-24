@@ -68,16 +68,21 @@ img {
     padding: 18px !important;
   }
 
-  .community-walking-content::after {
-    content: '';
-    display: block;
-    clear: both;
+  .community-walking-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
   }
 
   .community-walking-logo {
-    float: left;
+    flex: 0 0 140px;
     width: 140px;
-    margin: 0 16px 8px 0;
+    margin: 0;
+  }
+
+  .community-walking-content > div:last-child {
+    flex: 1;
+    min-width: 0;
   }
 
   .community-walking-content h3 {
