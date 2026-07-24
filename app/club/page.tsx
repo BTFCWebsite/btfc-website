@@ -65,7 +65,33 @@ const clubFacts = [
 ]
 
 export default async function ClubPage() {
-  const officials = await client.fetch(officialsQuery)
+  const fetchedOfficials = await client.fetch(officialsQuery)
+
+  const mattWatson = fetchedOfficials.find((official: any) =>
+    official.name?.trim().toLowerCase() === 'matt watson'
+  ) ?? { name: 'Matt Watson', role: 'Club Secretary' }
+
+  const stuartGlover = fetchedOfficials.find((official: any) =>
+    official.name?.trim().toLowerCase() === 'stuart glover'
+  ) ?? { name: 'Stuart Glover', role: 'Welfare Officer' }
+
+  const officials = fetchedOfficials.filter((official: any) => {
+    const name = official.name?.trim().toLowerCase()
+    return name !== 'matt watson' && name !== 'stuart glover'
+  })
+
+  const nickWrightIndex = officials.findIndex((official: any) =>
+    official.name?.trim().toLowerCase() === 'nick wright'
+  )
+
+  officials.splice(nickWrightIndex >= 0 ? nickWrightIndex + 1 : 0, 0, {
+    ...mattWatson,
+    role: 'Club Secretary',
+  })
+  officials.push({
+    ...stuartGlover,
+    role: 'Welfare Officer',
+  })
 
   return (
     <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '52px 24px 90px' }}>
