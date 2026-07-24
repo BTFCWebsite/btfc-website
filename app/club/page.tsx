@@ -87,7 +87,6 @@ export default async function ClubPage() {
   officials.splice(nickWrightIndex >= 0 ? nickWrightIndex + 1 : 0, 0, {
     ...mattWatson,
     role: 'Club Secretary',
-    phone: mattWatson.phone || '07718 586808',
   })
   officials.push({
     ...stuartGlover,
@@ -420,23 +419,6 @@ export default async function ClubPage() {
                         whiteSpace: 'nowrap',
                       }}>
                         {o.name}
-                        {o.phone && (
-                          <a
-                            href={`tel:${o.phone.replace(/\s/g, '')}`}
-                            className="club-official-phone"
-                            style={{
-                              color: '#1149D8',
-                              fontFamily: "'Montserrat', sans-serif",
-                              fontSize: 12,
-                              fontWeight: 700,
-                              marginLeft: 14,
-                              textDecoration: 'none',
-                              whiteSpace: 'nowrap',
-                            }}
-                          >
-                            {o.phone}
-                          </a>
-                        )}
                       </td>
                     </tr>
                   ))}
