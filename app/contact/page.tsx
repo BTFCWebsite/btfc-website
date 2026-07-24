@@ -313,9 +313,12 @@ export default function ContactPage() {
                   </a>
                 )}
 
-                {d.phone && (
-                  <a href={`tel:${d.phone.replace(/\s/g, '')}`} style={{ ...body, color: '#1149D8', fontSize: 11, wordBreak: 'break-all', display: 'block', marginTop: 6 }}>
-                    {d.phone}
+                {(d.phone || d.name?.trim().toLowerCase() === 'matt watson') && (
+                  <a
+                    href={`tel:${(d.name?.trim().toLowerCase() === 'matt watson' ? '07718586808' : d.phone || '').replace(/\s/g, '')}`}
+                    style={{ ...body, color: '#1149D8', fontSize: 11, wordBreak: 'break-all', display: 'block', marginTop: 6 }}
+                  >
+                    {d.name?.trim().toLowerCase() === 'matt watson' ? '07718586808' : d.phone}
                   </a>
                 )}
               </div>
