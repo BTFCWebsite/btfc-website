@@ -415,6 +415,7 @@ export default async function ClubPage() {
                         fontWeight: 800,
                         color: '#2D2D2D',
                         padding: '14px 24px',
+                        whiteSpace: 'nowrap',
                       }}>
                         {o.name}
                       </td>
