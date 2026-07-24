@@ -66,6 +66,18 @@ img {
   .community-walking-card {
     grid-column: 1 / -1;
   }
+
+  .community-walking-content::after {
+    content: '';
+    display: block;
+    clear: both;
+  }
+
+  .community-walking-logo {
+    float: left;
+    width: 180px;
+    margin: 0 24px 14px 0;
+  }
 }
 
 @media (max-width: 700px) {
