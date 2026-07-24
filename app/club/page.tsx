@@ -446,14 +446,83 @@ export default async function ClubPage() {
               </p>
             </div>
 
-            <div className="mobile-full-card" style={{ ...card, width: '100%', maxWidth: 340, minWidth: 0, overflowWrap: 'anywhere' }}>
-              <div style={{ fontSize: 28, marginBottom: 12 }}>🚶</div>
-              <h3 style={h3}>Walking Football</h3>
-              <p style={body}>
-                We offer walking football for over 50s — a slower-paced version of the
-                game that keeps players active and connected to the club. All welcome,
-                no experience necessary. Contact us to find out more.
-              </p>
+            <div className="mobile-full-card" style={{
+              ...card,
+              width: '100%',
+              maxWidth: 720,
+              minWidth: 0,
+              overflowWrap: 'anywhere',
+              gridColumn: '1 / -1',
+            }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))',
+                gap: 24,
+                alignItems: 'center',
+              }}>
+                <div style={{ textAlign: 'center' }}>
+                  <img
+                    src="/stroud-park-wfc.webp"
+                    alt="Stroud Park Walking Football Club badge"
+                    style={{ width: '100%', maxWidth: 230, height: 'auto', borderRadius: 8 }}
+                  />
+                </div>
+
+                <div>
+                  <div style={{ fontSize: 28, marginBottom: 12 }}>🚶</div>
+                  <h3 style={h3}>Walking Football at Active Lifestyles Stroud</h3>
+                  <p style={{ ...body, marginBottom: 12 }}>
+                    Have you hung up your boots but still miss the beautiful game? Why not give Walking Football a try?
+                  </p>
+                  <p style={{ ...body, marginBottom: 12 }}>
+                    Stroud Park Walking Football Club welcomes men and women who want to stay active,
+                    enjoy football in a friendly atmosphere and meet new people. Whether you played regularly,
+                    only had the occasional kickabout, or have not kicked a ball in years, you will receive a warm welcome.
+                  </p>
+                  <p style={{ ...body, marginBottom: 14 }}>
+                    Walking Football is exactly what it sounds like — no running and minimal physical contact —
+                    making it enjoyable, inclusive and suitable for a wide range of ages and abilities.
+                  </p>
+
+                  <h3 style={{ ...h3, fontSize: 18, marginBottom: 8 }}>Weekly sessions</h3>
+                  <ul style={{ ...body, paddingLeft: 20, margin: '0 0 14px' }}>
+                    <li><strong>Monday:</strong> 10.00am–11.00am</li>
+                    <li><strong>Wednesday:</strong> 9.00am–10.00am</li>
+                    <li><strong>Thursday:</strong> 7.00pm–8.00pm (summer) / 8.00pm–9.00pm indoors (winter)</li>
+                  </ul>
+
+                  <p style={{ ...body, marginBottom: 14 }}>
+                    If you have been thinking about getting back into football, or simply want an enjoyable
+                    way to keep active and improve fitness and mobility, come along and see what it is all about.
+                  </p>
+
+                  <p style={{ ...body, marginBottom: 12 }}>
+                    <strong>Contact: Peter Humphries</strong><br />
+                    <a href="tel:+447710437506" style={{ color: '#1149D8', fontWeight: 700 }}>
+                      07710 437506
+                    </a>
+                  </p>
+
+                  <a
+                    href="https://stroud-park-walking-football-club.jimdosite.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'inline-block',
+                      background: '#1149D8',
+                      color: '#fff',
+                      padding: '8px 16px',
+                      borderRadius: 6,
+                      fontFamily: "'Barlow Condensed', sans-serif",
+                      fontWeight: 800,
+                      fontSize: 15,
+                      textDecoration: 'none',
+                    }}
+                  >
+                    Visit the Club Website →
+                  </a>
+                </div>
+              </div>
             </div>
 
             <div className="mobile-full-card" style={{ ...card, width: '100%', maxWidth: 340, minWidth: 0, overflowWrap: 'anywhere' }}>
