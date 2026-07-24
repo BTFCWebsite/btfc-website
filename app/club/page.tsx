@@ -161,13 +161,13 @@ export default async function ClubPage() {
           <h2 style={h2}>Club History</h2>
           <p style={subhead}>Over 130 years in the heart of the Cotswold valley</p>
 
-          <div style={{
+          <div className="mobile-card-grid" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
             gap: 20,
             justifyItems: 'center',
           }}>
-            <div style={{ ...card, width: '100%', maxWidth: 460 }}>
+            <div className="mobile-full-card" style={{ ...card, width: '100%', maxWidth: 460 }}>
               <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
               <h3 style={h3}>Brimscombe FC — Est. 1886</h3>
               <p style={{ ...body, marginBottom: 12 }}>
@@ -188,7 +188,7 @@ export default async function ClubPage() {
               </p>
             </div>
 
-            <div style={{ ...card, width: '100%', maxWidth: 460 }}>
+            <div className="mobile-full-card" style={{ ...card, width: '100%', maxWidth: 460 }}>
               <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
               <h3 style={h3}>Brimscombe &amp; Thrupp FC</h3>
               <p style={{ ...body, marginBottom: 12 }}>
@@ -216,13 +216,13 @@ export default async function ClubPage() {
           <h2 style={h2}>Jessons Meadow</h2>
           <p style={subhead}>Home of Brimscombe &amp; Thrupp FC since 1886</p>
 
-          <div style={{
+          <div className="mobile-card-grid" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
             gap: 20,
             justifyItems: 'center',
           }}>
-            <div style={{ ...card, width: '100%', maxWidth: 460 }}>
+            <div className="mobile-full-card" style={{ ...card, width: '100%', maxWidth: 460 }}>
               <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
               <p style={{ ...body, marginBottom: 14 }}>
                 Jessons Meadow has been the home of Brimscombe &amp; Thrupp FC since the
@@ -241,7 +241,7 @@ export default async function ClubPage() {
               </p>
             </div>
 
-            <div style={{ display: 'grid', gap: 16, width: '100%', maxWidth: 460 }}>
+            <div className="mobile-full-card" style={{ display: 'grid', gap: 16, width: '100%', maxWidth: 460 }}>
               {[
                 { icon: '🏟', label: 'Capacity', value: '1,200' },
                 { icon: '💡', label: 'Floodlights', value: 'Yes' },
@@ -281,7 +281,7 @@ export default async function ClubPage() {
           <h2 style={h2}>Club Honours</h2>
           <p style={subhead}>A proud record of achievement — 1886 to present</p>
 
-          <div style={{
+          <div className="mobile-card-grid" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
             gap: 16,
@@ -341,7 +341,7 @@ export default async function ClubPage() {
                 ],
               },
             ].map(section => (
-              <div key={section.era} style={{
+              <div className="mobile-full-card" key={section.era} style={{
                 ...card,
                 width: '100%',
                 maxWidth: 380,
@@ -404,14 +404,14 @@ export default async function ClubPage() {
           <h2 style={h2}>Community &amp; Youth</h2>
           <p style={subhead}>Football for everyone in Brimscombe, Thrupp and the wider Stroud area</p>
 
-          <div style={{
+          <div className="mobile-card-grid" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))',
             gap: 20,
             justifyItems: 'center',
             width: '100%',
           }}>
-            <div style={{ ...card, width: '100%', maxWidth: 340, minWidth: 0, overflowWrap: 'anywhere' }}>
+            <div className="mobile-full-card" style={{ ...card, width: '100%', maxWidth: 340, minWidth: 0, overflowWrap: 'anywhere' }}>
               <div style={{ fontSize: 28, marginBottom: 12 }}>👶</div>
               <h3 style={h3}>Youth Football</h3>
               <p style={{ ...body, marginBottom: 14 }}>
@@ -446,7 +446,7 @@ export default async function ClubPage() {
               </p>
             </div>
 
-            <div style={{ ...card, width: '100%', maxWidth: 340, minWidth: 0, overflowWrap: 'anywhere' }}>
+            <div className="mobile-full-card" style={{ ...card, width: '100%', maxWidth: 340, minWidth: 0, overflowWrap: 'anywhere' }}>
               <div style={{ fontSize: 28, marginBottom: 12 }}>🚶</div>
               <h3 style={h3}>Walking Football</h3>
               <p style={body}>
@@ -456,7 +456,7 @@ export default async function ClubPage() {
               </p>
             </div>
 
-            <div style={{ ...card, width: '100%', maxWidth: 340, minWidth: 0, overflowWrap: 'anywhere' }}>
+            <div className="mobile-full-card" style={{ ...card, width: '100%', maxWidth: 340, minWidth: 0, overflowWrap: 'anywhere' }}>
               <div style={{ fontSize: 28, marginBottom: 12 }}>🤝</div>
               <h3 style={h3}>Get Involved</h3>
               <p style={{ ...body, marginBottom: 14 }}>
