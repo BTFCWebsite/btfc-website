@@ -193,7 +193,7 @@ export default async function ClubPage() {
             gap: 20,
             justifyItems: 'center',
           }}>
-            <div className="mobile-full-card" style={{ ...card, width: '100%', maxWidth: 460 }}>
+            <div className="mobile-full-card" style={{ ...card, width: '100%' }}>
               <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
               <h3 style={h3}>Brimscombe FC — Est. 1886</h3>
               <p style={{ ...body, marginBottom: 12 }}>
@@ -214,7 +214,7 @@ export default async function ClubPage() {
               </p>
             </div>
 
-            <div className="mobile-full-card" style={{ ...card, width: '100%', maxWidth: 460 }}>
+            <div className="mobile-full-card" style={{ ...card, width: '100%' }}>
               <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
               <h3 style={h3}>Brimscombe &amp; Thrupp FC</h3>
               <p style={{ ...body, marginBottom: 12 }}>
@@ -248,7 +248,7 @@ export default async function ClubPage() {
             gap: 20,
             justifyItems: 'center',
           }}>
-            <div className="mobile-full-card" style={{ ...card, width: '100%', maxWidth: 460 }}>
+            <div className="mobile-full-card" style={{ ...card, width: '100%' }}>
               <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
               <p style={{ ...body, marginBottom: 14 }}>
                 Jessons Meadow has been the home of Brimscombe &amp; Thrupp FC since the
@@ -267,7 +267,7 @@ export default async function ClubPage() {
               </p>
             </div>
 
-            <div className="mobile-full-card" style={{ display: 'grid', gap: 16, width: '100%', maxWidth: 460 }}>
+            <div className="mobile-full-card" style={{ display: 'grid', gap: 16, width: '100%' }}>
               {[
                 { icon: '🏟', label: 'Capacity', value: '1,200' },
                 { icon: '💡', label: 'Floodlights', value: 'Yes' },
@@ -439,7 +439,7 @@ export default async function ClubPage() {
             justifyItems: 'center',
             width: '100%',
           }}>
-            <div className="mobile-full-card" style={{ ...card, width: '100%', maxWidth: 340, minWidth: 0, overflowWrap: 'anywhere' }}>
+            <div className="mobile-full-card" style={{ ...card, width: '100%', minWidth: 0, overflowWrap: 'anywhere' }}>
               <div style={{ fontSize: 28, marginBottom: 12 }}>👶</div>
               <h3 style={h3}>Youth Football</h3>
               <p style={{ ...body, marginBottom: 14 }}>
@@ -477,7 +477,6 @@ export default async function ClubPage() {
             <div className="mobile-full-card community-walking-card" style={{
               ...card,
               width: '100%',
-              maxWidth: 720,
               minWidth: 0,
               overflowWrap: 'anywhere',
               gridColumn: '1 / -1',
@@ -553,7 +552,7 @@ export default async function ClubPage() {
               </div>
             </div>
 
-            <div className="mobile-full-card community-get-involved-card" style={{ ...card, width: '100%', maxWidth: 340, minWidth: 0, overflowWrap: 'anywhere' }}>
+            <div className="mobile-full-card community-get-involved-card" style={{ ...card, width: '100%', minWidth: 0, overflowWrap: 'anywhere' }}>
               <div style={{ fontSize: 28, marginBottom: 12 }}>🤝</div>
               <h3 style={h3}>Get Involved</h3>
               <p style={{ ...body, marginBottom: 14 }}>
