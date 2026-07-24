@@ -432,7 +432,7 @@ export default async function ClubPage() {
           <h2 style={h2}>Community &amp; Youth</h2>
           <p style={subhead}>Football for everyone in Brimscombe, Thrupp and the wider Stroud area</p>
 
-          <div className="mobile-card-grid" style={{
+          <div className="mobile-card-grid community-youth-grid" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))',
             gap: 20,
@@ -474,7 +474,7 @@ export default async function ClubPage() {
               </p>
             </div>
 
-            <div className="mobile-full-card" style={{
+            <div className="mobile-full-card community-walking-card" style={{
               ...card,
               width: '100%',
               maxWidth: 720,
@@ -553,7 +553,7 @@ export default async function ClubPage() {
               </div>
             </div>
 
-            <div className="mobile-full-card" style={{ ...card, width: '100%', maxWidth: 340, minWidth: 0, overflowWrap: 'anywhere' }}>
+            <div className="mobile-full-card community-get-involved-card" style={{ ...card, width: '100%', maxWidth: 340, minWidth: 0, overflowWrap: 'anywhere' }}>
               <div style={{ fontSize: 28, marginBottom: 12 }}>🤝</div>
               <h3 style={h3}>Get Involved</h3>
               <p style={{ ...body, marginBottom: 14 }}>
