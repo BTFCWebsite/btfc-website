@@ -62,12 +62,6 @@ const gettingHere = [
     text: 'The nearest station is Stroud, served by GWR with regular services from Gloucester, Swindon and London Paddington. From Stroud take the 67 bus or a taxi to the ground.',
     link: null,
   },
-  {
-    icon: '🚶',
-    title: 'On Foot',
-    text: 'Easily walkable from Brimscombe village. Follow London Road — the floodlights are visible from the road.',
-    link: null,
-  },
 ]
 
 const h2 = {
