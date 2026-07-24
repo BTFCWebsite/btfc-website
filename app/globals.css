@@ -54,7 +54,7 @@ img {
 /* Keep the Club page community tiles balanced on desktop. */
 @media (min-width: 701px) {
   .community-youth-grid {
-    grid-template-columns: repeat(2, minmax(0, 340px)) !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     justify-content: center;
   }
 
