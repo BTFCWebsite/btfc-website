@@ -114,6 +114,7 @@ export default function ContactPage() {
           name: 'Matt Watson',
           role: 'Club Secretary',
           department: 'Club Secretary',
+          phone: '07718586808',
         },
       ])
     }
