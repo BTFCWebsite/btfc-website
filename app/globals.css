@@ -122,6 +122,31 @@ img {
     padding: 20px !important;
   }
 
+  .club-officials-table {
+    min-width: 0 !important;
+    table-layout: fixed;
+  }
+
+  .club-official-role {
+    width: 44% !important;
+    padding: 12px 10px !important;
+    font-size: 9px !important;
+    letter-spacing: 0.04em !important;
+    overflow-wrap: normal;
+  }
+
+  .club-official-details {
+    padding: 12px 10px !important;
+    font-size: 18px !important;
+    overflow-wrap: normal;
+  }
+
+  .club-official-phone {
+    display: block;
+    margin: 4px 0 0 !important;
+    font-size: 11px !important;
+  }
+
   .matchday-fixture-copy {
     width: 100%;
   }
