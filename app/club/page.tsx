@@ -481,13 +481,8 @@ export default async function ClubPage() {
               overflowWrap: 'anywhere',
               gridColumn: '1 / -1',
             }}>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))',
-                gap: 14,
-                alignItems: 'center',
-              }}>
-                <div style={{ textAlign: 'center' }}>
+              <div className="community-walking-content">
+                <div className="community-walking-logo" style={{ textAlign: 'center' }}>
                   <img
                     src="/stroud-park-wfc.webp"
                     alt="Stroud Park Walking Football Club badge"
