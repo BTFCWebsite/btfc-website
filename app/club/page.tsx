@@ -390,14 +390,14 @@ export default async function ClubPage() {
           <div style={{ ...card, padding: 0, overflow: 'hidden' }}>
             <div style={{ height: 4, background: '#1149D8' }} />
             <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 500 }}>
+              <table className="club-officials-table" style={{ width: '100%', borderCollapse: 'collapse', minWidth: 500 }}>
                 <tbody>
                   {officials.map((o: any, i: number) => (
                     <tr key={`${o.role}-${o.name}`} style={{
                       borderBottom: i < officials.length - 1 ? '1px solid #F3F4F6' : 'none',
                       background: i % 2 === 0 ? '#fff' : '#FAFAFA',
                     }}>
-                      <td style={{
+                      <td className="club-official-role" style={{
                         ...body,
                         padding: '14px 24px',
                         fontSize: 11,
@@ -411,7 +411,7 @@ export default async function ClubPage() {
                         {o.role}
                       </td>
 
-                      <td style={{
+                      <td className="club-official-details" style={{
                         fontFamily: "'Barlow Condensed', sans-serif",
                         fontSize: 20,
                         fontWeight: 800,
@@ -423,6 +423,7 @@ export default async function ClubPage() {
                         {o.phone && (
                           <a
                             href={`tel:${o.phone.replace(/\s/g, '')}`}
+                            className="club-official-phone"
                             style={{
                               color: '#1149D8',
                               fontFamily: "'Montserrat', sans-serif",
