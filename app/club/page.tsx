@@ -45,6 +45,7 @@ const card = {
   border: '1px solid #E5E7EB',
   borderRadius: 8,
   padding: 24,
+  boxSizing: 'border-box',
 } as const
 
 const subhead = {
@@ -405,11 +406,12 @@ export default async function ClubPage() {
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))',
             gap: 20,
             justifyItems: 'center',
+            width: '100%',
           }}>
-            <div style={{ ...card, width: '100%', maxWidth: 340 }}>
+            <div style={{ ...card, width: '100%', maxWidth: 340, minWidth: 0, overflowWrap: 'anywhere' }}>
               <div style={{ fontSize: 28, marginBottom: 12 }}>👶</div>
               <h3 style={h3}>Youth Football</h3>
               <p style={{ ...body, marginBottom: 14 }}>
@@ -444,7 +446,7 @@ export default async function ClubPage() {
               </p>
             </div>
 
-            <div style={{ ...card, width: '100%', maxWidth: 340 }}>
+            <div style={{ ...card, width: '100%', maxWidth: 340, minWidth: 0, overflowWrap: 'anywhere' }}>
               <div style={{ fontSize: 28, marginBottom: 12 }}>🚶</div>
               <h3 style={h3}>Walking Football</h3>
               <p style={body}>
@@ -454,7 +456,7 @@ export default async function ClubPage() {
               </p>
             </div>
 
-            <div style={{ ...card, width: '100%', maxWidth: 340 }}>
+            <div style={{ ...card, width: '100%', maxWidth: 340, minWidth: 0, overflowWrap: 'anywhere' }}>
               <div style={{ fontSize: 28, marginBottom: 12 }}>🤝</div>
               <h3 style={h3}>Get Involved</h3>
               <p style={{ ...body, marginBottom: 14 }}>
