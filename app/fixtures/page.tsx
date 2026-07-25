@@ -235,9 +235,15 @@ export default function FixturesPage() {
           if (normalised.includes('first')) return 'First XI'
           return value
         }
-        const activeFeeds = (feeds || [])
+        const reservesSnippet = `<div id="lrep625925242" style="width: 350px;">Data loading....<a href="https://fulltime.thefa.com/index.html?divisionseason=222455275">click here for Division 2</a><br/><br/><a href="http://www.thefa.com/FULL-TIME">FULL-TIME Home</a></div>
+<script language="javascript" type="text/javascript">
+var lrcode = '625925242'
+</script>
+<script language="Javascript" type="text/javascript" src="https://fulltime.thefa.com/client/api/cs1.js"></script>`
+        const sanityFeeds = (feeds || [])
           .map((feed: any) => ({ team: canonicalTeam(feed?.team), snippet: feed?.snippet || '' }))
-          .filter((feed: any) => feed.team && feed.snippet)
+          .filter((feed: any) => feed.team && feed.snippet && feed.team !== 'Reserves')
+        const activeFeeds = [...sanityFeeds, { team: 'Reserves', snippet: reservesSnippet }]
         setFeedSnippets(Object.fromEntries(activeFeeds.map((feed: any) => [feed.team, feed.snippet])))
 
         const results = await Promise.all(activeFeeds.map(async (feed: any) => {
