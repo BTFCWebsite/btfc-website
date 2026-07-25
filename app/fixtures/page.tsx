@@ -7,6 +7,12 @@ import { getFixtures, getMatchFeeds } from '../lib/sanity.client'
 type TeamId = 'first' | 'reserves' | 'u17s'
 type ViewId = 'matches' | 'table'
 
+const reservesFullTime = {
+  division: '222455275',
+  matchesWidget: '625925242',
+  tableWidget: '681011209',
+}
+
 type Fixture = {
   _id: string
   date: string
@@ -247,14 +253,22 @@ var lrcode = '625925242'
         setFeedSnippets(Object.fromEntries(activeFeeds.map((feed: any) => [feed.team, feed.snippet])))
 
         const results = await Promise.all(activeFeeds.map(async (feed: any) => {
-          const widgetCode = feed.snippet.match(/\blrcode\s*=\s*['\"](\d+)['\"]/i)?.[1]
+          const configuredWidget = feed.snippet.match(/\blrcode\s*=\s*['\"](\d+)['\"]/i)?.[1]
           const divisionSeason = feed.snippet.match(/[?&]divisionseason=(\d+)/i)?.[1]
-          const params = new URLSearchParams({ team: feed.team })
-          if (widgetCode) params.set('widget', widgetCode)
-          if (divisionSeason) params.set('division', divisionSeason)
+          const matchesParams = new URLSearchParams({ team: feed.team })
+          const tableParams = new URLSearchParams({ team: feed.team })
+          const matchesWidget = feed.team === 'Reserves' ? reservesFullTime.matchesWidget : configuredWidget
+          const tableWidget = feed.team === 'Reserves' ? reservesFullTime.tableWidget : configuredWidget
+          const division = feed.team === 'Reserves' ? reservesFullTime.division : divisionSeason
+          if (matchesWidget) matchesParams.set('widget', matchesWidget)
+          if (tableWidget) tableParams.set('widget', tableWidget)
+          if (division) {
+            matchesParams.set('division', division)
+            tableParams.set('division', division)
+          }
           const [matchesResponse, tableResponse] = await Promise.all([
-            fetch(`/api/full-time?${params.toString()}&kind=matches`),
-            fetch(`/api/full-time?${params.toString()}&kind=table`),
+            fetch(`/api/full-time?${matchesParams.toString()}&kind=matches`),
+            fetch(`/api/full-time?${tableParams.toString()}&kind=table`),
           ])
           const matchData = matchesResponse.ok ? await matchesResponse.json() : { matches: [] }
           const tableData = tableResponse.ok ? await tableResponse.json() : { table: [] }
