@@ -127,9 +127,10 @@ const packages = [
     taken: false,
     sponsor: null,
     benefits: [
-      'Pitch-side hoarding',
-      'Logo on sponsor page',
-      'Social media shoutout',
+      'Large format pitch side board',
+      'Logo on sponsors page',
+      'Social Media Shoutouts',
+      'Matchday programme listing',
       'Complimentary match tickets',
     ],
   },
@@ -141,9 +142,8 @@ const packages = [
     taken: false,
     sponsor: null,
     benefits: [
-      'Logo on sponsor page',
-      'Social media recognition',
-      'Programme listing',
+      'Standard pitch side board',
+      'Logo on sponsors page',
     ],
   },
 ]
