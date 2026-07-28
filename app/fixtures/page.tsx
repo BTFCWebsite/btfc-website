@@ -9,8 +9,7 @@ type ViewId = 'matches' | 'table'
 
 const reservesFullTime = {
   division: '222455275',
-  matchesWidget: '625925242',
-  tableWidget: '681011209',
+  matchWidgets: ['625925242', '681011209'],
 }
 
 type Fixture = {
@@ -255,28 +254,30 @@ var lrcode = '625925242'
         const results = await Promise.all(activeFeeds.map(async (feed: any) => {
           const configuredWidget = feed.snippet.match(/\blrcode\s*=\s*['\"](\d+)['\"]/i)?.[1]
           const divisionSeason = feed.snippet.match(/[?&]divisionseason=(\d+)/i)?.[1]
-          const matchesParams = new URLSearchParams({ team: feed.team })
           const tableParams = new URLSearchParams({ team: feed.team })
-          const matchesWidget = feed.team === 'Reserves' ? reservesFullTime.matchesWidget : configuredWidget
-          const tableWidget = feed.team === 'Reserves' ? reservesFullTime.tableWidget : configuredWidget
+          const matchWidgets = feed.team === 'Reserves'
+            ? reservesFullTime.matchWidgets
+            : (configuredWidget ? [configuredWidget] : [])
           const division = feed.team === 'Reserves' ? reservesFullTime.division : divisionSeason
-          if (matchesWidget) matchesParams.set('widget', matchesWidget)
-          if (tableWidget) tableParams.set('widget', tableWidget)
-          if (division) {
-            matchesParams.set('division', division)
-            tableParams.set('division', division)
-          }
-          const [matchesResponse, tableResponse] = await Promise.all([
-            fetch(`/api/full-time?${matchesParams.toString()}&kind=matches`),
+          if (division) tableParams.set('division', division)
+
+          const [matchesResponses, tableResponse] = await Promise.all([
+            Promise.all(matchWidgets.map((widget) => {
+              const matchesParams = new URLSearchParams({ team: feed.team, widget })
+              if (division) matchesParams.set('division', division)
+              return fetch(`/api/full-time?${matchesParams.toString()}&kind=matches`)
+            })),
             fetch(`/api/full-time?${tableParams.toString()}&kind=table`),
           ])
-          const matchData = matchesResponse.ok ? await matchesResponse.json() : { matches: [] }
+          const matchPayloads = await Promise.all(
+            matchesResponses.map(response => response.ok ? response.json() : Promise.resolve({ matches: [] }))
+          )
           const tableData = tableResponse.ok ? await tableResponse.json() : { table: [] }
           return {
             team: feed.team,
-            matches: matchData.matches || [],
+            matches: matchPayloads.flatMap(payload => payload.matches || []),
             table: tableData.table || [],
-            fallback: !matchesResponse.ok || !tableResponse.ok,
+            fallback: matchesResponses.length === 0 || matchesResponses.every(response => !response.ok) || !tableResponse.ok,
           }
         }))
         setFullTimeMatches(results.flatMap(result => result.matches))
