@@ -148,24 +148,6 @@ const packages = [
   },
 ]
 
-const currentSponsors = {
-  principal: [
-    { name: 'Jessons Real Estate', role: 'Ground Sponsor', logo: '/sponsors/jessons-logo.png', url: '#' },
-    { name: 'Brackenfern Advisory Limited', role: 'First Team Sponsor', logo: '/sponsors/brackenfern-logo.png', url: '#' },
-  ],
-  gold: [
-    { name: 'Greenleaf Landscaping', role: 'Gold Partner', logo: null },
-    { name: 'Swift Print Co.', role: 'Gold Partner', logo: null },
-    { name: 'Elite Bootroom', role: 'Gold Partner', logo: null },
-  ],
-  club: [
-    { name: 'The Crown Inn', role: 'Club Partner', logo: null },
-    { name: 'TechFix IT', role: 'Club Partner', logo: null },
-    { name: 'Riverside Dental', role: 'Club Partner', logo: null },
-    { name: 'County Garage', role: 'Club Partner', logo: null },
-  ],
-}
-
 export default function SponsorsPage() {
   const [sponsors, setSponsors] = useState<any[]>([])
   const [submitted, setSubmitted] = useState(false)
@@ -182,11 +164,11 @@ export default function SponsorsPage() {
     getSponsors().then((data) => setSponsors(data || [])).catch(console.error)
   }, [])
 
-  const displayedSponsors = sponsors.length ? {
+  const displayedSponsors = {
     principal: sponsors.filter((s) => s.tier === 'principal'),
     gold: sponsors.filter((s) => s.tier === 'official'),
     club: sponsors.filter((s) => s.tier === 'club'),
-  } : currentSponsors
+  }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -236,7 +218,7 @@ export default function SponsorsPage() {
                   justifyContent: 'center',
                   marginBottom: 16,
                 }}>
-                  <img src={'logoUrl' in s ? s.logoUrl : s.logo} alt={s.name} style={{ maxHeight: 70, maxWidth: '80%', objectFit: 'contain' }} />
+                  <img src={s.logoUrl} alt={s.name} style={{ maxHeight: 70, maxWidth: '80%', objectFit: 'contain' }} />
                 </div>
 
                 <h3 style={h3}>{s.name}</h3>
@@ -259,83 +241,89 @@ export default function SponsorsPage() {
             ))}
           </div>
 
-          <h3 style={{ ...h3, marginBottom: 6, marginTop: 32 }}>Gold Partners</h3>
-          <p style={{ ...subhead, marginBottom: 16 }}>Supporting the club at gold level</p>
+          {displayedSponsors.gold.length > 0 && (
+            <>
+              <h3 style={{ ...h3, marginBottom: 6, marginTop: 32 }}>Gold Partners</h3>
+              <p style={{ ...subhead, marginBottom: 16 }}>Supporting the club at gold level</p>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))',
-            gap: 16,
-            marginBottom: 32,
-          }}>
-            {displayedSponsors.gold.map(s => (
-              <div key={s.name} style={{
-                ...card,
-                textAlign: 'center',
-                width: '100%',
-                maxWidth: 320,
-                margin: '0 auto',
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))',
+                gap: 16,
+                marginBottom: 32,
               }}>
-                <div style={{
-                  background: '#F8FAFF',
-                  border: '1px solid #E5E7EB',
-                  borderRadius: 6,
-                  height: 70,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: 12,
-                  fontFamily: "'Montserrat', sans-serif",
-                  fontSize: 10,
-                  color: '#9CA3AF',
-                }}>
-                  Logo to be added
-                </div>
+                {displayedSponsors.gold.map(s => (
+                  <div key={s.name} style={{
+                    ...card,
+                    textAlign: 'center',
+                    width: '100%',
+                    maxWidth: 320,
+                    margin: '0 auto',
+                  }}>
+                    {s.logoUrl && (
+                      <div style={{
+                        background: '#F8FAFF',
+                        border: '1px solid #E5E7EB',
+                        borderRadius: 6,
+                        height: 70,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginBottom: 12,
+                      }}>
+                        <img src={s.logoUrl} alt={s.name} style={{ maxHeight: 52, maxWidth: '80%', objectFit: 'contain' }} />
+                      </div>
+                    )}
 
-                <p style={{ ...body, fontWeight: 700, color: '#2D2D2D', marginBottom: 4 }}>{s.name}</p>
-                <p style={{ ...body, fontSize: 11, color: '#9CA3AF' }}>{s.role}</p>
+                    <p style={{ ...body, fontWeight: 700, color: '#2D2D2D', marginBottom: 4 }}>{s.name}</p>
+                    {s.role && <p style={{ ...body, fontSize: 11, color: '#9CA3AF' }}>{s.role}</p>}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </>
+          )}
 
-          <h3 style={{ ...h3, marginBottom: 6 }}>Club Partners</h3>
-          <p style={{ ...subhead, marginBottom: 16 }}>Our valued club partners</p>
+          {displayedSponsors.club.length > 0 && (
+            <>
+              <h3 style={{ ...h3, marginBottom: 6 }}>Club Partners</h3>
+              <p style={{ ...subhead, marginBottom: 16 }}>Our valued club partners</p>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))',
-            gap: 20,
-          }}>
-            {displayedSponsors.club.map(s => (
-              <div key={s.name} style={{
-                ...card,
-                textAlign: 'center',
-                padding: 16,
-                width: '100%',
-                maxWidth: 320,
-                margin: '0 auto',
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))',
+                gap: 20,
               }}>
-                <div style={{
-                  background: '#F8FAFF',
-                  border: '1px solid #E5E7EB',
-                  borderRadius: 6,
-                  height: 56,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: 10,
-                  fontFamily: "'Montserrat', sans-serif",
-                  fontSize: 10,
-                  color: '#9CA3AF',
-                }}>
-                  Logo
-                </div>
+                {displayedSponsors.club.map(s => (
+                  <div key={s.name} style={{
+                    ...card,
+                    textAlign: 'center',
+                    padding: 16,
+                    width: '100%',
+                    maxWidth: 320,
+                    margin: '0 auto',
+                  }}>
+                    {s.logoUrl && (
+                      <div style={{
+                        background: '#F8FAFF',
+                        border: '1px solid #E5E7EB',
+                        borderRadius: 6,
+                        height: 56,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginBottom: 10,
+                      }}>
+                        <img src={s.logoUrl} alt={s.name} style={{ maxHeight: 42, maxWidth: '80%', objectFit: 'contain' }} />
+                      </div>
+                    )}
 
-                <p style={{ ...body, fontWeight: 700, color: '#2D2D2D', fontSize: 11, marginBottom: 2 }}>{s.name}</p>
-                <p style={{ ...body, fontSize: 10, color: '#9CA3AF' }}>{s.role}</p>
+                    <p style={{ ...body, fontWeight: 700, color: '#2D2D2D', fontSize: 11, marginBottom: 2 }}>{s.name}</p>
+                    {s.role && <p style={{ ...body, fontSize: 10, color: '#9CA3AF' }}>{s.role}</p>}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </>
+          )}
         </div>
 
         <div style={{ marginBottom: 52 }}>
