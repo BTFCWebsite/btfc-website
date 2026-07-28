@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { getPlayers, getFixtures, getTeamStaff, getSiteSettings } from '../lib/sanity.client'
 
 type TeamKey = 'first' | 'reserves' | 'u17s'
@@ -13,8 +14,6 @@ type Player = {
   team: string
   imageUrl?: string
   sponsorName?: string
-  sponsorLogoUrl?: string
-  sponsorUrl?: string
 }
 
 type TeamStaff = {
@@ -52,48 +51,34 @@ function PlayerCard({ p }: { p: Player }) {
   const num = p.num > 0 ? String(p.num) : null
 
   return (
-    <article className="player-profile-card">
-      <div className={`player-profile-photo${p.imageUrl ? '' : ' is-placeholder'}`}>
-        {p.imageUrl ? (
-          <img src={p.imageUrl} alt={`${p.name}, ${p.pos}`} loading="lazy" />
-        ) : (
-          <div className="player-photo-placeholder" aria-label="Player photograph to follow">
-            <img src="/branding/crest.png" alt="" />
-            <span>Photo to follow</span>
+    <Link
+      className="player-profile-card player-profile-link"
+      href={`/players/${encodeURIComponent(p._id || p.name)}`}
+      aria-label={`View ${p.name}'s player profile`}
+    >
+        <div className={`player-profile-photo${p.imageUrl ? '' : ' is-placeholder'}`}>
+          {p.imageUrl ? (
+            <img src={p.imageUrl} alt={`${p.name}, ${p.pos}`} loading="lazy" />
+          ) : (
+            <div className="player-photo-placeholder" aria-label="Player photograph to follow">
+              <img src="/branding/crest.png" alt="" />
+              <span>Photo to follow</span>
+            </div>
+          )}
+          {num && <span className="player-squad-number">{num}</span>}
+          <div className="player-profile-identity">
+            <h4>{p.name}</h4>
+            <p>{p.pos}</p>
           </div>
-        )}
-        {num && <span className="player-squad-number">{num}</span>}
-        <div className="player-profile-identity">
-          <h4>{p.name}</h4>
-          <p>{p.pos}</p>
         </div>
-      </div>
-      {p.sponsorUrl ? (
-        <a
-          className={`player-sponsor-panel${p.sponsorName || p.sponsorLogoUrl ? ' has-sponsor' : ''}`}
-          href={p.sponsorUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`Visit ${p.sponsorName || `${p.name}'s sponsor`}`}
-        >
-          {p.sponsorLogoUrl && <img src={p.sponsorLogoUrl} alt={p.sponsorName || `${p.name}'s sponsor`} loading="lazy" />}
-          {p.sponsorName ? (
-            <><span>Sponsored by</span><strong>{p.sponsorName}</strong></>
-          ) : (
-            <><span>Player sponsorship</span><strong>Sponsor this player</strong></>
-          )}
-        </a>
-      ) : (
-        <div className={`player-sponsor-panel${p.sponsorName || p.sponsorLogoUrl ? ' has-sponsor' : ''}`}>
-          {p.sponsorLogoUrl && <img src={p.sponsorLogoUrl} alt={p.sponsorName || `${p.name}'s sponsor`} loading="lazy" />}
+        <div className={`player-sponsor-panel${p.sponsorName ? ' has-sponsor' : ''}`}>
           {p.sponsorName ? (
             <><span>Sponsored by</span><strong>{p.sponsorName}</strong></>
           ) : (
             <><span>Player sponsorship</span><strong>Sponsor this player</strong></>
           )}
         </div>
-      )}
-    </article>
+    </Link>
   )
 }
 
@@ -286,8 +271,6 @@ export default function TeamsPage() {
           team: p.team,
           imageUrl: p.imageUrl,
           sponsorName: p.sponsorName,
-          sponsorLogoUrl: p.sponsorLogoUrl,
-          sponsorUrl: p.sponsorUrl,
         }))
         setPlayers(mapped)
       })
