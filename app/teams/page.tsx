@@ -14,6 +14,7 @@ type Player = {
   imageUrl?: string
   sponsorName?: string
   sponsorLogoUrl?: string
+  sponsorUrl?: string
 }
 
 type TeamStaff = {
@@ -67,14 +68,31 @@ function PlayerCard({ p }: { p: Player }) {
           <p>{p.pos}</p>
         </div>
       </div>
-      <div className={`player-sponsor-panel${p.sponsorName || p.sponsorLogoUrl ? ' has-sponsor' : ''}`}>
-        {p.sponsorLogoUrl && <img src={p.sponsorLogoUrl} alt={p.sponsorName || `${p.name}'s sponsor`} loading="lazy" />}
-        {p.sponsorName ? (
-          <><span>Sponsored by</span><strong>{p.sponsorName}</strong></>
-        ) : (
-          <><span>Player sponsorship</span><strong>Sponsor this player</strong></>
-        )}
-      </div>
+      {p.sponsorUrl ? (
+        <a
+          className={`player-sponsor-panel${p.sponsorName || p.sponsorLogoUrl ? ' has-sponsor' : ''}`}
+          href={p.sponsorUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Visit ${p.sponsorName || `${p.name}'s sponsor`}`}
+        >
+          {p.sponsorLogoUrl && <img src={p.sponsorLogoUrl} alt={p.sponsorName || `${p.name}'s sponsor`} loading="lazy" />}
+          {p.sponsorName ? (
+            <><span>Sponsored by</span><strong>{p.sponsorName}</strong></>
+          ) : (
+            <><span>Player sponsorship</span><strong>Sponsor this player</strong></>
+          )}
+        </a>
+      ) : (
+        <div className={`player-sponsor-panel${p.sponsorName || p.sponsorLogoUrl ? ' has-sponsor' : ''}`}>
+          {p.sponsorLogoUrl && <img src={p.sponsorLogoUrl} alt={p.sponsorName || `${p.name}'s sponsor`} loading="lazy" />}
+          {p.sponsorName ? (
+            <><span>Sponsored by</span><strong>{p.sponsorName}</strong></>
+          ) : (
+            <><span>Player sponsorship</span><strong>Sponsor this player</strong></>
+          )}
+        </div>
+      )}
     </article>
   )
 }
@@ -269,6 +287,7 @@ export default function TeamsPage() {
           imageUrl: p.imageUrl,
           sponsorName: p.sponsorName,
           sponsorLogoUrl: p.sponsorLogoUrl,
+          sponsorUrl: p.sponsorUrl,
         }))
         setPlayers(mapped)
       })
