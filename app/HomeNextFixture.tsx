@@ -1,12 +1,10 @@
 'use client'
 
 import { useEffect } from 'react'
-import { getMatchFeeds } from './lib/sanity.client'
 
 type Fixture = {
   date?: string
   opponent?: string
-  team?: string
   venue?: string
   kickoff?: string
   played?: boolean
@@ -29,34 +27,21 @@ export default function HomeNextFixture() {
 
     async function loadNextFixture() {
       try {
-        const feeds = await getMatchFeeds()
-        const firstTeamFeed = (feeds || []).find((feed: any) => {
-          const team = String(feed?.team || '').toLowerCase().replace(/[^a-z0-9]/g, '')
-          return team.includes('first')
-        })
-
-        const snippet = firstTeamFeed?.snippet || ''
-        const widget = snippet.match(/\blrcode\s*=\s*['\"](\d+)['\"]/i)?.[1]
-        const division = snippet.match(/[?&]divisionseason=(\d+)/i)?.[1]
-        if (!widget) return
-
-        const params = new URLSearchParams({
-          team: 'First XI',
-          widget,
-          kind: 'matches',
-        })
-        if (division) params.set('division', division)
-
-        const response = await fetch(`/api/full-time?${params.toString()}`)
+        const response = await fetch(
+          '/api/full-time?team=First%20XI&widget=969980533&division=320568525&kind=matches',
+          { cache: 'no-store' }
+        )
         if (!response.ok) return
 
         const payload = await response.json()
-        const now = Date.now()
+        const startOfToday = new Date()
+        startOfToday.setHours(0, 0, 0, 0)
+
         const next = (payload?.matches || [])
           .filter((fixture: Fixture) => {
             if (!fixture?.date || !fixture?.opponent || fixture.played === true) return false
-            const date = new Date(fixture.date).getTime()
-            return Number.isFinite(date) && date >= now
+            const fixtureDate = new Date(fixture.date).getTime()
+            return Number.isFinite(fixtureDate) && fixtureDate >= startOfToday.getTime()
           })
           .sort((a: Fixture, b: Fixture) =>
             new Date(a.date || 0).getTime() - new Date(b.date || 0).getTime()
