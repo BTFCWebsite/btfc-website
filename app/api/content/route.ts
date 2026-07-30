@@ -27,7 +27,8 @@ const queries: Record<string, string> = {
     "slug": slug.current, "imageUrl": image.asset->url
   }`,
   sponsors: `*[_type == "sponsor"] | order(order asc) {
-    _id, name, tier, role, website, "logoUrl": logo.asset->url
+    _id, name, tier, role, about, contactName, phone, email, website,
+    "logoUrl": logo.asset->url
   }`,
 }
 
