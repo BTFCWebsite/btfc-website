@@ -21,6 +21,13 @@ function formatDate(value: string) {
   })
 }
 
+function findNextFixtureCard() {
+  const label = Array.from(document.querySelectorAll('div')).find(
+    element => element.textContent?.trim() === 'Next Fixture'
+  )
+  return label?.parentElement as HTMLElement | null
+}
+
 export default function HomeNextFixture() {
   useEffect(() => {
     let cancelled = false
@@ -49,10 +56,7 @@ export default function HomeNextFixture() {
 
         if (cancelled || !next?.date || !next?.opponent) return
 
-        const label = Array.from(document.querySelectorAll('div')).find(
-          element => element.textContent?.trim() === 'Next Fixture'
-        )
-        const card = label?.parentElement
+        const card = findNextFixtureCard()
         if (!card) return
 
         const rows = Array.from(card.children) as HTMLElement[]
@@ -66,6 +70,7 @@ export default function HomeNextFixture() {
 
         const time = next.kickoff ? ` · ${next.kickoff}` : ''
         details.textContent = `${formatDate(next.date)}${time}`
+        card.classList.add('next-fixture-loaded')
       } catch (error) {
         console.error('Unable to load the homepage fixture', error)
       }
@@ -75,5 +80,32 @@ export default function HomeNextFixture() {
     return () => { cancelled = true }
   }, [])
 
-  return null
+  return (
+    <style>{`
+      .hero-cards > div:nth-child(2) {
+        position: relative;
+      }
+      .hero-cards > div:nth-child(2) > div:nth-child(2),
+      .hero-cards > div:nth-child(2) > div:nth-child(3) {
+        visibility: hidden;
+      }
+      .hero-cards > div:nth-child(2)::after {
+        content: 'Loading next fixture…';
+        display: block;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 18px;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: .03em;
+        line-height: 1.2;
+      }
+      .hero-cards > div:nth-child(2).next-fixture-loaded > div:nth-child(2),
+      .hero-cards > div:nth-child(2).next-fixture-loaded > div:nth-child(3) {
+        visibility: visible;
+      }
+      .hero-cards > div:nth-child(2).next-fixture-loaded::after {
+        display: none;
+      }
+    `}</style>
+  )
 }
