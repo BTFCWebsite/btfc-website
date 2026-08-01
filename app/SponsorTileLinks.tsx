@@ -13,6 +13,23 @@ function sponsorSlug(name: string) {
     .replace(/^-+|-+$/g, '')
 }
 
+function findSponsorCard(start: Element, name: string) {
+  let current: HTMLElement | null = start as HTMLElement
+
+  while (current && current !== document.body) {
+    const text = current.textContent || ''
+    const rect = current.getBoundingClientRect()
+    const hasLogo = Boolean(current.querySelector('img'))
+    const containsName = text.includes(name)
+    const looksLikeCard = rect.width >= 180 && rect.height >= 90 && hasLogo && containsName
+
+    if (looksLikeCard) return current
+    current = current.parentElement
+  }
+
+  return null
+}
+
 export default function SponsorTileLinks() {
   const pathname = usePathname()
   const router = useRouter()
@@ -32,9 +49,10 @@ export default function SponsorTileLinks() {
 
         const textNode = Array.from(document.querySelectorAll('h3, p')).find(
           element => element.textContent?.trim() === name
-        ) as HTMLElement | undefined
+        )
+        if (!textNode) continue
 
-        const tile = textNode?.parentElement
+        const tile = findSponsorCard(textNode, name)
         if (!tile || tile.dataset.sponsorLinked === 'true') continue
 
         tile.dataset.sponsorLinked = 'true'
