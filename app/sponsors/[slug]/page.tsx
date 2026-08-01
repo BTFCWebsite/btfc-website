@@ -1,9 +1,7 @@
-'use client'
-
-import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { getSponsors } from '../../lib/sanity.client'
+import { client } from '../../lib/sanity.client'
+
+export const dynamic = 'force-dynamic'
 
 function sponsorSlug(name: string) {
   return name
@@ -21,24 +19,14 @@ function tierLabel(tier?: string) {
   return 'Club Sponsor'
 }
 
-export default function SponsorProfilePage() {
-  const params = useParams<{ slug: string }>()
-  const [sponsor, setSponsor] = useState<any | null>(null)
-  const [loaded, setLoaded] = useState(false)
+export default async function SponsorProfilePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const sponsors = await client.fetch(`*[_type == "sponsor"] | order(order asc) {
+    _id, name, tier, role, about, contactName, phone, email, website,
+    "logoUrl": logo.asset->url
+  }`, {}, { cache: 'no-store' })
 
-  useEffect(() => {
-    getSponsors()
-      .then((items) => {
-        const match = (items || []).find((item: any) => sponsorSlug(String(item?.name || '')) === params.slug)
-        setSponsor(match || null)
-      })
-      .catch(console.error)
-      .finally(() => setLoaded(true))
-  }, [params.slug])
-
-  if (!loaded) {
-    return <main style={{ minHeight: '70vh', background: '#F2F2F2' }} />
-  }
+  const sponsor = (sponsors || []).find((item: any) => sponsorSlug(String(item?.name || '')) === slug)
 
   if (!sponsor) {
     return (
