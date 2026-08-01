@@ -32,16 +32,28 @@ export default function SponsorTileLinks() {
 
         const textNode = Array.from(document.querySelectorAll('h3, p')).find(
           element => element.textContent?.trim() === name
-        )
-        const tile = textNode?.closest('div[style*="background"]') as HTMLElement | null
+        ) as HTMLElement | undefined
+
+        const tile = textNode?.parentElement
         if (!tile || tile.dataset.sponsorLinked === 'true') continue
 
         tile.dataset.sponsorLinked = 'true'
         tile.tabIndex = 0
         tile.setAttribute('role', 'link')
-        tile.setAttribute('aria-label', `View ${name}`)
+        tile.setAttribute('aria-label', `View ${name} sponsor profile`)
         tile.style.cursor = 'pointer'
         tile.style.transition = 'transform 160ms ease, box-shadow 160ms ease'
+
+        const cue = document.createElement('div')
+        cue.textContent = 'View Sponsor →'
+        cue.style.marginTop = '12px'
+        cue.style.color = '#1149D8'
+        cue.style.fontFamily = "'Montserrat', sans-serif"
+        cue.style.fontSize = '10px'
+        cue.style.fontWeight = '800'
+        cue.style.letterSpacing = '.06em'
+        cue.style.textTransform = 'uppercase'
+        tile.appendChild(cue)
 
         const open = () => router.push(`/sponsors/${sponsorSlug(name)}`)
         const keydown = (event: KeyboardEvent) => {
@@ -69,6 +81,7 @@ export default function SponsorTileLinks() {
           tile.removeEventListener('keydown', keydown)
           tile.removeEventListener('mouseenter', enter)
           tile.removeEventListener('mouseleave', leave)
+          cue.remove()
         })
       }
     }).catch(console.error)
