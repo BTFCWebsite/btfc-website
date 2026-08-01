@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import HomeNextFixture from './HomeNextFixture'
 import SponsorTileLinks from './SponsorTileLinks'
+import SiteBrandingUpdates from './SiteBrandingUpdates'
 
 export default function Template({ children }: { children: ReactNode }) {
   return (
@@ -29,10 +30,16 @@ export default function Template({ children }: { children: ReactNode }) {
         .hero-cards > div > div:last-child {
           color: rgba(255, 255, 255, 0.86) !important;
         }
+
+        .hero-cards > a span {
+          color: #fff !important;
+          font-weight: 900 !important;
+        }
       `}</style>
       {children}
       <HomeNextFixture />
       <SponsorTileLinks />
+      <SiteBrandingUpdates />
     </>
   )
 }
