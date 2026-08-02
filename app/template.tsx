@@ -3,6 +3,7 @@ import HomeNextFixture from './HomeNextFixture'
 import SponsorTileLinks from './SponsorTileLinks'
 import SiteBrandingUpdates from './SiteBrandingUpdates'
 
+// Deployment marker: restored stable version from 1 August 2026.
 export default function Template({ children }: { children: ReactNode }) {
   return (
     <>
