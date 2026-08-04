@@ -7,7 +7,8 @@ const queries: Record<string, string> = {
   settings: `*[_type == "siteSettings"][0]`,
   fixtures: `*[_type == "fixture"] | order(date asc) {
     _id, date, opponent, team, venue, competition, kickoff,
-    btfcScore, opponentScore, played
+    btfcScore, opponentScore, played,
+    "programmeUrl": programmePdf.asset->url
   }`,
   matchFeeds: `*[_type == "matchFeed" && active == true] | order(order asc) {
     team, snippet
