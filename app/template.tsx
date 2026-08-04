@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import HomeNextFixture from './HomeNextFixture'
 import SponsorTileLinks from './SponsorTileLinks'
 import SiteBrandingUpdates from './SiteBrandingUpdates'
+import ProgrammeLinks from './ProgrammeLinks'
 
 // Deployment marker: restored stable version from 1 August 2026.
 export default function Template({ children }: { children: ReactNode }) {
@@ -41,6 +42,7 @@ export default function Template({ children }: { children: ReactNode }) {
       <HomeNextFixture />
       <SponsorTileLinks />
       <SiteBrandingUpdates />
+      <ProgrammeLinks />
     </>
   )
 }
