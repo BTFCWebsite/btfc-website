@@ -5,6 +5,9 @@ import { getFixtures, getSiteSettings } from '../lib/sanity.client'
 
 const FALLBACK_MAP_EMBED = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d737.3188611688546!2d-2.196166640744735!3d51.72201894723951!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48710c418313cc5f%3A0x6e0c3c089afa1c4d!2sBrimscombe%20and%20Thrupp%20Football%20Club!5e1!3m2!1sen!2suk!4v1780823602873!5m2!1sen!2suk'
 const FALLBACK_MAP_URL = 'https://maps.google.com/?q=Brimscombe+and+Thrupp+FC,+London+Road,+Brimscombe,+GL5+2SH'
+const FALLBACK_BUS_URL = 'https://www.stagecoachbus.com/routes/west/67/bussage-cashes-green/xsao067.o'
+const FALLBACK_W3W = 'debit.query.solutions'
+const FALLBACK_W3W_URL = 'https://what3words.com/debit.query.solutions'
 
 const h2 = { fontFamily: "'Barlow Condensed', sans-serif", fontSize: 36, fontWeight: 800, color: '#2D2D2D', margin: '0 0 6px', letterSpacing: '0.03em' } as const
 const h3 = { fontFamily: "'Barlow Condensed', sans-serif", fontSize: 22, fontWeight: 800, color: '#2D2D2D', margin: '0 0 10px', lineHeight: 1.1 } as const
@@ -30,26 +33,69 @@ export default function MatchdayPage() {
 
   const groundName = settings.groundName || 'Brackenfern Meadow'
   const postcode = settings.postcode || 'GL5 2SH'
-  const address = [groundName, settings.addressLine1 || 'London Road, Brimscombe', settings.addressLine2, postcode].filter(Boolean).join(' · ')
+  const addressLine1 = settings.addressLine1 || 'London Road, Brimscombe'
+  const address = [groundName, addressLine1, settings.addressLine2, postcode].filter(Boolean).join(' · ')
 
   const facilities = useMemo(() => [
-    { icon: '🍺', title: 'Clubhouse Bar', text: settings.refreshmentsInformation || 'The clubhouse bar and pitch-side refreshments are available before, during and after First XI home matches. Cash and card accepted.' },
-    { icon: '🍔', title: 'Food & Drink', text: settings.refreshmentsInformation || 'Hot food, snacks and drinks are available on First XI matchdays.' },
-    { icon: '♿', title: 'Accessibility', text: settings.accessibilityInformation || 'Wheelchair spaces and level access are available. Contact the club in advance if assistance is required.' },
-    { icon: '📋', title: 'Programme', text: settings.programmeInformation || 'The official digital matchday programme is available free on the website for First XI home matches.' },
-    { icon: '🅿', title: 'Parking', text: settings.parkingInformation || 'Free parking is available at the ground. Please follow matchday signage and steward instructions.' },
-    { icon: '🎫', title: 'Entrance Fees', text: `League & Cup: Adult ${settings.admissionAdult || '£7'} · Concession ${settings.admissionConcession || '£5'} · Under 16 ${settings.admissionJunior || 'Free'}. Friendlies: ${settings.friendlyAdmission || '£3'}.` },
+    {
+      icon: '🍺',
+      title: 'Clubhouse Bar',
+      text: settings.clubhouseInformation || settings.refreshmentsInformation || 'The clubhouse bar is open before, during and after the match. A warm welcome is extended to home and away supporters. Cash and card are accepted.',
+    },
+    {
+      icon: '🍔',
+      title: 'Food & Drink',
+      text: settings.foodInformation || settings.refreshmentsInformation || 'Hot food, snacks and drinks are available from the pitch-side kiosk, which opens from approximately one hour before kick-off.',
+    },
+    {
+      icon: '♿',
+      title: 'Accessibility',
+      text: settings.accessibilityInformation || 'Wheelchair spaces are available in the main stand, with level access from the car park. Please contact the club in advance if you need assistance.',
+    },
+    {
+      icon: '📋',
+      title: 'Programme',
+      text: settings.programmeInformation || 'The official digital matchday programme is available free on the website for First XI home matches.',
+    },
+    {
+      icon: '🅿',
+      title: 'Parking',
+      text: settings.parkingInformation || 'Free parking is available in the main car park at the ground. Please follow matchday signage and steward instructions when the car park is busy.',
+    },
+    {
+      icon: '🎫',
+      title: 'Entrance Fees',
+      text: settings.entranceFeesInformation || `League & Cup: Adult ${settings.admissionAdult || '£7'} · Concession (65+) ${settings.admissionConcession || '£5'} · Under 16 ${settings.admissionJunior || 'Free'}. Friendlies: ${settings.friendlyAdmission || '£3'} for all. Reserves and Under 17s fixtures are free admission for all supporters.`,
+    },
   ], [settings])
 
   const gettingHere = useMemo(() => [
-    { icon: '🚗', title: 'By Car', text: settings.byCarInformation || `${groundName} is on London Road, Brimscombe, ${postcode}. Parking is available at the ground.`, link: null },
-    { icon: '🚌', title: 'By Bus', text: settings.byBusInformation || 'The number 67 bus runs from Stroud town centre to Brimscombe. Alight near the War Memorial on London Road.', link: settings.busTimetableUrl ? { label: 'View Bus Timetable', url: settings.busTimetableUrl } : null },
-    { icon: '🚆', title: 'By Train', text: settings.byTrainInformation || 'The nearest railway station is Stroud. From there, continue by bus or taxi to the ground.', link: null },
+    {
+      icon: '🚗',
+      title: 'By Car',
+      text: settings.byCarInformation || `${groundName} is on London Road, Brimscombe, ${postcode}. Free parking is available in the club car park at the ground.`,
+      link: null,
+    },
+    {
+      icon: '🚌',
+      title: 'By Bus',
+      text: settings.byBusInformation || 'The number 67 bus runs from Stroud town centre to Brimscombe. Alight at the War Memorial stop on London Road, approximately a two-minute walk from the ground. Journey time from Stroud is around seven minutes, with services normally running every 30 minutes.',
+      link: { label: 'View 67 Bus Timetable', url: settings.busTimetableUrl || FALLBACK_BUS_URL },
+    },
+    {
+      icon: '🚆',
+      title: 'By Train',
+      text: settings.byTrainInformation || 'The nearest railway station is Stroud, served by GWR with regular services from Gloucester, Swindon and London Paddington. From Stroud, take the number 67 bus or a taxi to the ground.',
+      link: null,
+    },
   ], [settings, groundName, postcode])
 
   const fixtureDate = nextHomeGame?.date
     ? new Date(`${nextHomeGame.date}T12:00:00`).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })
     : 'Fixture TBC'
+
+  const what3words = settings.what3words || FALLBACK_W3W
+  const what3wordsUrl = settings.what3wordsUrl || FALLBACK_W3W_URL
 
   return (
     <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '0 0 90px' }}>
@@ -62,7 +108,7 @@ export default function MatchdayPage() {
               📅 {fixtureDate} · ⏰ {nextHomeGame?.kickoff || 'TBC'} · 📍 {groundName} · {nextHomeGame?.competition || settings.seasonYear || ''}
             </p>
           </div>
-          <a href="/tickets" style={{ background: '#1149D8', padding: '12px 22px', borderRadius: 6, textAlign: 'center', fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 18, color: '#fff', textDecoration: 'none', whiteSpace: 'nowrap' }}>🎫 Tickets</a>
+          <a href="/tickets" style={{ background: '#1149D8', padding: '12px 22px', borderRadius: 6, textAlign: 'center', fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 18, color: '#fff', textDecoration: 'none', whiteSpace: 'nowrap' }}>🎫 Season Tickets</a>
         </div>
 
         <div className="mobile-card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20, marginBottom: 52 }}>
@@ -79,11 +125,9 @@ export default function MatchdayPage() {
           <h2 style={h2}>Getting Here</h2>
           <p style={{ ...body, color: '#6B7280', marginBottom: 12 }}>{address}</p>
 
-          {(settings.what3words || settings.what3wordsUrl) && (
-            <a href={settings.what3wordsUrl || `https://what3words.com/${settings.what3words}`} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 24, padding: '9px 14px', borderRadius: 6, background: '#fff', border: '1px solid #D1D5DB', color: '#041B5F', fontFamily: "'Montserrat', sans-serif", fontSize: 12, fontWeight: 800, textDecoration: 'none' }}>
-              <span style={{ color: '#E11D48', fontSize: 16 }}>///</span>{settings.what3words || 'Open what3words'}
-            </a>
-          )}
+          <a href={what3wordsUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 24, padding: '9px 14px', borderRadius: 6, background: '#fff', border: '1px solid #D1D5DB', color: '#041B5F', fontFamily: "'Montserrat', sans-serif", fontSize: 12, fontWeight: 800, textDecoration: 'none' }}>
+            <span style={{ color: '#E11D48', fontSize: 16 }}>///</span>{what3words}
+          </a>
 
           <div style={{ borderRadius: 8, overflow: 'hidden', marginBottom: 20, border: '1px solid #E5E7EB' }}>
             <iframe src={settings.googleMapsEmbedUrl || FALLBACK_MAP_EMBED} width="100%" height="280" style={{ border: 0, display: 'block' }} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade" title={`${groundName} location`} />
