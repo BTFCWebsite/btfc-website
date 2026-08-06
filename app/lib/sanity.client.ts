@@ -4,7 +4,7 @@ export const client = createClient({
   projectId: 'vm0n9zl5',
   dataset: 'production',
   apiVersion: '2024-01-01',
-  useCdn: false,
+  useCdn: true,
   token: undefined,
 })
 
@@ -14,7 +14,7 @@ async function fetchContent<T>(type: string): Promise<T> {
   }
 
   const response = await fetch(`/api/content?type=${encodeURIComponent(type)}`, {
-    cache: 'no-store',
+    cache: 'default',
   })
 
   if (!response.ok) throw new Error(`Content request failed (${response.status})`)
@@ -32,7 +32,7 @@ export async function getLatestNews() {
       "imageUrl": image.asset->url
     }`,
     {},
-    { cache: 'no-store' }
+    { next: { revalidate: 60 } }
   )
 }
 
