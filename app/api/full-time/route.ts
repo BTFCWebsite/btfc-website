@@ -19,10 +19,42 @@ function textFromHtml(value: string) {
     .trim()
 }
 
+const MONTHS: Record<string, number> = {
+  jan: 1,
+  feb: 2,
+  mar: 3,
+  apr: 4,
+  may: 5,
+  jun: 6,
+  jul: 7,
+  aug: 8,
+  sep: 9,
+  oct: 10,
+  nov: 11,
+  dec: 12,
+}
+
 function parseFullTimeDate(value: string) {
-  const cleaned = value.replace(/\bSept\b/i, 'Sep')
-  const parsed = new Date(cleaned)
-  return Number.isNaN(parsed.getTime()) ? null : parsed
+  const cleaned = value.replace(/\bSept\b/i, 'Sep').replace(/,/g, ' ')
+  const match = cleaned.match(/\b(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{4})(?:\s+(\d{1,2})[:.](\d{2}))?/i)
+
+  if (!match) return null
+
+  const day = Number(match[1])
+  const month = MONTHS[match[2].toLowerCase()]
+  const year = Number(match[3])
+  const hour = match[4] ? Number(match[4]) : null
+  const minute = match[5] ? Number(match[5]) : null
+
+  if (!day || !month || !year) return null
+
+  const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0))
+  const dateValue = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+  const kickoff = hour !== null && minute !== null
+    ? `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
+    : 'TBC'
+
+  return { date, dateValue, kickoff }
 }
 
 function hrefFromHtml(value: string) {
@@ -42,8 +74,8 @@ function parseMatches(script: string, team: string) {
 
   while ((row = rowPattern.exec(script))) {
     const dateLabel = textFromHtml(row[1])
-    const date = parseFullTimeDate(dateLabel)
-    if (!date || date < new Date('2026-07-01T00:00:00Z')) continue
+    const parsedDate = parseFullTimeDate(dateLabel)
+    if (!parsedDate || parsedDate.date < new Date('2026-07-01T00:00:00Z')) continue
 
     const cells = Array.from(row[2].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)).map(match => match[1])
     if (cells.length < 7) continue
@@ -63,13 +95,13 @@ function parseMatches(script: string, team: string) {
     const sourceUrl = hrefFromHtml(cells[0]) || hrefFromHtml(cells[1])
 
     matches.push({
-      _id: sourceUrl?.match(/[?&]id=(\d+)/)?.[1] ? `full-time-${sourceUrl.match(/[?&]id=(\d+)/)![1]}` : `full-time-${date.getTime()}`,
-      date: date.toISOString(),
+      _id: sourceUrl?.match(/[?&]id=(\d+)/)?.[1] ? `full-time-${sourceUrl.match(/[?&]id=(\d+)/)![1]}` : `full-time-${parsedDate.date.getTime()}`,
+      date: parsedDate.dateValue,
       opponent: isHome ? awayTeam : homeTeam,
       team,
       venue: isHome ? 'Home' : 'Away',
       competition: competition || 'Hellenic League Division One',
-      kickoff: date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/London' }),
+      kickoff: parsedDate.kickoff,
       btfcScore: played ? Number(isHome ? homeScore : awayScore) : undefined,
       opponentScore: played ? Number(isHome ? awayScore : homeScore) : undefined,
       played,
@@ -92,7 +124,6 @@ function parseTable(html: string) {
     const cells = Array.from(row[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)).map(cell => textFromHtml(cell[1]))
     if (cells.length < 7) return []
 
-    // Adult tables normally include goal difference; some youth leagues do not.
     const hasGoalDifference = cells.length >= 8
     return [{
       position: Number(cells[0]),
