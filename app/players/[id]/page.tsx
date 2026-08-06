@@ -19,6 +19,11 @@ type Player = {
   sponsorMessage?: string
 }
 
+function clean(value?: string) {
+  const text = String(value || '').trim()
+  return text || undefined
+}
+
 export default function PlayerPage() {
   const params = useParams<{ id: string }>()
   const [player, setPlayer] = useState<Player | null>(null)
@@ -48,6 +53,11 @@ export default function PlayerPage() {
   }
 
   const number = Number(player.squadNumber) > 0 ? player.squadNumber : null
+  const bio = clean(player.bio)
+  const sponsorName = clean(player.sponsorName)
+  const sponsorLogoUrl = clean(player.sponsorLogoUrl)
+  const sponsorUrl = clean(player.sponsorUrl)
+  const sponsorMessage = clean(player.sponsorMessage)
 
   return (
     <main style={{ background: '#f2f2f2', minHeight: '100vh', padding: '80px 24px' }}>
@@ -73,28 +83,39 @@ export default function PlayerPage() {
               {[player.position, player.team].filter(Boolean).join(' · ')}
             </p>
 
-            {player.bio && <p className="player-detail-bio">{player.bio}</p>}
+            {bio && <p className="player-detail-bio">{bio}</p>}
 
-            {player.sponsorName && (
+            {sponsorName ? (
               <section className="player-detail-sponsor">
                 <p className="player-detail-sponsor-label">Player sponsor</p>
-                {player.sponsorLogoUrl && (
-                  <img src={player.sponsorLogoUrl} alt={`${player.sponsorName} logo`} />
+                {sponsorLogoUrl && (
+                  <img src={sponsorLogoUrl} alt={`${sponsorName} logo`} />
                 )}
-                <h2>{player.sponsorName}</h2>
-                {player.sponsorMessage && (
-                  <p className="player-detail-sponsor-message">{player.sponsorMessage}</p>
+                <h2>{sponsorName}</h2>
+                {sponsorMessage && (
+                  <p className="player-detail-sponsor-message">{sponsorMessage}</p>
                 )}
-                {player.sponsorUrl && (
+                {sponsorUrl && (
                   <a
                     className="player-detail-sponsor-link"
-                    href={player.sponsorUrl}
+                    href={sponsorUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
                     Visit sponsor website
                   </a>
                 )}
+              </section>
+            ) : (
+              <section className="player-detail-sponsor">
+                <p className="player-detail-sponsor-label">Player sponsorship</p>
+                <h2>Sponsor {player.name}</h2>
+                <p className="player-detail-sponsor-message">
+                  Support the club and promote your business by sponsoring this player for the season.
+                </p>
+                <Link className="player-detail-sponsor-link" href="/contact">
+                  Enquire about sponsorship
+                </Link>
               </section>
             )}
           </div>
