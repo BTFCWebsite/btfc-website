@@ -14,7 +14,7 @@ async function fetchContent<T>(type: string, params?: Record<string, string>): P
   }
 
   const search = new URLSearchParams({ type, ...(params || {}) })
-  const needsFreshData = ['settings', 'players', 'staff', 'teams', 'player'].includes(type)
+  const needsFreshData = ['settings', 'players', 'staff', 'teams', 'player', 'programmes'].includes(type)
   const response = await fetch(`/api/content?${search.toString()}`, {
     cache: needsFreshData ? 'no-store' : 'default',
   })
@@ -26,6 +26,7 @@ export async function getSiteSettings() { return fetchContent<any>('settings') }
 export async function getNewsArticles() { return fetchContent<any[]>('news') }
 export async function getFixtures() { return fetchContent<any[]>('fixtures') }
 export async function getMatchFeeds() { return fetchContent<any[]>('matchFeeds') }
+export async function getMatchdayProgrammes() { return fetchContent<any[]>('programmes') }
 export async function getSponsors() { return fetchContent<any[]>('sponsors') }
 export async function getSponsorshipPackages() { return fetchContent<any[]>('sponsorshipPackages') }
 export async function getPlayers() { return fetchContent<any[]>('players') }
