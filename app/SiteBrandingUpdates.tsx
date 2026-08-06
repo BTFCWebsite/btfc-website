@@ -53,11 +53,14 @@ function buildReplacements(settings: SiteSettings): Array<[RegExp, string]> {
   const groundName = settings.groundName || defaults.groundName
   const groundSponsorName = settings.groundSponsorName || defaults.groundSponsorName
   const clubName = settings.clubName || defaults.clubName
+  const clubNameUpper = clubName.toUpperCase()
   const seasonYear = settings.seasonYear || defaults.seasonYear
   const footerText = settings.footerText || defaults.footerText
   const copyrightText = settings.copyrightText || defaults.copyrightText
-  const heroTitle = settings.heroTitle || defaults.heroTitle
   const heroSubtitle = settings.heroSubtitle || defaults.heroSubtitle
+  const finalClubSegment = clubNameUpper.includes('THRUPP ')
+    ? `THRUPP ${clubNameUpper.split('THRUPP ')[1]}`
+    : 'THRUPP FC'
   const address = [groundName, settings.addressLine1 || defaults.addressLine1, settings.addressLine2, settings.postcode || defaults.postcode]
     .filter(Boolean)
     .join(', ')
@@ -71,7 +74,8 @@ function buildReplacements(settings: SiteSettings): Array<[RegExp, string]> {
     [/Brackenfern Meadow/g, groundName],
     [/BRACKENFERN MEADOW/g, groundName.toUpperCase()],
     [/Brackenfern Advisory Limited/g, groundSponsorName],
-    [/BRIMSCOMBE\s*&\s*THRUPP FC/g, heroTitle],
+    [/BRIMSCOMBE\s*&\s*THRUPP FC/g, clubNameUpper],
+    [/THRUPP FC/g, finalClubSegment],
     [/Brimscombe & Thrupp FC/g, clubName],
     [/Est\. 1886 · The Lilywhites/g, heroSubtitle],
     [/2026\/27 Season/g, `${seasonYear} Season`],
@@ -181,7 +185,7 @@ export default function SiteBrandingUpdates() {
     async function applySettings() {
       let settings: SiteSettings = {}
       try {
-        const response = await fetch('/api/content?type=settings')
+        const response = await fetch('/api/content?type=settings', { cache: 'no-store' })
         if (response.ok) settings = await response.json()
       } catch {
         // Keep safe defaults when Sanity is temporarily unavailable.
