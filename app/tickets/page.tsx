@@ -15,24 +15,33 @@ const fallbackFaqs = [
 ]
 
 export default function TicketsPage() {
-  const [settings, setSettings] = useState<any>({})
+  const [settings, setSettings] = useState<any | null>(null)
+  const [settingsFailed, setSettingsFailed] = useState(false)
 
   useEffect(() => {
-    getSiteSettings().then((data) => setSettings(data || {})).catch(console.error)
+    getSiteSettings()
+      .then((data) => setSettings(data || {}))
+      .catch((error) => {
+        console.error(error)
+        setSettingsFailed(true)
+        setSettings({})
+      })
   }, [])
 
-  const season = settings.seasonYear || '2026/27'
+  const loadedSettings = settings || {}
+  const pricesReady = settings !== null
+  const season = loadedSettings.seasonYear || '2026/27'
   const seasonPrices = [
-    ['Adult', settings.seasonTicketAdult || '£100'],
-    ['Concession', settings.seasonTicketConcession || '£80'],
-    ['Under 16', settings.seasonTicketJunior || 'Free'],
+    ['Adult', pricesReady ? (loadedSettings.seasonTicketAdult || '£89') : '—'],
+    ['Concession', pricesReady ? (loadedSettings.seasonTicketConcession || '£69') : '—'],
+    ['Under 16', pricesReady ? (loadedSettings.seasonTicketJunior || 'Free') : '—'],
   ]
   const admissionPrices = [
-    { label: 'Adult', price: settings.admissionAdult || '£7' },
-    { label: 'Concession (65+)', price: settings.admissionConcession || '£5' },
-    { label: 'Under 16', price: settings.admissionJunior || 'Free' },
+    { label: 'Adult', price: pricesReady ? (loadedSettings.admissionAdult || '£7') : '—' },
+    { label: 'Concession (65+)', price: pricesReady ? (loadedSettings.admissionConcession || '£5') : '—' },
+    { label: 'Under 16', price: pricesReady ? (loadedSettings.admissionJunior || 'Free') : '—' },
   ]
-  const faqs = useMemo(() => Array.isArray(settings.ticketFaqs) && settings.ticketFaqs.length ? settings.ticketFaqs : fallbackFaqs, [settings.ticketFaqs])
+  const faqs = useMemo(() => Array.isArray(loadedSettings.ticketFaqs) && loadedSettings.ticketFaqs.length ? loadedSettings.ticketFaqs : fallbackFaqs, [loadedSettings.ticketFaqs])
 
   return (
     <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '0 0 90px' }}>
@@ -42,7 +51,7 @@ export default function TicketsPage() {
             <span style={{ display: 'inline-block', background: '#1149D8', color: '#fff', padding: '3px 10px', borderRadius: 4, fontFamily: "'Montserrat', sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 12 }}>Now On Sale</span>
             <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 34, fontWeight: 800, margin: '0 0 10px', letterSpacing: '0.03em', lineHeight: 1 }}>{season} Season Tickets</h2>
             <p style={{ fontFamily: "'Montserrat', sans-serif", margin: '0 0 20px', color: 'rgba(255,255,255,.7)', fontSize: 13, lineHeight: 1.7 }}>
-              {settings.seasonTicketIntro || 'All First XI home league and club cup games included, excluding FA Vase ties.'}<br />
+              {loadedSettings.seasonTicketIntro || 'All First XI home league and club cup games included, excluding FA Vase ties.'}<br />
               Digital QR season ticket — add it to Apple Wallet on iPhone, or receive it as a PDF by email.
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 12, maxWidth: 420 }}>
@@ -53,6 +62,7 @@ export default function TicketsPage() {
                 </div>
               ))}
             </div>
+            {settingsFailed && <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 10, color: 'rgba(255,255,255,.55)', margin: '10px 0 0' }}>Live prices could not be loaded; fallback prices are shown.</p>}
           </div>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <img src="/matchday/btfc_apple_pass_mock.png" alt="BTFC Season Ticket Apple Wallet Pass" style={{ width: '100%', maxWidth: 220, borderRadius: 16, boxShadow: '0 8px 32px rgba(0,0,0,.4)' }} />
@@ -77,13 +87,13 @@ export default function TicketsPage() {
           </div>
 
           <div style={{ textAlign: 'center', padding: '10px 0 4px' }}>
-            <a href={settings.ticketPurchaseUrl || 'https://www.tickettailor.com/all-tickets/brimscombeandthruppfc/?ref=website_widget'} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', background: '#1149D8', color: '#fff', padding: '15px 30px', borderRadius: 7, fontFamily: "'Montserrat', sans-serif", fontSize: 13, fontWeight: 800, letterSpacing: '.05em', textTransform: 'uppercase', textDecoration: 'none' }}>🎟 Buy Season Tickets</a>
+            <a href={loadedSettings.ticketPurchaseUrl || 'https://www.tickettailor.com/all-tickets/brimscombeandthruppfc/?ref=website_widget'} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', background: '#1149D8', color: '#fff', padding: '15px 30px', borderRadius: 7, fontFamily: "'Montserrat', sans-serif", fontSize: 13, fontWeight: 800, letterSpacing: '.05em', textTransform: 'uppercase', textDecoration: 'none' }}>🎟 Buy Season Tickets</a>
           </div>
         </div>
 
         <div style={{ marginBottom: 52 }}>
           <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 36, fontWeight: 800, color: '#2D2D2D', margin: '0 0 6px', letterSpacing: '0.03em' }}>Matchday Admission</h2>
-          <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 12, color: '#6B7280', margin: '0 0 20px' }}>{settings.matchdayAdmissionIntro || 'Pay on the gate — First XI matches only. All other fixtures are free to attend.'}</p>
+          <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 12, color: '#6B7280', margin: '0 0 20px' }}>{loadedSettings.matchdayAdmissionIntro || 'Pay on the gate — First XI matches only. All other fixtures are free to attend.'}</p>
 
           <div className="mobile-card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20, marginBottom: 20 }}>
             <div style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, padding: 24, width: '100%', maxWidth: 420, margin: '0 auto' }}>
@@ -95,10 +105,10 @@ export default function TicketsPage() {
                   <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 22, fontWeight: 800, color: row.price === 'Free' ? '#16a34a' : '#1149D8' }}>{row.price}</span>
                 </div>
               ))}
-              <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: '#6B7280', lineHeight: 1.6, margin: '14px 0 0' }}>{settings.faVaseNote || 'FA Vase ties are excluded from season tickets and standard cup admission. Admission will be charged separately on the day.'}</p>
+              <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: '#6B7280', lineHeight: 1.6, margin: '14px 0 0' }}>{loadedSettings.faVaseNote || 'FA Vase ties are excluded from season tickets and standard cup admission. Admission will be charged separately on the day.'}</p>
               <div style={{ marginTop: 16, background: '#F0FDF4', borderRadius: 8, border: '2px solid #86EFAC', padding: '16px 18px' }}>
                 <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 20, color: '#16a34a', marginBottom: 6 }}>🆓 Free Admission</div>
-                <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 12, color: '#15803d', lineHeight: 1.6, margin: 0 }}>{settings.freeAdmissionNote || 'All Reserves and Under 17s home fixtures are completely free to attend — no ticket needed.'}</p>
+                <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 12, color: '#15803d', lineHeight: 1.6, margin: 0 }}>{loadedSettings.freeAdmissionNote || 'All Reserves and Under 17s home fixtures are completely free to attend — no ticket needed.'}</p>
               </div>
             </div>
 
@@ -107,9 +117,9 @@ export default function TicketsPage() {
               <h3 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 22, fontWeight: 800, color: '#2D2D2D', margin: '0 0 16px' }}>Friendlies</h3>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #F3F4F6' }}>
                 <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 13, color: '#374151' }}>Everyone</span>
-                <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 22, fontWeight: 800, color: '#1149D8' }}>{settings.friendlyAdmission || '£3'}</span>
+                <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 22, fontWeight: 800, color: '#1149D8' }}>{pricesReady ? (loadedSettings.friendlyAdmission || '£3') : '—'}</span>
               </div>
-              <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: '#9CA3AF', margin: '16px 0 0' }}>{settings.friendlyAdmissionNote || 'Season tickets do not cover friendly fixtures.'}</p>
+              <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: '#9CA3AF', margin: '16px 0 0' }}>{loadedSettings.friendlyAdmissionNote || 'Season tickets do not cover friendly fixtures.'}</p>
             </div>
           </div>
         </div>
