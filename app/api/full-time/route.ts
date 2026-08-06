@@ -20,24 +20,13 @@ function textFromHtml(value: string) {
 }
 
 const MONTHS: Record<string, number> = {
-  jan: 1,
-  feb: 2,
-  mar: 3,
-  apr: 4,
-  may: 5,
-  jun: 6,
-  jul: 7,
-  aug: 8,
-  sep: 9,
-  oct: 10,
-  nov: 11,
-  dec: 12,
+  jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
+  jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12,
 }
 
 function parseFullTimeDate(value: string) {
   const cleaned = value.replace(/\bSept\b/i, 'Sep').replace(/,/g, ' ')
   const match = cleaned.match(/\b(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{4})(?:\s+(\d{1,2})[:.](\d{2}))?/i)
-
   if (!match) return null
 
   const day = Number(match[1])
@@ -45,7 +34,6 @@ function parseFullTimeDate(value: string) {
   const year = Number(match[3])
   const hour = match[4] ? Number(match[4]) : null
   const minute = match[5] ? Number(match[5]) : null
-
   if (!day || !month || !year) return null
 
   const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0))
@@ -53,7 +41,6 @@ function parseFullTimeDate(value: string) {
   const kickoff = hour !== null && minute !== null
     ? `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
     : 'TBC'
-
   return { date, dateValue, kickoff }
 }
 
@@ -93,9 +80,10 @@ function parseMatches(script: string, team: string) {
 
     const played = separator === '-' && /^\d+$/.test(homeScore) && /^\d+$/.test(awayScore)
     const sourceUrl = hrefFromHtml(cells[0]) || hrefFromHtml(cells[1])
+    const sourceId = sourceUrl?.match(/[?&]id=(\d+)/)?.[1]
 
     matches.push({
-      _id: sourceUrl?.match(/[?&]id=(\d+)/)?.[1] ? `full-time-${sourceUrl.match(/[?&]id=(\d+)/)![1]}` : `full-time-${parsedDate.date.getTime()}`,
+      _id: sourceId ? `full-time-${sourceId}` : `full-time-${parsedDate.date.getTime()}`,
       date: parsedDate.dateValue,
       opponent: isHome ? awayTeam : homeTeam,
       team,
@@ -123,19 +111,19 @@ function parseTable(html: string) {
   return Array.from(body.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)).flatMap(row => {
     const cells = Array.from(row[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)).map(cell => textFromHtml(cell[1]))
     if (cells.length < 7) return []
-
     const hasGoalDifference = cells.length >= 8
     return [{
-      position: Number(cells[0]),
-      team: cells[1],
-      played: Number(cells[2]),
-      won: Number(cells[3]),
-      drawn: Number(cells[4]),
-      lost: Number(cells[5]),
+      position: Number(cells[0]), team: cells[1], played: Number(cells[2]),
+      won: Number(cells[3]), drawn: Number(cells[4]), lost: Number(cells[5]),
       goalDifference: hasGoalDifference ? Number(cells[6]) : 0,
       points: Number(cells[hasGoalDifference ? 7 : 6]),
     }]
   })
+}
+
+const publicHeaders = {
+  'Cache-Control': 'public, s-maxage=1800, stale-while-revalidate=86400',
+  'Access-Control-Allow-Origin': '*',
 }
 
 export async function GET(request: NextRequest) {
@@ -168,17 +156,12 @@ export async function GET(request: NextRequest) {
       throw new Error('A Full-Time data kind is required')
     }
 
-    return NextResponse.json(
-      { matches, table },
-      { headers: { 'Cache-Control': 'public, s-maxage=1800, stale-while-revalidate=86400' } }
-    )
+    return NextResponse.json({ matches, table }, { headers: publicHeaders })
   } catch (error) {
     console.error('Unable to refresh Full-Time data:', error)
     return NextResponse.json({
-      matches: [],
-      table: [],
-      error: 'Full-Time data is temporarily unavailable.',
+      matches: [], table: [], error: 'Full-Time data is temporarily unavailable.',
       upstreamError: error instanceof Error ? error.message : 'Unknown upstream error',
-    }, { status: 502 })
+    }, { status: 502, headers: { 'Access-Control-Allow-Origin': '*' } })
   }
 }
