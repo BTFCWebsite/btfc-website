@@ -19,9 +19,7 @@ const queries: Record<string, string> = {
     btfcScore, opponentScore, played,
     "programmeUrl": programmePdf.asset->url
   }`,
-  matchFeeds: `*[_type == "matchFeed" && active == true] | order(order asc) {
-    team, snippet
-  }`,
+  matchFeeds: `*[_type == "matchFeed" && active == true] | order(order asc) { team, snippet }`,
   players: `*[_type == "player" && active == true] | order(order asc, squadNumber asc) {
     _id, name, squadNumber, position, team, active, order,
     "imageUrl": coalesce(photo.asset->url, image.asset->url), bio,
@@ -29,8 +27,7 @@ const queries: Record<string, string> = {
     "sponsorLogoUrl": sponsorLogo.asset->url
   }`,
   staff: `*[_type == "teamStaff" && active == true] | order(order asc, name asc) {
-    _id, name, role, team, active, order,
-    "imageUrl": image.asset->url
+    _id, name, role, team, active, order, "imageUrl": image.asset->url
   }`,
   news: `*[_type == "newsArticle"] | order(date desc) {
     _id, title, category, date, summary, body,
@@ -40,40 +37,32 @@ const queries: Record<string, string> = {
     _id, name, tier, role, about, contactName, phone, email, website,
     "logoUrl": logo.asset->url
   }`,
+  sponsorshipPackages: `*[_type == "sponsorshipPackage"] | order(order asc) {
+    _id, name, icon, colour, featured, available, currentSponsor,
+    description, priceNote, benefits, order
+  }`,
 }
 
 export async function GET(request: NextRequest) {
   const type = request.nextUrl.searchParams.get('type') || ''
   const query = queries[type]
-
-  if (!query) {
-    return NextResponse.json({ error: 'Unknown content type' }, { status: 400 })
-  }
+  if (!query) return NextResponse.json({ error: 'Unknown content type' }, { status: 400 })
 
   try {
     if (type === 'settings') {
       const data = await freshClient.fetch(query, {}, { cache: 'no-store' })
-      return NextResponse.json(data, {
-        headers: {
-          'Cache-Control': 'no-store, max-age=0',
-        },
-      })
+      return NextResponse.json(data, { headers: { 'Cache-Control': 'no-store, max-age=0' } })
     }
 
     const data = await client.fetch(query, {}, { next: { revalidate: 60 } })
     return NextResponse.json(data, {
-      headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
-      },
+      headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' },
     })
   } catch (error) {
     console.error(`Failed to load Sanity content: ${type}`, error)
     return NextResponse.json(
       { error: 'Content is temporarily unavailable' },
-      {
-        status: 502,
-        headers: { 'Cache-Control': 'no-store' },
-      }
+      { status: 502, headers: { 'Cache-Control': 'no-store' } }
     )
   }
 }
