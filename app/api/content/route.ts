@@ -51,7 +51,11 @@ export async function GET(request: NextRequest) {
   try {
     if (type === 'settings') {
       const data = await freshClient.fetch(query, {}, { cache: 'no-store' })
-      return NextResponse.json(data, { headers: { 'Cache-Control': 'no-store, max-age=0' } })
+      const postcode = String(data?.postcode || '').trim().toUpperCase()
+      const corrected = postcode === 'GL5 2SH' || postcode === 'GL52SH'
+        ? { ...data, postcode: 'GL5 2SD' }
+        : data
+      return NextResponse.json(corrected, { headers: { 'Cache-Control': 'no-store, max-age=0' } })
     }
 
     const data = await client.fetch(query, {}, { next: { revalidate: 60 } })
