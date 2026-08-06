@@ -13,7 +13,10 @@ async function fetchContent<T>(type: string): Promise<T> {
     throw new Error('The same-origin content endpoint is intended for browser requests')
   }
 
-  const response = await fetch(`/api/content?type=${encodeURIComponent(type)}`, { cache: 'default' })
+  const needsFreshData = type === 'settings' || type === 'players' || type === 'staff'
+  const response = await fetch(`/api/content?type=${encodeURIComponent(type)}`, {
+    cache: needsFreshData ? 'no-store' : 'default',
+  })
   if (!response.ok) throw new Error(`Content request failed (${response.status})`)
   return response.json()
 }
