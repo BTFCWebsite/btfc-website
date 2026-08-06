@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { client } from '../../lib/sanity.client'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 60
 
 const queries: Record<string, string> = {
   settings: `*[_type == "siteSettings"][0]`,
@@ -42,12 +42,20 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const data = await client.fetch(query, {}, { cache: 'no-store' })
+    const data = await client.fetch(query, {}, { next: { revalidate: 60 } })
     return NextResponse.json(data, {
-      headers: { 'Cache-Control': 'no-store, max-age=0' },
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+      },
     })
   } catch (error) {
     console.error(`Failed to load Sanity content: ${type}`, error)
-    return NextResponse.json({ error: 'Content is temporarily unavailable' }, { status: 502 })
+    return NextResponse.json(
+      { error: 'Content is temporarily unavailable' },
+      {
+        status: 502,
+        headers: { 'Cache-Control': 'no-store' },
+      }
+    )
   }
 }
