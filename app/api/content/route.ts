@@ -4,7 +4,7 @@ import { client } from '../../lib/sanity.client'
 export const revalidate = 60
 
 const queries: Record<string, string> = {
-  settings: `*[_type == "siteSettings"][0]`,
+  settings: `*[_type == "siteSettings"] | order(_updatedAt desc)[0]`,
   fixtures: `*[_type == "fixture"] | order(date asc) {
     _id, date, opponent, team, venue, competition, kickoff,
     btfcScore, opponentScore, played,
