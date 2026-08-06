@@ -1,7 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from 'next-sanity'
 import { client } from '../../lib/sanity.client'
 
 export const revalidate = 60
+
+const freshClient = createClient({
+  projectId: 'vm0n9zl5',
+  dataset: 'production',
+  apiVersion: '2024-01-01',
+  useCdn: false,
+  token: undefined,
+})
 
 const queries: Record<string, string> = {
   settings: `*[_type == "siteSettings"] | order(_updatedAt desc)[0]`,
@@ -42,6 +51,15 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    if (type === 'settings') {
+      const data = await freshClient.fetch(query, {}, { cache: 'no-store' })
+      return NextResponse.json(data, {
+        headers: {
+          'Cache-Control': 'no-store, max-age=0',
+        },
+      })
+    }
+
     const data = await client.fetch(query, {}, { next: { revalidate: 60 } })
     return NextResponse.json(data, {
       headers: {
