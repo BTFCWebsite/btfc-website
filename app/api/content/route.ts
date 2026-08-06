@@ -49,13 +49,18 @@ export async function GET(request: NextRequest) {
   if (!query) return NextResponse.json({ error: 'Unknown content type' }, { status: 400 })
 
   try {
-    if (type === 'settings') {
+    if (type === 'settings' || type === 'players' || type === 'staff') {
       const data = await freshClient.fetch(query, {}, { cache: 'no-store' })
-      const postcode = String(data?.postcode || '').trim().toUpperCase()
-      const corrected = postcode === 'GL5 2SH' || postcode === 'GL52SH'
-        ? { ...data, postcode: 'GL5 2SD' }
-        : data
-      return NextResponse.json(corrected, { headers: { 'Cache-Control': 'no-store, max-age=0' } })
+
+      if (type === 'settings') {
+        const postcode = String(data?.postcode || '').trim().toUpperCase()
+        const corrected = postcode === 'GL5 2SH' || postcode === 'GL52SH'
+          ? { ...data, postcode: 'GL5 2SD' }
+          : data
+        return NextResponse.json(corrected, { headers: { 'Cache-Control': 'no-store, max-age=0' } })
+      }
+
+      return NextResponse.json(data, { headers: { 'Cache-Control': 'no-store, max-age=0' } })
     }
 
     const data = await client.fetch(query, {}, { next: { revalidate: 60 } })
