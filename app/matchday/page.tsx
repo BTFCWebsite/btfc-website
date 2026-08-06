@@ -91,12 +91,11 @@ export default function MatchdayPage() {
   const fixtureDate = nextHomeGame?.date
     ? new Date(`${nextHomeGame.date}T12:00:00`).toLocaleDateString('en-GB', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'})
     : 'Fixture TBC'
-  const programmeDetails = programme ? programmeFixture(programme) : null
 
   return (
     <main style={{background: '#F2F2F2', minHeight: '100vh', padding: '0 0 90px'}}>
       <section style={{maxWidth: 980, margin: '0 auto', padding: '52px 24px'}}>
-        <div className="mobile-feature-card" style={{background: '#041B5F', borderRadius: 10, padding: '28px 30px', color: '#fff', marginBottom: programme ? 16 : 44, boxShadow: '0 12px 32px rgba(4,27,95,.18)'}}>
+        <div className="mobile-feature-card" style={{background: '#041B5F', borderRadius: 10, padding: '28px 30px', color: '#fff', marginBottom: 44, boxShadow: '0 12px 32px rgba(4,27,95,.18)'}}>
           <div style={{fontFamily: "'Montserrat', sans-serif", fontSize: 10, letterSpacing: '.14em', opacity: .65, textTransform: 'uppercase', marginBottom: 12}}>Your Matchday · Next Home Fixture</div>
           <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 24, flexWrap: 'wrap'}}>
             <div>
@@ -104,19 +103,11 @@ export default function MatchdayPage() {
               <h1 style={{fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(32px, 6vw, 48px)', fontWeight: 800, margin: '0 0 10px', lineHeight: 1}}>{loadingFixture ? 'Loading next home fixture…' : nextHomeGame ? `BTFC v ${nextHomeGame.opponent}` : 'Next home fixture to be confirmed'}</h1>
               <p style={{fontFamily: "'Montserrat', sans-serif", margin: 0, color: 'rgba(255,255,255,.76)', fontSize: 13, lineHeight: 1.7}}>📅 {fixtureDate} · ⏰ {nextHomeGame?.kickoff || 'TBC'} · 📍 {groundName}</p>
             </div>
-            <a href="/tickets" style={{background: '#1149D8', padding: '13px 22px', borderRadius: 6, fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 18, color: '#fff', textDecoration: 'none'}}>🎫 Tickets & Admission</a>
+            {programme?.programmeUrl && (
+              <a href={programme.programmeUrl} target="_blank" rel="noopener noreferrer" style={{background: '#1149D8', padding: '13px 22px', borderRadius: 6, fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 18, color: '#fff', textDecoration: 'none', whiteSpace: 'nowrap'}}>📖 View Match Programme</a>
+            )}
           </div>
         </div>
-
-        {programme?.programmeUrl && (
-          <section style={{background: '#fff', border: '1px solid #DCE3F1', borderLeft: '5px solid #1149D8', borderRadius: 8, padding: '20px 24px', marginBottom: 44, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 20, flexWrap: 'wrap'}}>
-            <div>
-              <div style={{fontFamily: "'Montserrat', sans-serif", fontSize: 10, color: '#1149D8', fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 5}}>Digital Match Programme</div>
-              <h2 style={{...h3, fontSize: 25, margin: 0}}>{programme.title || `BTFC v ${nextHomeGame?.opponent || programmeDetails?.opponent || 'Matchday'}`}</h2>
-            </div>
-            <a href={programme.programmeUrl} target="_blank" rel="noopener noreferrer" style={{background: '#041B5F', color: '#fff', padding: '12px 20px', borderRadius: 6, fontFamily: "'Barlow Condensed', sans-serif", fontSize: 18, fontWeight: 800, textDecoration: 'none'}}>📖 View Programme</a>
-          </section>
-        )}
 
         <div className="mobile-card-grid" style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20, marginBottom: 52}}>
           {facilities.map(item => <div key={item.title} style={{...card, width: '100%', maxWidth: 360, margin: '0 auto'}}><div style={{fontSize: 24, marginBottom: 10}}>{item.icon}</div><h3 style={h3}>{item.title}</h3><p style={body}>{item.text}</p></div>)}
