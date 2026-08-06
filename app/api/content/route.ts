@@ -31,6 +31,10 @@ const staffQuery = `*[_type == "teamStaff" && active == true] | order(order asc,
 const queries: Record<string, string> = {
   settings: settingsQuery,
   fixtures: fixturesQuery,
+  programmes: `*[_type == "matchdayProgramme" && published != false] | order(matchDate desc) {
+    _id, title, fullTimeFixtureId, team, opponent, matchDate,
+    "programmeUrl": programmePdf.asset->url
+  }`,
   matchFeeds: `*[_type == "matchFeed" && active == true] | order(order asc) { team, snippet }`,
   players: playersQuery,
   staff: staffQuery,
@@ -91,7 +95,7 @@ export async function GET(request: NextRequest) {
     const query = queries[type]
     if (!query) return NextResponse.json({ error: 'Unknown content type' }, { status: 400 })
 
-    if (type === 'settings' || type === 'players' || type === 'staff') {
+    if (type === 'settings' || type === 'players' || type === 'staff' || type === 'programmes') {
       const data = await freshClient.fetch(query, {}, { cache: 'no-store' })
       return NextResponse.json(
         type === 'settings' ? correctSettings(data) : data,
