@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { getFixtures, getPlayers, getSiteSettings, getTeamStaff } from '../lib/sanity.client'
+import { getTeamsContent } from '../lib/sanity.client'
 
 type TeamKey = 'first' | 'reserves' | 'u17s'
 
@@ -25,28 +25,17 @@ type TeamStaff = {
 }
 
 const teamConfig: Record<TeamKey, { sanityName: string; settingsName: string; settingsLeague: string; fallbackName: string; fallbackLeague: string }> = {
-  first: {
-    sanityName: 'First XI',
-    settingsName: 'firstTeamName',
-    settingsLeague: 'firstTeamLeague',
-    fallbackName: 'BTFC First XI',
-    fallbackLeague: 'Uhlsport Hellenic League Division One',
-  },
-  reserves: {
-    sanityName: 'Reserves',
-    settingsName: 'reservesName',
-    settingsLeague: 'reservesLeague',
-    fallbackName: 'BTFC Reserves',
-    fallbackLeague: 'Stroud & District League Division 2',
-  },
-  u17s: {
-    sanityName: 'Under 17s',
-    settingsName: 'u17Name',
-    settingsLeague: 'u17League',
-    fallbackName: 'BTFC Under 17s',
-    fallbackLeague: 'Cheltenham Youth Football League',
-  },
+  first: { sanityName: 'First XI', settingsName: 'firstTeamName', settingsLeague: 'firstTeamLeague', fallbackName: 'BTFC First XI', fallbackLeague: 'Uhlsport Hellenic League Division One' },
+  reserves: { sanityName: 'Reserves', settingsName: 'reservesName', settingsLeague: 'reservesLeague', fallbackName: 'BTFC Reserves', fallbackLeague: 'Stroud & District League Division 2' },
+  u17s: { sanityName: 'Under 17s', settingsName: 'u17Name', settingsLeague: 'u17League', fallbackName: 'BTFC Under 17s', fallbackLeague: 'Cheltenham Youth Football League' },
 }
+
+const positionGroups = [
+  { key: 'goalkeepers', label: 'Goalkeepers' },
+  { key: 'defenders', label: 'Defenders' },
+  { key: 'midfielders', label: 'Midfielders' },
+  { key: 'strikers', label: 'Strikers' },
+]
 
 function normaliseTeam(value: string): TeamKey {
   const team = String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '')
@@ -64,30 +53,31 @@ function positionGroup(position: string) {
   return 'midfielders'
 }
 
-const positionGroups = [
-  { key: 'goalkeepers', label: 'Goalkeepers' },
-  { key: 'defenders', label: 'Defenders' },
-  { key: 'midfielders', label: 'Midfielders' },
-  { key: 'strikers', label: 'Strikers' },
-]
-
-function PlayerCard({ player }: { player: Player }) {
+function PlayerCard({ player, eager }: { player: Player; eager: boolean }) {
+  const sponsorName = String(player.sponsorName || '').trim()
   return (
     <Link className="player-profile-card player-profile-link" href={`/players/${encodeURIComponent(player._id)}`} aria-label={`View ${player.name}'s player profile`}>
       <div className={`player-profile-photo${player.imageUrl ? '' : ' is-placeholder'}`}>
         {player.imageUrl ? (
-          <img src={player.imageUrl} alt={`${player.name}, ${player.pos}`} loading="lazy" />
+          <img
+            src={player.imageUrl}
+            alt={`${player.name}, ${player.pos}`}
+            width={480}
+            height={600}
+            loading={eager ? 'eager' : 'lazy'}
+            decoding="async"
+          />
         ) : (
           <div className="player-photo-placeholder" aria-label="Player photograph to follow">
-            <img src="/branding/crest.png" alt="" />
+            <img src="/branding/crest.png" alt="" width={120} height={120} />
             <span>Photo to follow</span>
           </div>
         )}
         {Number(player.num) > 0 && <span className="player-squad-number">{player.num}</span>}
         <div className="player-profile-identity"><h4>{player.name}</h4><p>{player.pos}</p></div>
       </div>
-      <div className={`player-sponsor-panel${player.sponsorName ? ' has-sponsor' : ''}`}>
-        {player.sponsorName ? <><span>Sponsored by</span><strong>{player.sponsorName}</strong></> : <><span>Player sponsorship</span><strong>Sponsor this player</strong></>}
+      <div className={`player-sponsor-panel${sponsorName ? ' has-sponsor' : ''}`}>
+        {sponsorName ? <><span>Sponsored by</span><strong>{sponsorName}</strong></> : <><span>Player sponsorship</span><strong>Sponsor this player</strong></>}
       </div>
     </Link>
   )
@@ -95,6 +85,7 @@ function PlayerCard({ player }: { player: Player }) {
 
 function SquadGrid({ players }: { players: Player[] }) {
   if (!players.length) return <div className="squad-pitch"><div className="squad-empty">No active players have been published in Sanity for this squad yet.</div></div>
+  let visibleIndex = 0
   return (
     <div className="squad-pitch">
       {positionGroups.map(group => {
@@ -103,7 +94,13 @@ function SquadGrid({ players }: { players: Player[] }) {
         return (
           <section className="squad-position-line" key={group.key}>
             <h3>{group.label}</h3>
-            <div className="squad-player-grid">{groupedPlayers.map(player => <PlayerCard key={player._id} player={player} />)}</div>
+            <div className="squad-player-grid">
+              {groupedPlayers.map(player => {
+                const eager = visibleIndex < 4
+                visibleIndex += 1
+                return <PlayerCard key={player._id} player={player} eager={eager} />
+              })}
+            </div>
           </section>
         )
       })}
@@ -120,7 +117,11 @@ function ManagementTeam({ staff }: { staff: TeamStaff[] }) {
         {staff.map(member => (
           <article className="player-profile-card management-profile-card" key={member._id}>
             <div className={`player-profile-photo${member.imageUrl ? '' : ' is-placeholder'}`}>
-              {member.imageUrl ? <img src={member.imageUrl} alt={`${member.name}, ${member.role}`} loading="lazy" /> : <div className="player-photo-placeholder"><img src="/branding/crest.png" alt="" /><span>Photo to follow</span></div>}
+              {member.imageUrl ? (
+                <img src={member.imageUrl} alt={`${member.name}, ${member.role}`} width={480} height={600} loading="lazy" decoding="async" />
+              ) : (
+                <div className="player-photo-placeholder"><img src="/branding/crest.png" alt="" width={120} height={120} /><span>Photo to follow</span></div>
+              )}
               <div className="player-profile-identity"><h4>{member.name}</h4><p>{member.role}</p></div>
             </div>
           </article>
@@ -133,7 +134,7 @@ function ManagementTeam({ staff }: { staff: TeamStaff[] }) {
 function TeamBanner({ title, subtitle, stats }: { title: string; subtitle: string; stats: { value: string; label: string }[] }) {
   return (
     <div style={{ background: '#041B5F', borderRadius: 8, padding: '20px 28px', marginBottom: 32, display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-      <img src="/branding/crest.png" alt="BTFC" style={{ width: 56, height: 56, borderRadius: '50%', border: '2px solid #fff' }} />
+      <img src="/branding/crest.png" alt="BTFC" width={56} height={56} style={{ borderRadius: '50%', border: '2px solid #fff' }} />
       <div style={{ flex: 1 }}><div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: 26, color: '#fff', letterSpacing: '0.04em' }}>{title}</div><div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)' }}>{subtitle}</div></div>
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>{stats.map(stat => <div key={stat.label} style={{ background: 'rgba(255,255,255,0.08)', borderRadius: 6, padding: '10px 18px', textAlign: 'center' }}><div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: 22, color: '#fff' }}>{stat.value}</div><div style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{stat.label}</div></div>)}</div>
     </div>
@@ -169,16 +170,22 @@ export default function TeamsPage() {
   const [staff, setStaff] = useState<TeamStaff[]>([])
   const [fixtures, setFixtures] = useState<any[]>([])
   const [settings, setSettings] = useState<any>({})
+  const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(false)
 
   useEffect(() => {
-    Promise.all([getPlayers(), getTeamStaff(), getFixtures(), getSiteSettings()])
-      .then(([playerData, staffData, fixtureData, siteSettings]) => {
-        setPlayers((playerData || []).map((player: any) => ({ _id: player._id, name: player.name, num: player.squadNumber, pos: player.position, team: player.team, imageUrl: player.imageUrl, sponsorName: player.sponsorName })))
-        setStaff(staffData || [])
-        setFixtures(fixtureData || [])
-        setSettings(siteSettings || {})
+    getTeamsContent()
+      .then(data => {
+        setPlayers((data.players || []).map((player: any) => ({ _id: player._id, name: player.name, num: player.squadNumber, pos: player.position, team: player.team, imageUrl: player.imageUrl, sponsorName: player.sponsorName })))
+        setStaff(data.staff || [])
+        setFixtures(data.fixtures || [])
+        setSettings(data.settings || {})
       })
-      .catch(error => console.error('Failed to load teams content:', error))
+      .catch(error => {
+        console.error('Failed to load teams content:', error)
+        setLoadError(true)
+      })
+      .finally(() => setLoading(false))
   }, [])
 
   const selected = teamConfig[team]
@@ -190,6 +197,14 @@ export default function TeamsPage() {
   const tabs: { id: TeamKey; label: string }[] = [{ id: 'first', label: '⚽ First XI' }, { id: 'reserves', label: '⚽ Reserves' }, { id: 'u17s', label: '⚽ Under 17s' }]
   const title = settings[selected.settingsName] || selected.fallbackName
   const league = settings[selected.settingsLeague] || selected.fallbackLeague
+
+  if (loading) {
+    return <main className="player-detail-status">Loading teams…</main>
+  }
+
+  if (loadError) {
+    return <main className="player-detail-status">The teams section is temporarily unavailable. Please refresh and try again.</main>
+  }
 
   return (
     <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '80px 24px' }}>
