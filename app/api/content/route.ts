@@ -31,8 +31,8 @@ const staffQuery = `*[_type == "teamStaff" && active == true] | order(order asc,
 const queries: Record<string, string> = {
   settings: settingsQuery,
   fixtures: fixturesQuery,
-  programmes: `*[_type == "matchdayProgramme" && published != false] | order(matchDate desc) {
-    _id, title, fullTimeFixtureId, team, opponent, matchDate,
+  programmes: `*[_type == "matchdayProgramme" && published != false] | order(_updatedAt desc) {
+    _id, selectedFixture, title, fullTimeFixtureId, team, opponent, matchDate,
     "programmeUrl": programmePdf.asset->url
   }`,
   matchFeeds: `*[_type == "matchFeed" && active == true] | order(order asc) { team, snippet }`,
