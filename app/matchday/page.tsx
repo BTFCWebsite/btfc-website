@@ -36,15 +36,20 @@ export default function MatchdayPage() {
   const postcode = rawPostcode === 'GL5 2SH' || rawPostcode === 'GL52SH' ? 'GL5 2SD' : rawPostcode
   const addressLine1 = settings.addressLine1 || 'London Road, Brimscombe'
   const address = [groundName, addressLine1, settings.addressLine2, postcode].filter(Boolean).join(' · ')
+  const savedTurnstileOpening = String(settings.turnstileOpening || '').trim()
+  const turnstileOpening = !savedTurnstileOpening || /^one hour before kick-?off$/i.test(savedTurnstileOpening)
+    ? 'Approximately 1½ hours before kick-off'
+    : savedTurnstileOpening
 
   const facilities = useMemo(() => [
+    { icon: '🕒', title: 'Turnstiles', text: `Turnstiles normally open ${turnstileOpening.toLowerCase()}.` },
     { icon: '🍺', title: 'Clubhouse Bar', text: settings.clubhouseInformation || settings.refreshmentsInformation || 'The clubhouse bar is open before, during and after the match. A warm welcome is extended to home and away supporters. Cash and card are accepted.' },
     { icon: '🍔', title: 'Food & Drink', text: settings.foodInformation || settings.refreshmentsInformation || 'Hot food, snacks and drinks are available from the pitch-side kiosk, which opens from approximately one hour before kick-off.' },
     { icon: '♿', title: 'Accessibility', text: settings.accessibilityInformation || 'Wheelchair spaces are available in the main stand, with level access from the car park. Please contact the club in advance if you need assistance.' },
     { icon: '📋', title: 'Programme', text: settings.programmeInformation || 'The official digital matchday programme is available free on the website for First XI home matches.' },
     { icon: '🅿', title: 'Parking', text: settings.parkingInformation || 'Free parking is available in the main car park at the ground. Please follow matchday signage and steward instructions when the car park is busy.' },
     { icon: '🎫', title: 'Entrance Fees', text: settings.entranceFeesInformation || `League & Cup: Adult ${settings.admissionAdult || '£7'} · Concession (65+) ${settings.admissionConcession || '£5'} · Under 16 ${settings.admissionJunior || 'Free'}. Friendlies: ${settings.friendlyAdmission || '£3'} for all. Reserves and Under 17s fixtures are free admission for all supporters.` },
-  ], [settings])
+  ], [settings, turnstileOpening])
 
   const gettingHere = useMemo(() => [
     { icon: '🚗', title: 'By Car', text: settings.byCarInformation || `${groundName} is on London Road, Brimscombe, ${postcode}. Free parking is available in the club car park at the ground.`, link: null },
