@@ -8,13 +8,14 @@ export const client = createClient({
   token: undefined,
 })
 
-async function fetchContent<T>(type: string): Promise<T> {
+async function fetchContent<T>(type: string, params?: Record<string, string>): Promise<T> {
   if (typeof window === 'undefined') {
     throw new Error('The same-origin content endpoint is intended for browser requests')
   }
 
-  const needsFreshData = type === 'settings' || type === 'players' || type === 'staff'
-  const response = await fetch(`/api/content?type=${encodeURIComponent(type)}`, {
+  const search = new URLSearchParams({ type, ...(params || {}) })
+  const needsFreshData = ['settings', 'players', 'staff', 'teams', 'player'].includes(type)
+  const response = await fetch(`/api/content?${search.toString()}`, {
     cache: needsFreshData ? 'no-store' : 'default',
   })
   if (!response.ok) throw new Error(`Content request failed (${response.status})`)
@@ -29,6 +30,12 @@ export async function getSponsors() { return fetchContent<any[]>('sponsors') }
 export async function getSponsorshipPackages() { return fetchContent<any[]>('sponsorshipPackages') }
 export async function getPlayers() { return fetchContent<any[]>('players') }
 export async function getTeamStaff() { return fetchContent<any[]>('staff') }
+export async function getTeamsContent() {
+  return fetchContent<{ players: any[]; staff: any[]; fixtures: any[]; settings: any }>('teams')
+}
+export async function getPlayer(id: string) {
+  return fetchContent<any | null>('player', { id })
+}
 
 export async function getLatestNews() {
   return client.fetch(
