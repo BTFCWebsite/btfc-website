@@ -18,16 +18,17 @@ type SiteSettings = {
   xUrl?: string
   openingHours?: string
   seasonYear?: string
+  heroTitle?: string
+  heroSubtitle?: string
+  homepageNotice?: string
+  homepageNoticeLink?: string
+  showHomepageNotice?: boolean
   footerText?: string
   copyrightText?: string
   sponsorTicker?: string[]
 }
 
-const defaults: Required<Pick<SiteSettings,
-  'clubName' | 'clubNickname' | 'foundedYear' | 'groundName' | 'groundSponsorName' |
-  'addressLine1' | 'postcode' | 'contactEmail' | 'contactPhone' | 'facebookUrl' |
-  'instagramUrl' | 'xUrl' | 'openingHours' | 'seasonYear' | 'footerText' | 'copyrightText'
->> = {
+const defaults = {
   clubName: 'Brimscombe & Thrupp FC',
   clubNickname: 'The Lilywhites',
   foundedYear: '1886',
@@ -42,12 +43,10 @@ const defaults: Required<Pick<SiteSettings,
   xUrl: 'https://x.com/Btfcthemeadow',
   openingHours: 'Mon–Fri 9am–5pm',
   seasonYear: '2026/27',
+  heroTitle: 'BRIMSCOMBE & THRUPP FC',
+  heroSubtitle: 'Est. 1886 · The Lilywhites',
   footerText: 'Est. 1886 · The Lilywhites',
   copyrightText: '© 2026 Brimscombe & Thrupp FC. All rights reserved.',
-}
-
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
 function buildReplacements(settings: SiteSettings): Array<[RegExp, string]> {
@@ -57,6 +56,8 @@ function buildReplacements(settings: SiteSettings): Array<[RegExp, string]> {
   const seasonYear = settings.seasonYear || defaults.seasonYear
   const footerText = settings.footerText || defaults.footerText
   const copyrightText = settings.copyrightText || defaults.copyrightText
+  const heroTitle = settings.heroTitle || defaults.heroTitle
+  const heroSubtitle = settings.heroSubtitle || defaults.heroSubtitle
   const address = [groundName, settings.addressLine1 || defaults.addressLine1, settings.addressLine2, settings.postcode || defaults.postcode]
     .filter(Boolean)
     .join(', ')
@@ -70,16 +71,17 @@ function buildReplacements(settings: SiteSettings): Array<[RegExp, string]> {
     [/Brackenfern Meadow/g, groundName],
     [/BRACKENFERN MEADOW/g, groundName.toUpperCase()],
     [/Brackenfern Advisory Limited/g, groundSponsorName],
-    [/BRIMSCOMBE & THRUPP FC/g, clubName.toUpperCase()],
+    [/BRIMSCOMBE\s*&\s*THRUPP FC/g, heroTitle],
     [/Brimscombe & Thrupp FC/g, clubName],
+    [/Est\. 1886 · The Lilywhites/g, heroSubtitle],
     [/2026\/27 Season/g, `${seasonYear} Season`],
-    [/Est\. 1886 · The Lilywhites/g, footerText],
     [/© 2026 Brimscombe & Thrupp FC\. All rights reserved\./g, copyrightText],
     [/📍 Jessons Meadow, London Road, Brimscombe, GL5 2SH/g, `📍 ${address}`],
     [/📍 Brackenfern Meadow, London Road, Brimscombe, GL5 2SH/g, `📍 ${address}`],
     [/📧 info@brimscombeandthruppfc\.co\.uk/g, `📧 ${settings.contactEmail || defaults.contactEmail}`],
     [/📞 07814 854108/g, `📞 ${settings.contactPhone || defaults.contactPhone}`],
     [/🕐 Mon–Fri 9am–5pm/g, `🕐 ${settings.openingHours || defaults.openingHours}`],
+    [new RegExp(defaults.footerText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), footerText],
   ]
 }
 
@@ -101,9 +103,7 @@ function updateNode(root: ParentNode, settings: SiteSettings, replacements: Arra
 
   root.querySelectorAll?.('img, iframe, a').forEach((element) => {
     if (element instanceof HTMLImageElement) {
-      if (element.src.includes('/sponsors/jessons-logo.png')) {
-        element.src = '/sponsors/brackenfern-logo.png'
-      }
+      if (element.src.includes('/sponsors/jessons-logo.png')) element.src = '/sponsors/brackenfern-logo.png'
       element.alt = replaceText(element.alt, replacements)
     }
 
@@ -129,11 +129,48 @@ function updateSponsorTicker(settings: SiteSettings) {
   )
   if (!ticker) return
 
-  const spans = Array.from(ticker.querySelectorAll('span'))
   const repeated = [...names, ...names]
-  spans.forEach((span, index) => {
+  Array.from(ticker.querySelectorAll('span')).forEach((span, index) => {
     span.textContent = repeated[index % repeated.length]
   })
+}
+
+function updateHomepageNotice(settings: SiteSettings) {
+  document.getElementById('cms-homepage-notice')?.remove()
+  if (!settings.showHomepageNotice || !settings.homepageNotice?.trim() || window.location.pathname !== '/') return
+
+  const hero = document.querySelector('main section')
+  if (!hero) return
+
+  const notice = document.createElement(settings.homepageNoticeLink ? 'a' : 'div')
+  notice.id = 'cms-homepage-notice'
+  notice.textContent = settings.homepageNotice.trim()
+  notice.setAttribute('style', [
+    'position:absolute',
+    'top:82px',
+    'left:50%',
+    'transform:translateX(-50%)',
+    'z-index:5',
+    'width:min(92%,760px)',
+    'padding:12px 18px',
+    'border-radius:6px',
+    'background:#1149D8',
+    'color:#fff',
+    'font-family:Montserrat,sans-serif',
+    'font-size:12px',
+    'font-weight:800',
+    'letter-spacing:.04em',
+    'text-align:center',
+    'text-decoration:none',
+    'box-shadow:0 8px 24px rgba(4,27,95,.35)',
+  ].join(';'))
+
+  if (notice instanceof HTMLAnchorElement && settings.homepageNoticeLink) {
+    notice.href = settings.homepageNoticeLink
+    notice.target = '_blank'
+    notice.rel = 'noopener noreferrer'
+  }
+  hero.appendChild(notice)
 }
 
 export default function SiteBrandingUpdates() {
@@ -154,13 +191,14 @@ export default function SiteBrandingUpdates() {
       const replacements = buildReplacements(settings)
       updateNode(document.body, settings, replacements)
       updateSponsorTicker(settings)
+      updateHomepageNotice(settings)
 
       observer = new MutationObserver((mutations) => {
         for (const mutation of mutations) {
           mutation.addedNodes.forEach((node) => {
             if (node.nodeType === Node.TEXT_NODE && node.nodeValue) {
               node.nodeValue = replaceText(node.nodeValue, replacements)
-            } else if (node instanceof HTMLElement) {
+            } else if (node instanceof HTMLElement && node.id !== 'cms-homepage-notice') {
               updateNode(node, settings, replacements)
               updateSponsorTicker(settings)
             }
