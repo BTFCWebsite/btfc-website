@@ -1,174 +1,46 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { getSponsors } from '../lib/sanity.client'
+import { useEffect, useMemo, useState } from 'react'
+import { getSiteSettings, getSponsors, getSponsorshipPackages } from '../lib/sanity.client'
 
-const h2 = {
-  fontFamily: "'Barlow Condensed', sans-serif",
-  fontSize: 36,
-  fontWeight: 800,
-  color: '#2D2D2D',
-  margin: '0 0 6px',
-  letterSpacing: '0.03em',
-} as const
+const h2 = { fontFamily: "'Barlow Condensed', sans-serif", fontSize: 36, fontWeight: 800, color: '#2D2D2D', margin: '0 0 6px', letterSpacing: '0.03em' } as const
+const h3 = { fontFamily: "'Barlow Condensed', sans-serif", fontSize: 22, fontWeight: 800, color: '#2D2D2D', margin: '0 0 10px', lineHeight: 1.1 } as const
+const body = { fontFamily: "'Montserrat', sans-serif", fontSize: 12, color: '#4B5563', lineHeight: 1.65, margin: 0 } as const
+const card = { background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, padding: 24 } as const
+const subhead = { fontFamily: "'Montserrat', sans-serif", fontSize: 12, color: '#6B7280', margin: '0 0 24px' } as const
+const inputStyle = { width: '100%', padding: '11px 14px', border: '1px solid #CBD5E1', borderRadius: 6, fontFamily: "'Montserrat', sans-serif", fontSize: 13, color: '#2D2D2D', background: '#fff', boxSizing: 'border-box' as const, outline: 'none' }
 
-const h3 = {
-  fontFamily: "'Barlow Condensed', sans-serif",
-  fontSize: 22,
-  fontWeight: 800,
-  color: '#2D2D2D',
-  margin: '0 0 10px',
-  lineHeight: 1.1,
-} as const
-
-const body = {
-  fontFamily: "'Montserrat', sans-serif",
-  fontSize: 12,
-  color: '#4B5563',
-  lineHeight: 1.65,
-  margin: 0,
-} as const
-
-const card = {
-  background: '#fff',
-  border: '1px solid #E5E7EB',
-  borderRadius: 8,
-  padding: 24,
-} as const
-
-const subhead = {
-  fontFamily: "'Montserrat', sans-serif",
-  fontSize: 12,
-  color: '#6B7280',
-  margin: '0 0 24px',
-} as const
-
-const inputStyle = {
-  width: '100%',
-  padding: '11px 14px',
-  border: '1px solid #CBD5E1',
-  borderRadius: 6,
-  fontFamily: "'Montserrat', sans-serif",
-  fontSize: 13,
-  color: '#2D2D2D',
-  background: '#fff',
-  boxSizing: 'border-box' as const,
-  outline: 'none',
-}
-
-const packages = [
-  {
-    tier: 'Ground Sponsor',
-    icon: '🏟',
-    color: '#041B5F',
-    highlight: true,
-    taken: true,
-    sponsor: 'Jessons Real Estate',
-    benefits: [
-      'Ground naming rights — Jessons Meadow',
-      'Large pitch-side hoarding',
-      'Logo on all matchday materials',
-      'Homepage feature — maximum visibility',
-      'Social media recognition',
-      'Hospitality tickets included',
-    ],
-  },
-  {
-    tier: 'First Team Sponsor',
-    icon: '⚽',
-    color: '#1149D8',
-    highlight: true,
-    taken: true,
-    sponsor: 'Brackenfern Advisory Limited',
-    benefits: [
-      'First team shirt sponsorship',
-      'Logo on all matchday graphics',
-      'Homepage feature alongside club crest',
-      'Social media recognition all season',
-      'Hospitality tickets included',
-      '14,200+ monthly website impressions',
-    ],
-  },
-  {
-    tier: 'Reserves Sponsor',
-    icon: '⚽',
-    color: '#1149D8',
-    highlight: false,
-    taken: false,
-    sponsor: null,
-    benefits: [
-      'Reserves team shirt sponsorship',
-      'Logo on reserves matchday materials',
-      'Website sponsor page feature',
-      'Social media recognition',
-      'Complimentary match tickets',
-    ],
-  },
-  {
-    tier: 'Under 17s Sponsor',
-    icon: '👶',
-    color: '#1149D8',
-    highlight: false,
-    taken: false,
-    sponsor: null,
-    benefits: [
-      'Under 17s team shirt sponsorship',
-      'Logo on youth matchday materials',
-      'Website sponsor page feature',
-      'Social media recognition',
-      'Community and youth development association',
-    ],
-  },
-  {
-    tier: 'Gold Partner',
-    icon: '🌟',
-    color: '#92400e',
-    highlight: false,
-    taken: false,
-    sponsor: null,
-    benefits: [
-      'Large format pitch side board',
-      'Logo on sponsors page',
-      'Social Media Shoutouts',
-      'Matchday programme listing',
-      'Complimentary match tickets',
-    ],
-  },
-  {
-    tier: 'Club Partner',
-    icon: '🤝',
-    color: '#374151',
-    highlight: false,
-    taken: false,
-    sponsor: null,
-    benefits: [
-      'Standard pitch side board',
-      'Logo on sponsors page',
-    ],
-  },
+const fallbackPackages = [
+  { name: 'Reserves Sponsor', icon: '⚽', colour: '#1149D8', available: true, featured: false, benefits: ['Reserves team shirt sponsorship', 'Logo on reserves matchday materials', 'Website sponsor page feature', 'Social media recognition', 'Complimentary match tickets'] },
+  { name: 'Under 17s Sponsor', icon: '👶', colour: '#1149D8', available: true, featured: false, benefits: ['Under 17s team shirt sponsorship', 'Logo on youth matchday materials', 'Website sponsor page feature', 'Social media recognition', 'Community and youth development association'] },
+  { name: 'Gold Partner', icon: '🌟', colour: '#92400e', available: true, featured: false, benefits: ['Large format pitch side board', 'Logo on sponsors page', 'Social Media Shoutouts', 'Matchday programme listing', 'Complimentary match tickets'] },
+  { name: 'Club Partner', icon: '🤝', colour: '#374151', available: true, featured: false, benefits: ['Standard pitch side board', 'Logo on sponsors page'] },
 ]
 
 export default function SponsorsPage() {
   const [sponsors, setSponsors] = useState<any[]>([])
-  const [submitted, setSubmitted] = useState(false)
-  const [form, setForm] = useState({
-    name: '',
-    business: '',
-    email: '',
-    phone: '',
-    package: 'Gold Partner',
-    message: '',
-  })
+  const [packages, setPackages] = useState<any[]>([])
+  const [settings, setSettings] = useState<any>({})
+  const [form, setForm] = useState({ name: '', business: '', email: '', phone: '', package: 'Gold Partner', message: '' })
 
   useEffect(() => {
-    getSponsors().then((data) => setSponsors(data || [])).catch(console.error)
+    Promise.all([getSponsors(), getSponsorshipPackages(), getSiteSettings()])
+      .then(([sponsorData, packageData, settingsData]) => {
+        setSponsors(sponsorData || [])
+        setPackages(packageData?.length ? packageData : fallbackPackages)
+        setSettings(settingsData || {})
+      })
+      .catch(console.error)
   }, [])
 
-  const displayedSponsors = {
-    principal: sponsors.filter((s) => s.tier === 'principal'),
-    gold: sponsors.filter((s) => s.tier === 'official'),
-    club: sponsors.filter((s) => s.tier === 'club'),
-  }
+  const displayedSponsors = useMemo(() => ({
+    principal: sponsors.filter(s => s.tier === 'principal'),
+    gold: sponsors.filter(s => s.tier === 'official'),
+    club: sponsors.filter(s => s.tier === 'club'),
+  }), [sponsors])
+
+  const availablePackages = packages.filter(p => p.available !== false)
+  const season = settings.seasonYear || '2026/27'
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -176,207 +48,56 @@ export default function SponsorsPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-
     if (!form.name.trim() || !form.email.includes('@') || !form.business.trim()) {
       alert('Please fill in all required fields.')
       return
     }
 
-    setSubmitted(true)
+    const recipient = settings.commercialEmail || settings.contactEmail || 'info@brimscombeandthruppfc.co.uk'
+    const subject = encodeURIComponent(`Sponsorship enquiry: ${form.package}`)
+    const message = encodeURIComponent(`Name: ${form.name}\nBusiness: ${form.business}\nEmail: ${form.email}\nPhone: ${form.phone || 'Not supplied'}\nPackage: ${form.package}\n\n${form.message}`)
+    window.location.href = `mailto:${recipient}?subject=${subject}&body=${message}`
   }
+
+  const SponsorGrid = ({ items, compact = false }: { items: any[]; compact?: boolean }) => (
+    <div style={{ display: 'grid', gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, ${compact ? 220 : 280}px), 1fr))`, gap: 20 }}>
+      {items.map(s => (
+        <div key={s._id || s.name} style={{ ...card, textAlign: compact ? 'center' : 'left', width: '100%', maxWidth: compact ? 320 : 420, margin: '0 auto' }}>
+          {s.logoUrl && <div style={{ height: compact ? 70 : 100, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}><img src={s.logoUrl} alt={s.name} style={{ maxHeight: compact ? 52 : 70, maxWidth: '80%', objectFit: 'contain' }} /></div>}
+          <h3 style={h3}>{s.name}</h3>
+          {s.role && <p style={{ ...body, color: '#1149D8', fontWeight: 700 }}>{s.role}</p>}
+        </div>
+      ))}
+    </div>
+  )
 
   return (
     <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '0 0 90px' }}>
       <section style={{ maxWidth: 980, margin: '0 auto', padding: '52px 24px' }}>
-
         <div style={{ marginBottom: 52 }}>
           <h2 style={h2}>Principal Sponsors</h2>
-          <p style={subhead}>Our headline partners for the 2026/27 season</p>
+          <p style={subhead}>Our headline partners for the {season} season</p>
+          <SponsorGrid items={displayedSponsors.principal} />
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
-            gap: 20,
-            marginBottom: 20,
-          }}>
-            {displayedSponsors.principal.map(s => (
-              <div key={s.name} style={{
-                ...card,
-                width: '100%',
-                maxWidth: 420,
-                margin: '0 auto',
-              }}>
-                <div style={{ height: 4, background: '#1149D8', marginBottom: 20, borderRadius: 2 }} />
-
-                <div style={{
-                  background: '#fff',
-                  border: '1px solid #E5E7EB',
-                  borderRadius: 8,
-                  height: 100,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: 16,
-                }}>
-                  <img src={s.logoUrl} alt={s.name} style={{ maxHeight: 70, maxWidth: '80%', objectFit: 'contain' }} />
-                </div>
-
-                <h3 style={h3}>{s.name}</h3>
-
-                <span style={{
-                  display: 'inline-block',
-                  background: '#1149D8',
-                  color: '#fff',
-                  padding: '3px 10px',
-                  borderRadius: 4,
-                  fontFamily: "'Montserrat', sans-serif",
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: '.08em',
-                  textTransform: 'uppercase',
-                }}>
-                  {s.role}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          {displayedSponsors.gold.length > 0 && (
-            <>
-              <h3 style={{ ...h3, marginBottom: 6, marginTop: 32 }}>Gold Partners</h3>
-              <p style={{ ...subhead, marginBottom: 16 }}>Supporting the club at gold level</p>
-
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))',
-                gap: 16,
-                marginBottom: 32,
-              }}>
-                {displayedSponsors.gold.map(s => (
-                  <div key={s.name} style={{
-                    ...card,
-                    textAlign: 'center',
-                    width: '100%',
-                    maxWidth: 320,
-                    margin: '0 auto',
-                  }}>
-                    {s.logoUrl && (
-                      <div style={{
-                        background: '#F8FAFF',
-                        border: '1px solid #E5E7EB',
-                        borderRadius: 6,
-                        height: 70,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginBottom: 12,
-                      }}>
-                        <img src={s.logoUrl} alt={s.name} style={{ maxHeight: 52, maxWidth: '80%', objectFit: 'contain' }} />
-                      </div>
-                    )}
-
-                    <p style={{ ...body, fontWeight: 700, color: '#2D2D2D', marginBottom: 4 }}>{s.name}</p>
-                    {s.role && <p style={{ ...body, fontSize: 11, color: '#9CA3AF' }}>{s.role}</p>}
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-
-          {displayedSponsors.club.length > 0 && (
-            <>
-              <h3 style={{ ...h3, marginBottom: 6 }}>Club Partners</h3>
-              <p style={{ ...subhead, marginBottom: 16 }}>Our valued club partners</p>
-
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))',
-                gap: 20,
-              }}>
-                {displayedSponsors.club.map(s => (
-                  <div key={s.name} style={{
-                    ...card,
-                    textAlign: 'center',
-                    padding: 16,
-                    width: '100%',
-                    maxWidth: 320,
-                    margin: '0 auto',
-                  }}>
-                    {s.logoUrl && (
-                      <div style={{
-                        background: '#F8FAFF',
-                        border: '1px solid #E5E7EB',
-                        borderRadius: 6,
-                        height: 56,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginBottom: 10,
-                      }}>
-                        <img src={s.logoUrl} alt={s.name} style={{ maxHeight: 42, maxWidth: '80%', objectFit: 'contain' }} />
-                      </div>
-                    )}
-
-                    <p style={{ ...body, fontWeight: 700, color: '#2D2D2D', fontSize: 11, marginBottom: 2 }}>{s.name}</p>
-                    {s.role && <p style={{ ...body, fontSize: 10, color: '#9CA3AF' }}>{s.role}</p>}
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
+          {displayedSponsors.gold.length > 0 && <div style={{ marginTop: 32 }}><h3 style={h3}>Gold Partners</h3><SponsorGrid items={displayedSponsors.gold} compact /></div>}
+          {displayedSponsors.club.length > 0 && <div style={{ marginTop: 32 }}><h3 style={h3}>Club Partners</h3><SponsorGrid items={displayedSponsors.club} compact /></div>}
         </div>
 
         <div style={{ marginBottom: 52 }}>
           <h2 style={h2}>Sponsorship Packages</h2>
-          <p style={subhead}>Available packages for the 2026/27 season — contact us for pricing</p>
-
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
-            gap: 20,
-          }}>
-            {packages.filter(p => !p.taken).map(p => (
-              <div key={p.tier} style={{
-                ...card,
-                border: `1px solid ${p.highlight ? '#1149D8' : '#E5E7EB'}`,
-                width: '100%',
-                maxWidth: 380,
-                margin: '0 auto',
-              }}>
-                <div style={{ height: 4, background: p.color, marginBottom: 20, borderRadius: 2 }} />
-                <div style={{ fontSize: 24, marginBottom: 8 }}>{p.icon}</div>
-                <h3 style={h3}>{p.tier}</h3>
-
-                <div style={{ display: 'grid', gap: 6, marginBottom: 20 }}>
-                  {p.benefits.map(b => (
-                    <div key={b} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                      <span style={{ color: '#1149D8', fontWeight: 900, fontSize: 12, marginTop: 1 }}>✓</span>
-                      <span style={{ ...body, fontSize: 12 }}>{b}</span>
-                    </div>
-                  ))}
+          <p style={subhead}>Available packages for the {season} season — contact us for pricing</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: 20 }}>
+            {availablePackages.map(p => (
+              <div key={p._id || p.name} style={{ ...card, border: `1px solid ${p.featured ? '#1149D8' : '#E5E7EB'}`, width: '100%', maxWidth: 380, margin: '0 auto' }}>
+                <div style={{ height: 4, background: p.colour || '#1149D8', marginBottom: 20, borderRadius: 2 }} />
+                <div style={{ fontSize: 24, marginBottom: 8 }}>{p.icon || '🤝'}</div>
+                <h3 style={h3}>{p.name}</h3>
+                {p.description && <p style={{ ...body, marginBottom: 14 }}>{p.description}</p>}
+                <div style={{ display: 'grid', gap: 6, marginBottom: 18 }}>
+                  {(p.benefits || []).map((benefit: string) => <div key={benefit} style={{ display: 'flex', gap: 8 }}><span style={{ color: '#1149D8', fontWeight: 900 }}>✓</span><span style={body}>{benefit}</span></div>)}
                 </div>
-
-                <button
-                  onClick={() => {
-                    setForm({ ...form, package: p.tier })
-                    document.getElementById('enquiry-form')?.scrollIntoView({ behavior: 'smooth' })
-                  }}
-                  style={{
-                    width: '100%',
-                    background: '#fff',
-                    border: '2px solid #1149D8',
-                    color: '#1149D8',
-                    padding: '9px 14px',
-                    borderRadius: 6,
-                    fontFamily: "'Barlow Condensed', sans-serif",
-                    fontWeight: 800,
-                    fontSize: 16,
-                    cursor: 'pointer',
-                    letterSpacing: '.04em',
-                  }}
-                >
-                  Enquire →
-                </button>
+                {p.priceNote && <p style={{ ...body, fontWeight: 700, marginBottom: 14 }}>{p.priceNote}</p>}
+                <button onClick={() => { setForm({ ...form, package: p.name }); document.getElementById('enquiry-form')?.scrollIntoView({ behavior: 'smooth' }) }} style={{ width: '100%', background: '#fff', border: '2px solid #1149D8', color: '#1149D8', padding: '9px 14px', borderRadius: 6, fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 16, cursor: 'pointer' }}>Enquire →</button>
               </div>
             ))}
           </div>
@@ -384,89 +105,22 @@ export default function SponsorsPage() {
 
         <div id="enquiry-form">
           <h2 style={h2}>Sponsorship Enquiry</h2>
-          <p style={subhead}>Interested in partnering with BTFC? Get in touch and we'll be in contact within 2 working days.</p>
-
-          <div style={card}>
-            <div style={{ height: 4, background: '#1149D8', marginBottom: 24, borderRadius: 2 }} />
-
-            {submitted ? (
-              <div style={{
-                background: '#F0FDF4',
-                border: '1px solid #86EFAC',
-                borderRadius: 8,
-                padding: '28px 24px',
-                textAlign: 'center',
-              }}>
-                <div style={{ fontSize: 36, marginBottom: 12 }}>✅</div>
-                <h3 style={{ ...h3, color: '#16a34a' }}>Enquiry Received</h3>
-                <p style={{ ...body, color: '#15803d' }}>
-                  Thanks for your interest in sponsoring BTFC. We'll be in touch within 2 working days.
-                </p>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit}>
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
-                  gap: 16,
-                  marginBottom: 16,
-                }}>
-                  <div>
-                    <label style={{ ...body, fontSize: 11, fontWeight: 700, color: '#374151', display: 'block', marginBottom: 6 }}>Your Name *</label>
-                    <input name="name" value={form.name} onChange={handleChange} placeholder="Full name" style={inputStyle} required />
-                  </div>
-
-                  <div>
-                    <label style={{ ...body, fontSize: 11, fontWeight: 700, color: '#374151', display: 'block', marginBottom: 6 }}>Business Name *</label>
-                    <input name="business" value={form.business} onChange={handleChange} placeholder="Your business" style={inputStyle} required />
-                  </div>
-
-                  <div>
-                    <label style={{ ...body, fontSize: 11, fontWeight: 700, color: '#374151', display: 'block', marginBottom: 6 }}>Email Address *</label>
-                    <input name="email" type="email" value={form.email} onChange={handleChange} placeholder="your@email.com" style={inputStyle} required />
-                  </div>
-
-                  <div>
-                    <label style={{ ...body, fontSize: 11, fontWeight: 700, color: '#374151', display: 'block', marginBottom: 6 }}>Phone Number</label>
-                    <input name="phone" value={form.phone} onChange={handleChange} placeholder="Optional" style={inputStyle} />
-                  </div>
-                </div>
-
-                <div style={{ marginBottom: 16 }}>
-                  <label style={{ ...body, fontSize: 11, fontWeight: 700, color: '#374151', display: 'block', marginBottom: 6 }}>Package of Interest</label>
-                  <select name="package" value={form.package} onChange={handleChange} style={{ ...inputStyle, cursor: 'pointer' }}>
-                    <option>Reserves Sponsor</option>
-                    <option>Under 17s Sponsor</option>
-                    <option>Gold Partner</option>
-                    <option>Club Partner</option>
-                    <option>Other / Not sure yet</option>
-                  </select>
-                </div>
-
-                <div style={{ marginBottom: 20 }}>
-                  <label style={{ ...body, fontSize: 11, fontWeight: 700, color: '#374151', display: 'block', marginBottom: 6 }}>Message</label>
-                  <textarea name="message" value={form.message} onChange={handleChange} placeholder="Tell us a bit about your business and what you're looking for..." rows={4} style={{ ...inputStyle, resize: 'vertical' }} />
-                </div>
-
-                <button type="submit" style={{
-                  background: '#1149D8',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: 6,
-                  padding: '12px 28px',
-                  fontFamily: "'Barlow Condensed', sans-serif",
-                  fontWeight: 800,
-                  fontSize: 18,
-                  cursor: 'pointer',
-                  letterSpacing: '0.03em',
-                }}>
-                  Send Enquiry →
-                </button>
-              </form>
-            )}
-          </div>
+          <p style={subhead}>Interested in partnering with BTFC? Send the club your enquiry directly.</p>
+          <form onSubmit={handleSubmit} style={card}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: 16, marginBottom: 16 }}>
+              <input name="name" value={form.name} onChange={handleChange} placeholder="Your name" style={inputStyle} required />
+              <input name="business" value={form.business} onChange={handleChange} placeholder="Business name" style={inputStyle} required />
+              <input name="email" type="email" value={form.email} onChange={handleChange} placeholder="Email address" style={inputStyle} required />
+              <input name="phone" value={form.phone} onChange={handleChange} placeholder="Phone number" style={inputStyle} />
+            </div>
+            <select name="package" value={form.package} onChange={handleChange} style={{ ...inputStyle, marginBottom: 16 }}>
+              {availablePackages.map(p => <option key={p._id || p.name}>{p.name}</option>)}
+              <option>Other / Not sure yet</option>
+            </select>
+            <textarea name="message" value={form.message} onChange={handleChange} placeholder="Tell us what you are looking for..." rows={4} style={{ ...inputStyle, resize: 'vertical', marginBottom: 20 }} />
+            <button type="submit" style={{ background: '#1149D8', color: '#fff', border: 'none', borderRadius: 6, padding: '12px 28px', fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 18, cursor: 'pointer' }}>Send Enquiry →</button>
+          </form>
         </div>
-
       </section>
     </main>
   )
