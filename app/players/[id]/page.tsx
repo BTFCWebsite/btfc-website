@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { getPlayers } from '../../lib/sanity.client'
+import { getPlayer } from '../../lib/sanity.client'
 
 type Player = {
   _id: string
@@ -30,12 +30,14 @@ export default function PlayerPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    getPlayers()
-      .then((players) => {
-        const id = decodeURIComponent(String(params.id || ''))
-        setPlayer((players || []).find((item: Player) => item._id === id || item.name === id) || null)
+    const id = decodeURIComponent(String(params.id || ''))
+    setLoading(true)
+    getPlayer(id)
+      .then((data) => setPlayer(data || null))
+      .catch(error => {
+        console.error('Failed to load player profile:', error)
+        setPlayer(null)
       })
-      .catch(console.error)
       .finally(() => setLoading(false))
   }, [params.id])
 
@@ -67,10 +69,17 @@ export default function PlayerPage() {
         <article className="player-detail-card">
           <div className={`player-profile-photo player-detail-photo${player.imageUrl ? '' : ' is-placeholder'}`}>
             {player.imageUrl ? (
-              <img src={player.imageUrl} alt={`${player.name}, ${player.position || 'BTFC player'}`} />
+              <img
+                src={player.imageUrl}
+                alt={`${player.name}, ${player.position || 'BTFC player'}`}
+                width={720}
+                height={900}
+                loading="eager"
+                decoding="async"
+              />
             ) : (
               <div className="player-photo-placeholder" aria-label="Player photograph to follow">
-                <img src="/branding/crest.png" alt="" />
+                <img src="/branding/crest.png" alt="" width={160} height={160} />
                 <span>Photo to follow</span>
               </div>
             )}
@@ -89,7 +98,7 @@ export default function PlayerPage() {
               <section className="player-detail-sponsor">
                 <p className="player-detail-sponsor-label">Player sponsor</p>
                 {sponsorLogoUrl && (
-                  <img src={sponsorLogoUrl} alt={`${sponsorName} logo`} />
+                  <img src={sponsorLogoUrl} alt={`${sponsorName} logo`} width={320} height={160} decoding="async" />
                 )}
                 <h2>{sponsorName}</h2>
                 {sponsorMessage && (
