@@ -49,10 +49,10 @@ export default async function HomePage() {
 
     const [last, next, settings] = await Promise.all([
       client.fetch(
-        `*[_type == "fixture" && team == "First XI" && played == true] | order(date desc)[0] {
+        `*[_type == "fixture" && team == "First XI" && date < $today && defined(btfcScore) && defined(opponentScore)] | order(date desc)[0] {
           _id, opponent, btfcScore, opponentScore, date, competition
         }`,
-        {},
+        { today },
         { cache: 'no-store' }
       ),
       client.fetch(
