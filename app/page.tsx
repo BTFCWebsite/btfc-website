@@ -47,7 +47,7 @@ export default async function HomePage() {
   try {
     const today = new Date().toISOString().split('T')[0]
 
-    const [last, next, settings] = await Promise.all([
+    const [manualLast, next, settings, fullTime] = await Promise.all([
       client.fetch(
         `*[_type == "fixture" && team == "First XI" && date < $today && defined(btfcScore) && defined(opponentScore)] | order(date desc)[0] {
           _id, opponent, btfcScore, opponentScore, date, competition
@@ -67,7 +67,16 @@ export default async function HomePage() {
         {},
         { cache: 'no-store' }
       ),
+      fetch('https://btfc-website.vercel.app/api/full-time?kind=matches&team=First%20XI', { cache: 'no-store' })
+        .then(response => response.ok ? response.json() : { matches: [] })
+        .catch(() => ({ matches: [] })),
     ])
+
+    const fullTimeLast = (fullTime?.matches || [])
+      .filter((fixture: any) => fixture.played && fixture.date < today)
+      .sort((a: any, b: any) => String(b.date).localeCompare(String(a.date)))[0]
+
+    const last = fullTimeLast || manualLast
 
     if (last) {
       lastResult = last
