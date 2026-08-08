@@ -70,7 +70,6 @@ function parseMatches(script: string, team: string) {
     const competition = textFromHtml(cells[0])
     const homeTeam = textFromHtml(cells[1])
     const homeScore = textFromHtml(cells[2])
-    const separator = textFromHtml(cells[3])
     const awayScore = textFromHtml(cells[4])
     const awayTeam = textFromHtml(cells[5])
     const location = textFromHtml(cells[6])
@@ -78,7 +77,9 @@ function parseMatches(script: string, team: string) {
     const isAway = isBtfcTeam(awayTeam)
     if (!isHome && !isAway) continue
 
-    const played = separator === '-' && /^\d+$/.test(homeScore) && /^\d+$/.test(awayScore)
+    // Full-Time can vary the markup used between the two score cells.
+    // Numeric home and away score cells are sufficient to identify a completed match.
+    const played = /^\d+$/.test(homeScore) && /^\d+$/.test(awayScore)
     const sourceUrl = hrefFromHtml(cells[0]) || hrefFromHtml(cells[1])
     const sourceId = sourceUrl?.match(/[?&]id=(\d+)/)?.[1]
 
