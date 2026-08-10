@@ -3,6 +3,7 @@ import HomeNextFixture from './HomeNextFixture'
 import SponsorTileLinks from './SponsorTileLinks'
 import SiteBrandingUpdates from './SiteBrandingUpdates'
 import ProgrammeLinks from './ProgrammeLinks'
+import MatchReportLinkLabels from './MatchReportLinkLabels'
 
 // Deployment marker: restored stable version from 1 August 2026.
 export default function Template({ children }: { children: ReactNode }) {
@@ -43,6 +44,7 @@ export default function Template({ children }: { children: ReactNode }) {
       <SponsorTileLinks />
       <SiteBrandingUpdates />
       <ProgrammeLinks />
+      <MatchReportLinkLabels />
     </>
   )
 }
