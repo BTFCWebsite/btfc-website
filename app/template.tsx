@@ -40,17 +40,16 @@ export default function Template({ children }: { children: ReactNode }) {
         }
 
         @media (min-width: 769px) {
-          .hero-cards {
-            gap: 16px !important;
-            width: calc(100vw - 160px) !important;
-            max-width: 1100px !important;
-            transform: translateY(42px);
-          }
-
           .hero-cards > a,
           .hero-cards > div {
-            min-height: 82px !important;
-            padding: 10px 26px !important;
+            background: rgba(4, 27, 95, 0.58) !important;
+            border-color: rgba(255, 255, 255, 0.48) !important;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.10) !important;
+          }
+
+          .hero-cards > a > div,
+          .hero-cards > div > div {
+            text-shadow: 0 2px 3px rgba(0, 0, 0, 1), 0 0 8px rgba(0, 0, 0, 0.95) !important;
           }
         }
       `}</style>
