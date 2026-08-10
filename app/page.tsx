@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 import Link from 'next/link'
 import { client } from './lib/sanity.client'
@@ -53,19 +53,19 @@ export default async function HomePage() {
           _id, opponent, btfcScore, opponentScore, date, competition
         }`,
         { today },
-        { cache: 'no-store' }
+        { next: { revalidate: 300 } }
       ),
       client.fetch(
         `*[_type == "fixture" && team == "First XI" && played != true && date >= $today] | order(date asc)[0] {
           opponent, date, competition, kickoff
         }`,
         { today },
-        { cache: 'no-store' }
+        { next: { revalidate: 300 } }
       ),
       client.fetch(
         `*[_type == "siteSettings"][0] { leaguePosition, seasonYear }`,
         {},
-        { cache: 'no-store' }
+        { next: { revalidate: 300 } }
       ),
     ])
 
@@ -76,7 +76,7 @@ export default async function HomePage() {
           "slug": slug.current
         }`,
         { fixtureId: last._id, date: last.date },
-        { cache: 'no-store' }
+        { next: { revalidate: 300 } }
       )
       if (report?.slug) lastMatchReportSlug = report.slug
     }
