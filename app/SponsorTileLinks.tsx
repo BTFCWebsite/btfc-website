@@ -21,7 +21,7 @@ function findSponsorCard(start: Element, name: string) {
     const rect = current.getBoundingClientRect()
     const hasLogo = Boolean(current.querySelector('img'))
     const containsName = text.includes(name)
-    const looksLikeCard = rect.width >= 180 && rect.height >= 90 && hasLogo && containsName
+    const looksLikeCard = rect.width >= 180 && rect.height >= 70 && hasLogo && containsName
 
     if (looksLikeCard) return current
     current = current.parentElement
@@ -38,75 +38,88 @@ export default function SponsorTileLinks() {
     if (pathname !== '/sponsors') return
 
     let cancelled = false
-    const cleanups: Array<() => void> = []
+    let observer: MutationObserver | null = null
+    const cleanups = new Map<HTMLElement, () => void>()
 
     getSponsors().then((sponsors) => {
       if (cancelled) return
 
-      for (const sponsor of sponsors || []) {
-        const name = String(sponsor?.name || '').trim()
-        if (!name) continue
+      const sponsorList = (sponsors || [])
+        .map((sponsor: any) => ({ ...sponsor, name: String(sponsor?.name || '').trim() }))
+        .filter((sponsor: any) => sponsor.name)
 
-        const textNode = Array.from(document.querySelectorAll('h3, p')).find(
-          element => element.textContent?.trim() === name
-        )
-        if (!textNode) continue
+      function linkTiles() {
+        if (cancelled) return
 
-        const tile = findSponsorCard(textNode, name)
-        if (!tile || tile.dataset.sponsorLinked === 'true') continue
+        for (const sponsor of sponsorList) {
+          const textNode = Array.from(document.querySelectorAll('h3, p')).find(
+            element => element.textContent?.trim() === sponsor.name
+          )
+          if (!textNode) continue
 
-        tile.dataset.sponsorLinked = 'true'
-        tile.tabIndex = 0
-        tile.setAttribute('role', 'link')
-        tile.setAttribute('aria-label', `View ${name} sponsor profile`)
-        tile.style.cursor = 'pointer'
-        tile.style.transition = 'transform 160ms ease, box-shadow 160ms ease'
+          const tile = findSponsorCard(textNode, sponsor.name)
+          if (!tile || tile.dataset.sponsorLinked === 'true') continue
 
-        const cue = document.createElement('div')
-        cue.textContent = 'View Sponsor →'
-        cue.style.marginTop = '12px'
-        cue.style.color = '#1149D8'
-        cue.style.fontFamily = "'Montserrat', sans-serif"
-        cue.style.fontSize = '10px'
-        cue.style.fontWeight = '800'
-        cue.style.letterSpacing = '.06em'
-        cue.style.textTransform = 'uppercase'
-        tile.appendChild(cue)
+          tile.dataset.sponsorLinked = 'true'
+          tile.tabIndex = 0
+          tile.setAttribute('role', 'link')
+          tile.setAttribute('aria-label', `View ${sponsor.name} sponsor profile`)
+          tile.style.cursor = 'pointer'
+          tile.style.transition = 'transform 160ms ease, box-shadow 160ms ease'
 
-        const open = () => router.push(`/sponsors/${sponsorSlug(name)}`)
-        const keydown = (event: KeyboardEvent) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault()
-            open()
+          const cue = document.createElement('div')
+          cue.textContent = 'View Sponsor →'
+          cue.style.marginTop = '12px'
+          cue.style.color = '#1149D8'
+          cue.style.fontFamily = "'Montserrat', sans-serif"
+          cue.style.fontSize = '10px'
+          cue.style.fontWeight = '800'
+          cue.style.letterSpacing = '.06em'
+          cue.style.textTransform = 'uppercase'
+          tile.appendChild(cue)
+
+          const open = () => router.push(`/sponsors/${sponsorSlug(sponsor.name)}`)
+          const keydown = (event: KeyboardEvent) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault()
+              open()
+            }
           }
-        }
-        const enter = () => {
-          tile.style.transform = 'translateY(-2px)'
-          tile.style.boxShadow = '0 10px 24px rgba(17, 73, 216, 0.12)'
-        }
-        const leave = () => {
-          tile.style.transform = ''
-          tile.style.boxShadow = ''
-        }
+          const enter = () => {
+            tile.style.transform = 'translateY(-2px)'
+            tile.style.boxShadow = '0 10px 24px rgba(17, 73, 216, 0.12)'
+          }
+          const leave = () => {
+            tile.style.transform = ''
+            tile.style.boxShadow = ''
+          }
 
-        tile.addEventListener('click', open)
-        tile.addEventListener('keydown', keydown)
-        tile.addEventListener('mouseenter', enter)
-        tile.addEventListener('mouseleave', leave)
+          tile.addEventListener('click', open)
+          tile.addEventListener('keydown', keydown)
+          tile.addEventListener('mouseenter', enter)
+          tile.addEventListener('mouseleave', leave)
 
-        cleanups.push(() => {
-          tile.removeEventListener('click', open)
-          tile.removeEventListener('keydown', keydown)
-          tile.removeEventListener('mouseenter', enter)
-          tile.removeEventListener('mouseleave', leave)
-          cue.remove()
-        })
+          cleanups.set(tile, () => {
+            tile.removeEventListener('click', open)
+            tile.removeEventListener('keydown', keydown)
+            tile.removeEventListener('mouseenter', enter)
+            tile.removeEventListener('mouseleave', leave)
+            cue.remove()
+            delete tile.dataset.sponsorLinked
+          })
+        }
       }
+
+      linkTiles()
+      observer = new MutationObserver(linkTiles)
+      observer.observe(document.body, { childList: true, subtree: true })
     }).catch(console.error)
 
     return () => {
       cancelled = true
+      observer?.disconnect()
       cleanups.forEach(cleanup => cleanup())
+      cleanups.clear()
     }
   }, [pathname, router])
 
