@@ -41,7 +41,16 @@ export default function Template({ children }: { children: ReactNode }) {
 
         @media (min-width: 769px) {
           .hero-cards {
-            gap: 120px !important;
+            gap: 16px !important;
+            width: calc(100vw - 160px) !important;
+            max-width: 1100px !important;
+            transform: translateY(42px);
+          }
+
+          .hero-cards > a,
+          .hero-cards > div {
+            min-height: 82px !important;
+            padding: 10px 26px !important;
           }
         }
       `}</style>
