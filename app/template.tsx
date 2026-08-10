@@ -6,6 +6,7 @@ import ProgrammeLinks from './ProgrammeLinks'
 import MatchReportLinkLabels from './MatchReportLinkLabels'
 import MatchdayMobileTileWidth from './MatchdayMobileTileWidth'
 import ContactsMobileTileWidth from './ContactsMobileTileWidth'
+import SponsorTickerSync from './SponsorTickerSync'
 
 // Deployment marker: restored stable version from 1 August 2026.
 export default function Template({ children }: { children: ReactNode }) {
@@ -65,6 +66,7 @@ export default function Template({ children }: { children: ReactNode }) {
       <MatchReportLinkLabels />
       <MatchdayMobileTileWidth />
       <ContactsMobileTileWidth />
+      <SponsorTickerSync />
     </>
   )
 }
