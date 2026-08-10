@@ -11,6 +11,7 @@ type Fixture = {
   played?: boolean
   btfcScore?: number
   opponentScore?: number
+  sourceUrl?: string
 }
 
 function formatDate(value: string) {
@@ -62,6 +63,27 @@ function updateLatestResult(fixtures: Fixture[]) {
   )
 
   details.textContent = `${formatDate(latest.date)}${latest.competition ? ` · ${latest.competition}` : ''}`
+
+  if (latest.sourceUrl) {
+    const link = card.closest('a') as HTMLAnchorElement | null
+    if (link) {
+      link.href = latest.sourceUrl
+      link.target = '_blank'
+      link.rel = 'noopener noreferrer'
+    } else {
+      card.style.cursor = 'pointer'
+      card.setAttribute('role', 'link')
+      card.setAttribute('tabindex', '0')
+      const openFullTime = () => window.open(latest.sourceUrl, '_blank', 'noopener,noreferrer')
+      card.onclick = openFullTime
+      card.onkeydown = (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          openFullTime()
+        }
+      }
+    }
+  }
 }
 
 function updateNextFixture(fixtures: Fixture[]) {
