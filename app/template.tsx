@@ -38,6 +38,12 @@ export default function Template({ children }: { children: ReactNode }) {
           color: #fff !important;
           font-weight: 900 !important;
         }
+
+        @media (min-width: 769px) {
+          .hero-cards {
+            gap: 120px !important;
+          }
+        }
       `}</style>
       {children}
       <HomeNextFixture />
