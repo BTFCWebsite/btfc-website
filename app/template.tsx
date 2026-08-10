@@ -45,6 +45,8 @@ export default function Template({ children }: { children: ReactNode }) {
             background: rgba(4, 27, 95, 0.58) !important;
             border-color: rgba(255, 255, 255, 0.48) !important;
             box-shadow: 0 10px 28px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.10) !important;
+            padding-top: 12px !important;
+            padding-bottom: 12px !important;
           }
 
           .hero-cards > a > div,
