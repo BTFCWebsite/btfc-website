@@ -45,18 +45,18 @@ export default function Template({ children }: { children: ReactNode }) {
         @media (min-width: 769px) {
           .hero-cards > a,
           .hero-cards > div {
-            background: linear-gradient(135deg, rgba(10, 21, 45, 0.62), rgba(17, 73, 216, 0.34)) !important;
-            border-color: rgba(255, 255, 255, 0.42) !important;
-            backdrop-filter: blur(6px) saturate(115%) !important;
-            -webkit-backdrop-filter: blur(6px) saturate(115%) !important;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+            background: rgba(18, 20, 24, 0.38) !important;
+            border-color: rgba(255, 255, 255, 0.34) !important;
+            backdrop-filter: blur(7px) saturate(90%) !important;
+            -webkit-backdrop-filter: blur(7px) saturate(90%) !important;
+            box-shadow: 0 7px 18px rgba(0, 0, 0, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.10) !important;
             padding-top: 8px !important;
             padding-bottom: 8px !important;
           }
 
           .hero-cards > a > div,
           .hero-cards > div > div {
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95), 0 0 7px rgba(0, 0, 0, 0.75) !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95), 0 0 6px rgba(0, 0, 0, 0.65) !important;
           }
         }
       `}</style>
