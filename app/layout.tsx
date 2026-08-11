@@ -29,7 +29,6 @@ function Nav() {
     return () => window.removeEventListener('scroll', handler)
   }, [])
 
-  // Close menu on route change
   useEffect(() => {
     setMenuOpen(false)
   }, [pathname])
@@ -55,8 +54,6 @@ function Nav() {
         transition: 'background .3s',
       }}>
         <div style={{ maxWidth: 1320, margin: '0 auto', padding: '0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
-
-          {/* Logo */}
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
             <img src="/branding/crest.png" alt="BTFC" style={{ width: 42, height: 42, borderRadius: '50%', border: '2px solid #fff' }} />
             <div>
@@ -65,7 +62,6 @@ function Nav() {
             </div>
           </Link>
 
-          {/* Desktop nav */}
           <div className="nav-desktop" style={{ display: 'flex', gap: 0, alignItems: 'center' }}>
             {NAV_LINKS.map(([label, href]) => {
               const active = pathname === href || (href !== '/' && pathname.startsWith(href + '/'))
@@ -98,7 +94,6 @@ function Nav() {
             </Link>
           </div>
 
-          {/* Hamburger button */}
           <button
             className="nav-hamburger"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -115,7 +110,6 @@ function Nav() {
           </button>
         </div>
 
-        {/* Mobile menu */}
         <div
           className="nav-mobile-menu"
           style={{
@@ -170,12 +164,10 @@ function Ticker() {
     }}>
       <div style={{ display: 'flex', gap: 52, whiteSpace: 'nowrap', animation: 'ticker 30s linear infinite' }}>
         {[
-          'Jessons Real Estate',
           'Brackenfern Advisory Limited',
           'Reserves Sponsor TBC',
           'U17s Sponsor TBC',
           'Your Business Here',
-          'Jessons Real Estate',
           'Brackenfern Advisory Limited',
           'Reserves Sponsor TBC',
           'U17s Sponsor TBC',
@@ -199,7 +191,6 @@ function Footer() {
         gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
         gap: 44, marginBottom: 44
       }}>
-        {/* Brand */}
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
             <img src="/branding/crest.png" style={{ width: 56, height: 56, borderRadius: '50%', border: '2px solid #fff' }} alt="BTFC" />
@@ -222,7 +213,6 @@ function Footer() {
           </div>
         </div>
 
-        {/* Navigation */}
         <div>
           <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 10, color: 'rgba(255,255,255,.28)', letterSpacing: '.14em', textTransform: 'uppercase', marginBottom: 14 }}>Navigation</div>
           {NAV_LINKS.map(([label, href]) => (
@@ -232,11 +222,10 @@ function Footer() {
           ))}
         </div>
 
-        {/* Contact */}
         <div>
           <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 10, color: 'rgba(255,255,255,.28)', letterSpacing: '.14em', textTransform: 'uppercase', marginBottom: 14 }}>Contact</div>
           {[
-            '📍 Jessons Meadow, London Road, Brimscombe, GL5 2SH',
+            '📍 Brackenfern Meadow, London Road, Brimscombe, GL5 2SD',
             '📧 info@brimscombeandthruppfc.co.uk',
             '📞 07814 854108',
             '🕐 Mon–Fri 9am–5pm',
@@ -258,22 +247,20 @@ function Footer() {
   )
 }
 
-
 const PAGE_HEADERS: Record<string, { title: string; subtitle: string }> = {
-  '/news':     { title: 'Club News',          subtitle: 'The latest from Brimscombe & Thrupp FC' },
+  '/news':     { title: 'Club News',           subtitle: 'The latest from Brimscombe & Thrupp FC' },
   '/teams':    { title: 'Our Teams',           subtitle: 'First XI · Reserves · Under 17s' },
   '/fixtures': { title: 'Fixtures & Results',  subtitle: '2026/27 Season' },
   '/tickets':  { title: 'Tickets',             subtitle: 'Season tickets and matchday admission' },
-  '/matchday': { title: 'Matchday',            subtitle: 'Everything you need for Jessons Meadow' },
+  '/matchday': { title: 'Matchday',            subtitle: 'Everything you need for Brackenfern Meadow' },
   '/sponsors': { title: 'Sponsors',            subtitle: 'Our valued club partners' },
   '/club':     { title: 'The Club',            subtitle: 'Brimscombe & Thrupp FC — Est. 1886' },
-  '/shop':     { title: 'Club Shop',           subtitle: 'Official BTFC merchandise' },
+  '/shop':     { title: 'Club Shop',            subtitle: 'Official BTFC merchandise' },
   '/contact':  { title: 'Contact Us',          subtitle: 'Get in touch with the club' },
 }
 
 function AutoPageHeader() {
   const pathname = usePathname()
-  // Never show on homepage - it has its own hero
   if (pathname === '/') return null
   const header = PAGE_HEADERS[pathname]
   if (!header) return null
@@ -343,9 +330,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   )
 }
 
-// ─── PAGE HEADER ─────────────────────────────────────────────────────────────
-// Use this on every inner page for consistent styling
-// Usage: <PageHeader title="News" subtitle="The latest from BTFC" />
 export function PageHeader({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <div style={{
