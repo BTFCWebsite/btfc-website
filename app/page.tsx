@@ -6,8 +6,7 @@ import NewsSection from './NewsSection'
 import LeaguePosition from './LeaguePosition'
 
 const SPONSORS = [
-  { name: 'Jessons Real Estate', role: 'Ground Sponsor', logo: '/sponsors/jessons-logo.png' },
-  { name: 'Brackenfern Advisory Limited', role: 'First Team Sponsor', logo: '/sponsors/brackenfern-logo.png' },
+  { name: 'Brackenfern Advisory Limited', role: 'Ground & First Team Sponsor', logo: '/sponsors/brackenfern-logo.png' },
 ]
 
 function formatDate(dateStr: string) {
@@ -18,50 +17,38 @@ function formatDate(dateStr: string) {
 
 const FALLBACK_LAST = {
   _id: '',
-  opponent: 'FC Stratford',
-  btfcScore: 1,
-  opponentScore: 2,
-  date: '2026-04-18',
-  competition: 'Hellenic Div One',
+  opponent: 'Bromyard Town',
+  btfcScore: 2,
+  opponentScore: 4,
+  date: '2026-08-08',
+  competition: 'HL1',
+  sourceUrl: undefined as string | undefined,
 }
 
 const FALLBACK_NEXT = {
-  opponent: 'Fixture TBC',
-  date: null as string | null,
-  competition: 'Fixtures released July 2026',
+  opponent: 'Cheltenham Saracens',
+  date: '2026-08-15' as string | null,
+  competition: 'Hellenic League Division One',
   kickoff: '15:00',
+  sourceUrl: undefined as string | undefined,
 }
 
 const FALLBACK_SETTINGS = {
-  leaguePosition: '7th',
-  seasonYear: '2025/26',
+  leaguePosition: '17th',
+  seasonYear: '2026/27',
 }
 
 export default async function HomePage() {
   let lastResult = FALLBACK_LAST
-  let lastMatchReportSlug: string | null = null
   let nextFixture = FALLBACK_NEXT
   let leaguePosition = FALLBACK_SETTINGS.leaguePosition
   let seasonYear = FALLBACK_SETTINGS.seasonYear
 
   try {
-    const today = new Date().toISOString().split('T')[0]
-
-    const [last, next, settings] = await Promise.all([
-      client.fetch(
-        `*[_type == "fixture" && team == "First XI" && date < $today && defined(btfcScore) && defined(opponentScore)] | order(date desc)[0] {
-          _id, opponent, btfcScore, opponentScore, date, competition
-        }`,
-        { today },
-        { next: { revalidate: 300 } }
-      ),
-      client.fetch(
-        `*[_type == "fixture" && team == "First XI" && played != true && date >= $today] | order(date asc)[0] {
-          opponent, date, competition, kickoff
-        }`,
-        { today },
-        { next: { revalidate: 300 } }
-      ),
+    const [fullTimeResponse, settings] = await Promise.all([
+      fetch('https://btfc-website.vercel.app/api/full-time?team=First%20XI&widget=969980533&division=320568525&kind=matches', {
+        next: { revalidate: 300 },
+      }).then(response => response.ok ? response.json() : { matches: [] }),
       client.fetch(
         `*[_type == "siteSettings"][0] { leaguePosition, seasonYear }`,
         {},
@@ -69,30 +56,24 @@ export default async function HomePage() {
       ),
     ])
 
-    if (last) {
-      lastResult = last
-      const report = await client.fetch(
-        `*[_type == "newsArticle" && category == "Match Report" && (fixture._ref == $fixtureId || (!defined(fixture) && date == $date))] | order(_updatedAt desc)[0] {
-          "slug": slug.current
-        }`,
-        { fixtureId: last._id, date: last.date },
-        { next: { revalidate: 300 } }
-      )
-      if (report?.slug) lastMatchReportSlug = report.slug
-    }
-    if (next) nextFixture = next
+    const matches = Array.isArray(fullTimeResponse?.matches) ? fullTimeResponse.matches : []
+    const played = matches
+      .filter((match: any) => match?.played === true && match?.date && match?.opponent)
+      .sort((a: any, b: any) => String(b.date).localeCompare(String(a.date)))[0]
+    const upcoming = matches
+      .filter((match: any) => match?.played !== true && match?.date && match?.opponent)
+      .sort((a: any, b: any) => String(a.date).localeCompare(String(b.date)))[0]
+
+    if (played) lastResult = played
+    if (upcoming) nextFixture = upcoming
     if (settings?.leaguePosition) leaguePosition = settings.leaguePosition
     if (settings?.seasonYear) seasonYear = settings.seasonYear
   } catch (e) {
-    // Use fallback data
+    // Use current safe fallbacks if Full-Time or Sanity is temporarily unavailable.
   }
 
   const lastScore = `${lastResult.btfcScore ?? 0}–${lastResult.opponentScore ?? 0}`
-  const latestResultHref = lastMatchReportSlug
-    ? `/news/${lastMatchReportSlug}`
-    : lastResult._id
-      ? `/match-report/${encodeURIComponent(lastResult._id)}`
-      : '/fixtures'
+  const latestResultHref = lastResult.sourceUrl || '/fixtures'
   const longestFixtureTitleLength = Math.max(
     `BTFC ${lastScore} ${lastResult.opponent}`.length,
     `BTFC vs ${nextFixture.opponent}`.length
@@ -161,16 +142,14 @@ export default async function HomePage() {
         }
       `}</style>
 
-      {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <section style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '100px 24px 0', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-          <img src="/matchday/Ground_Pic.jpeg" alt="Jessons Meadow" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 55%', filter: 'contrast(1.05) saturate(1.05)' }} />
+          <img src="/matchday/Ground_Pic.jpeg" alt="Brackenfern Meadow" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 55%', filter: 'contrast(1.05) saturate(1.05)' }} />
           <div style={{ position: 'absolute', inset: 0, background: 'rgba(4,27,95,.12)' }} />
           <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '40%', background: 'linear-gradient(0deg,rgba(4,27,95,.92) 0%,transparent 100%)' }} />
         </div>
 
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, justifyContent: 'center', paddingBottom: 60 }}>
-          {/* Crest */}
           <div style={{ width: 120, height: 120, borderRadius: '50%', border: '3px solid #fff', boxShadow: '0 0 0 3px #041B5F, 0 0 0 5px #1149D8', overflow: 'hidden', background: '#fff' }}>
             <img src="/branding/crest.png" alt="BTFC" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
@@ -191,9 +170,8 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {/* Result + Fixture cards */}
           <div className="hero-cards" style={{ display: 'flex', gap: 16, flexWrap: 'nowrap', justifyContent: 'center', alignItems: 'stretch', width: '100%', maxWidth: fixtureCardsMaxWidth }}>
-            <Link href={latestResultHref} aria-label="View latest match report" style={{ ...fixtureCardBase, background: 'rgba(255,255,255,.06)', borderLeft: '4px solid #EF4444', textDecoration: 'none' }}>
+            <a href={latestResultHref} target={lastResult.sourceUrl ? '_blank' : undefined} rel={lastResult.sourceUrl ? 'noopener noreferrer' : undefined} aria-label="View latest match report" style={{ ...fixtureCardBase, background: 'rgba(255,255,255,.06)', borderLeft: '4px solid #EF4444', textDecoration: 'none' }}>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: 'rgba(255,255,255,.5)', letterSpacing: '.16em', textTransform: 'uppercase', marginBottom: 6 }}>Latest Result</div>
               <div style={fixtureTitle}>
                 BTFC <span style={{ color: '#EF4444' }}>{lastScore}</span> {lastResult.opponent}
@@ -201,7 +179,7 @@ export default async function HomePage() {
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: 'rgba(255,255,255,.4)', marginTop: 7, lineHeight: 1.35, overflowWrap: 'anywhere' }}>
                 {lastResult.date ? formatDate(lastResult.date) : ''} · {lastResult.competition}
               </div>
-            </Link>
+            </a>
             <div style={{ ...fixtureCardBase, background: 'rgba(17,73,216,.3)', borderLeft: '4px solid #1149D8' }}>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: 'rgba(255,255,255,.5)', letterSpacing: '.16em', textTransform: 'uppercase', marginBottom: 6 }}>Next Fixture</div>
               <div style={fixtureTitle}>BTFC vs {nextFixture.opponent}</div>
@@ -212,23 +190,22 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Jessons Meadow + Stats */}
         <div style={{ position: 'relative', zIndex: 1, width: 'calc(100% + 48px)', marginLeft: -24, marginRight: -24 }}>
           <div className="jessons-strip" style={{ background: 'rgba(4,27,95,.95)', borderTop: '1px solid rgba(255,255,255,.08)', padding: '16px 40px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
             <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 10, color: 'rgba(255,255,255,.4)', letterSpacing: '.15em', textTransform: 'uppercase' }}>Home of BTFC</span>
             <div className="jessons-divider" style={{ width: 1, height: 18, background: 'rgba(255,255,255,.15)' }} />
-            <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 20, color: '#fff', letterSpacing: '.06em' }}>JESSONS MEADOW</span>
+            <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 20, color: '#fff', letterSpacing: '.06em' }}>BRACKENFERN MEADOW</span>
             <div className="jessons-divider" style={{ width: 1, height: 18, background: 'rgba(255,255,255,.15)' }} />
             <span style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 10, color: 'rgba(255,255,255,.4)', letterSpacing: '.12em', textTransform: 'uppercase' }}>Ground Sponsor</span>
             <div style={{ background: '#fff', borderRadius: 4, padding: '3px 10px', display: 'flex', alignItems: 'center' }}>
-              <img src="/sponsors/jessons-logo.png" alt="Jessons Real Estate" style={{ height: 22, objectFit: 'contain' }} />
+              <img src="/sponsors/brackenfern-logo.png" alt="Brackenfern Advisory Limited" style={{ height: 22, objectFit: 'contain' }} />
             </div>
           </div>
           <div className="stats-strip" style={{ background: '#1149D8', display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
             {[
-              { value: <LeaguePosition fallback={leaguePosition || '7th'} />, label: 'League Position' },
+              { value: <LeaguePosition fallback={leaguePosition || '17th'} />, label: 'League Position' },
               { value: 'Hellenic', label: 'Division One' },
-              { value: seasonYear || '2025/26', label: 'Season' },
+              { value: seasonYear || '2026/27', label: 'Season' },
               { value: 'Est. 1886', label: 'Founded' },
             ].map(({ value, label }) => (
               <div key={label} style={{ padding: '14px 36px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,.18)' }}>
@@ -242,17 +219,16 @@ export default async function HomePage() {
 
       <NewsSection />
 
-      {/* ── SEASON TICKET PROMO ──────────────────────────────────────────── */}
       <section style={{ padding: '72px 24px', background: '#F2F2F2' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div className="promo-inner" style={{ background: '#041B5F', borderRadius: 8, padding: '44px 40px', display: 'flex', gap: 28, alignItems: 'center', flexWrap: 'wrap' }}>
             <div style={{ flex: 1 }}>
               <span style={{ display: 'inline-block', background: '#1149D8', color: '#fff', padding: '3px 10px', borderRadius: 4, fontFamily: "'Montserrat', sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 12 }}>Now On Sale</span>
               <h3 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 'clamp(26px,3.5vw,42px)', color: '#fff', margin: '0 0 8px', letterSpacing: '.04em' }}>2026/27 Season Tickets</h3>
-              <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 13, color: 'rgba(255,255,255,.55)', margin: 0 }}>Adult £89 · Concession £69 · All home league & cup games · Digital QR ticket by email</p>
+              <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 13, color: 'rgba(255,255,255,.55)', margin: 0 }}>Adult £100 · Concession £80 · All home league & club cup games · Digital QR ticket by email</p>
             </div>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
-              {[['Adult', '£89'], ['Concession', '£69']].map(([label, price]) => (
+              {[['Adult', '£100'], ['Concession', '£80']].map(([label, price]) => (
                 <div key={label} style={{ background: 'rgba(255,255,255,.07)', border: '1px solid rgba(255,255,255,.12)', borderRadius: 6, padding: '12px 18px', textAlign: 'center' as const, minWidth: 90 }}>
                   <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 600, fontSize: 10, color: 'rgba(255,255,255,.5)', letterSpacing: '.1em', textTransform: 'uppercase' as const }}>{label}</div>
                   <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 28, color: '#fff' }}>{price}</div>
@@ -266,7 +242,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── SPONSORS ─────────────────────────────────────────────────────── */}
       <section style={{ padding: '72px 24px', background: '#041B5F' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
