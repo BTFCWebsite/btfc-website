@@ -80,17 +80,17 @@ export default async function HomePage() {
   )
   const fixtureCardsMaxWidth = Math.min(
     1100,
-    Math.max(900, Math.ceil(longestFixtureTitleLength * 26.4 + 112))
+    Math.max(960, Math.ceil(longestFixtureTitleLength * 27.5 + 144))
   )
   const fixtureTitleFontSize = Math.max(
     15,
-    Math.min(22, (fixtureCardsMaxWidth - 112) / (longestFixtureTitleLength * 1.35))
+    Math.min(22, (fixtureCardsMaxWidth - 144) / (longestFixtureTitleLength * 1.35))
   )
 
   const fixtureCardBase = {
     border: '1px solid rgba(255,255,255,.12)',
     borderRadius: 8,
-    padding: '16px 22px',
+    padding: '16px 28px',
     textAlign: 'left' as const,
     flex: '1 1 0',
     minWidth: 0,
