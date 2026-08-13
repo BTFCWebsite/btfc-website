@@ -42,7 +42,7 @@ const queries: Record<string, string> = {
   players: playersQuery,
   staff: staffQuery,
   news: `*[_type == "newsArticle"] | order(date desc) {
-    _id, title, category, date, summary, body,
+    _id, title, category, date, showUntil, summary, body,
     "slug": slug.current, "imageUrl": image.asset->url
   }`,
   sponsors: `*[_type == "sponsor"] | order(order asc) {
