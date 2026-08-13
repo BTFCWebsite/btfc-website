@@ -14,7 +14,7 @@ async function fetchContent<T>(type: string, params?: Record<string, string>): P
   }
 
   const search = new URLSearchParams({ type, ...(params || {}) })
-  const needsFreshData = ['settings', 'players', 'staff', 'teams', 'player', 'programmes', 'news'].includes(type)
+  const needsFreshData = ['settings', 'players', 'staff', 'player', 'programmes', 'news'].includes(type)
   const response = await fetch(`/api/content?${search.toString()}`, {
     cache: needsFreshData ? 'no-store' : 'default',
   })
