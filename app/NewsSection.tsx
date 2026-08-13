@@ -20,7 +20,8 @@ const cardShell = {
   border: '1px solid #E5E7EB',
   borderRadius: 8,
   overflow: 'hidden',
-  height: '100%',
+  height: 290,
+  boxSizing: 'border-box',
 } as const
 
 export default function NewsSection() {
@@ -44,7 +45,7 @@ export default function NewsSection() {
   return (
     <section style={{ padding: '72px 24px', background: '#fff' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <div className="homepage-news-columns" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 24, alignItems: 'stretch' }}>
+        <div className="homepage-news-columns" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 24, alignItems: 'start' }}>
           <div style={{ minWidth: 0 }}>
             <div style={{ textAlign: 'center', marginBottom: 24 }}>
               <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 'clamp(26px,3.5vw,38px)', color: '#2D2D2D', margin: '0 0 8px', letterSpacing: '.04em' }}>Announcement</h2>
@@ -52,7 +53,7 @@ export default function NewsSection() {
             </div>
 
             {announcement ? (
-              <Link href={articleHref(announcement)} style={{ textDecoration: 'none', display: 'block', height: 'calc(100% - 66px)' }}>
+              <Link href={articleHref(announcement)} style={{ textDecoration: 'none', display: 'block' }}>
                 <div style={{ ...cardShell, borderTop: '6px solid #D97706' }}>
                   <div style={{ padding: 20 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginBottom: 10 }}>
@@ -66,8 +67,12 @@ export default function NewsSection() {
                 </div>
               </Link>
             ) : (
-              <div style={{ ...cardShell, borderTop: '6px solid #E5E7EB', minHeight: 170, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, boxSizing: 'border-box' }}>
-                <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 12, color: '#9CA3AF', textAlign: 'center' }}>No current announcements</span>
+              <div style={{ ...cardShell, borderTop: '6px solid #D97706', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 24, marginBottom: 10 }}>📢</div>
+                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 20, color: '#4B5563', marginBottom: 5 }}>No Current Announcements</div>
+                  <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 12, color: '#9CA3AF', lineHeight: 1.5 }}>There are no current club announcements.</div>
+                </div>
               </div>
             )}
           </div>
