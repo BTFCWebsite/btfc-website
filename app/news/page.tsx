@@ -3,15 +3,15 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { getNewsArticles } from '../lib/sanity.client'
 
-const CATEGORIES = ['Club News', 'Match Report']
+const CATEGORIES = ['Club News', 'Announcements']
 
 const categoryColor: Record<string, string> = {
-  'Match Report': '#1149D8',
+  'Announcements': '#1149D8',
   'Club News': '#059669',
 }
 
 const categoryIcon: Record<string, string> = {
-  'Match Report': '⚽',
+  'Announcements': '📣',
   'Club News': '🤝',
 }
 
@@ -39,7 +39,9 @@ export default function NewsPage() {
       .then(data => {
         const normalised = (data || []).map((article: any) => ({
           ...article,
-          displayCategory: article.category === 'Match Report' ? 'Match Report' : 'Club News',
+          displayCategory: article.category === 'Announcement' || article.category === 'Announcements'
+            ? 'Announcements'
+            : 'Club News',
         }))
         setArticles(normalised)
       })
