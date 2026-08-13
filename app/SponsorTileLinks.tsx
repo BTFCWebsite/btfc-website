@@ -35,7 +35,7 @@ export default function SponsorTileLinks() {
   const router = useRouter()
 
   useEffect(() => {
-    if (pathname !== '/sponsors') return
+    if (pathname !== '/sponsors' && pathname !== '/') return
 
     let cancelled = false
     let observer: MutationObserver | null = null
@@ -51,8 +51,15 @@ export default function SponsorTileLinks() {
       function linkTiles() {
         if (cancelled) return
 
+        if (pathname === '/') {
+          const heading = Array.from(document.querySelectorAll('h2')).find(
+            element => element.textContent?.trim() === 'Club Sponsors'
+          )
+          if (heading) heading.textContent = 'Club Main Sponsors'
+        }
+
         for (const sponsor of sponsorList) {
-          const textNode = Array.from(document.querySelectorAll('h3, p')).find(
+          const textNode = Array.from(document.querySelectorAll('h3, p, div')).find(
             element => element.textContent?.trim() === sponsor.name
           )
           if (!textNode) continue
@@ -67,22 +74,29 @@ export default function SponsorTileLinks() {
           tile.style.cursor = 'pointer'
           tile.style.transition = 'transform 160ms ease, box-shadow 160ms ease'
 
-          const cue = document.createElement('div')
-          cue.textContent = 'View Sponsor →'
-          cue.style.marginTop = '12px'
-          cue.style.color = '#1149D8'
-          cue.style.fontFamily = "'Montserrat', sans-serif"
-          cue.style.fontSize = '10px'
-          cue.style.fontWeight = '800'
-          cue.style.letterSpacing = '.06em'
-          cue.style.textTransform = 'uppercase'
-          tile.appendChild(cue)
+          let cue: HTMLDivElement | null = null
+          if (pathname === '/sponsors') {
+            cue = document.createElement('div')
+            cue.textContent = 'View Sponsor →'
+            cue.style.marginTop = '12px'
+            cue.style.color = '#1149D8'
+            cue.style.fontFamily = "'Montserrat', sans-serif"
+            cue.style.fontSize = '10px'
+            cue.style.fontWeight = '800'
+            cue.style.letterSpacing = '.06em'
+            cue.style.textTransform = 'uppercase'
+            tile.appendChild(cue)
+          }
 
-          const open = () => router.push(`/sponsors/${sponsorSlug(sponsor.name)}`)
+          const open = (event?: Event) => {
+            event?.preventDefault()
+            event?.stopPropagation()
+            router.push(`/sponsors/${sponsorSlug(sponsor.name)}`)
+          }
           const keydown = (event: KeyboardEvent) => {
             if (event.key === 'Enter' || event.key === ' ') {
               event.preventDefault()
-              open()
+              open(event)
             }
           }
           const enter = () => {
@@ -104,7 +118,7 @@ export default function SponsorTileLinks() {
             tile.removeEventListener('keydown', keydown)
             tile.removeEventListener('mouseenter', enter)
             tile.removeEventListener('mouseleave', leave)
-            cue.remove()
+            cue?.remove()
             delete tile.dataset.sponsorLinked
           })
         }
