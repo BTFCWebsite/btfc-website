@@ -36,6 +36,9 @@ const FALLBACK_NEXT = {
 const FALLBACK_SETTINGS = {
   leaguePosition: '17th',
   seasonYear: '2026/27',
+  seasonTicketAdult: '—',
+  seasonTicketConcession: '—',
+  seasonTicketIntro: 'All First XI home league and club cup games included, excluding FA Vase ties.',
 }
 
 export default async function HomePage() {
@@ -43,6 +46,9 @@ export default async function HomePage() {
   let nextFixture = FALLBACK_NEXT
   let leaguePosition = FALLBACK_SETTINGS.leaguePosition
   let seasonYear = FALLBACK_SETTINGS.seasonYear
+  let seasonTicketAdult = FALLBACK_SETTINGS.seasonTicketAdult
+  let seasonTicketConcession = FALLBACK_SETTINGS.seasonTicketConcession
+  let seasonTicketIntro = FALLBACK_SETTINGS.seasonTicketIntro
 
   try {
     const [fullTimeResponse, settings] = await Promise.all([
@@ -50,7 +56,7 @@ export default async function HomePage() {
         next: { revalidate: 300 },
       }).then(response => response.ok ? response.json() : { matches: [] }),
       client.fetch(
-        `*[_type == "siteSettings"][0] { leaguePosition, seasonYear }`,
+        `*[_type == "siteSettings"][0] { leaguePosition, seasonYear, seasonTicketAdult, seasonTicketConcession, seasonTicketIntro }`,
         {},
         { next: { revalidate: 300 } }
       ),
@@ -68,6 +74,9 @@ export default async function HomePage() {
     if (upcoming) nextFixture = upcoming
     if (settings?.leaguePosition) leaguePosition = settings.leaguePosition
     if (settings?.seasonYear) seasonYear = settings.seasonYear
+    if (settings?.seasonTicketAdult) seasonTicketAdult = settings.seasonTicketAdult
+    if (settings?.seasonTicketConcession) seasonTicketConcession = settings.seasonTicketConcession
+    if (settings?.seasonTicketIntro) seasonTicketIntro = settings.seasonTicketIntro
   } catch (e) {
     // Use current safe fallbacks if Full-Time or Sanity is temporarily unavailable.
   }
@@ -224,11 +233,11 @@ export default async function HomePage() {
           <div className="promo-inner" style={{ background: '#041B5F', borderRadius: 8, padding: '44px 40px', display: 'flex', gap: 28, alignItems: 'center', flexWrap: 'wrap' }}>
             <div style={{ flex: 1 }}>
               <span style={{ display: 'inline-block', background: '#1149D8', color: '#fff', padding: '3px 10px', borderRadius: 4, fontFamily: "'Montserrat', sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 12 }}>Now On Sale</span>
-              <h3 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 'clamp(26px,3.5vw,42px)', color: '#fff', margin: '0 0 8px', letterSpacing: '.04em' }}>2026/27 Season Tickets</h3>
-              <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 13, color: 'rgba(255,255,255,.55)', margin: 0 }}>Adult £100 · Concession £80 · All home league & club cup games · Digital QR ticket by email</p>
+              <h3 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 'clamp(26px,3.5vw,42px)', color: '#fff', margin: '0 0 8px', letterSpacing: '.04em' }}>{seasonYear} Season Tickets</h3>
+              <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 13, color: 'rgba(255,255,255,.55)', margin: 0 }}>{seasonTicketIntro}</p>
             </div>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
-              {[['Adult', '£100'], ['Concession', '£80']].map(([label, price]) => (
+              {[['Adult', seasonTicketAdult], ['Concession', seasonTicketConcession]].map(([label, price]) => (
                 <div key={label} style={{ background: 'rgba(255,255,255,.07)', border: '1px solid rgba(255,255,255,.12)', borderRadius: 6, padding: '12px 18px', textAlign: 'center' as const, minWidth: 90 }}>
                   <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 600, fontSize: 10, color: 'rgba(255,255,255,.5)', letterSpacing: '.1em', textTransform: 'uppercase' as const }}>{label}</div>
                   <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 28, color: '#fff' }}>{price}</div>
