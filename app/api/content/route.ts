@@ -68,14 +68,14 @@ export async function GET(request: NextRequest) {
   try {
     if (type === 'teams') {
       const [players, staff, fixtures, settings] = await Promise.all([
-        freshClient.fetch(playersQuery, {}, { cache: 'no-store' }),
-        freshClient.fetch(staffQuery, {}, { cache: 'no-store' }),
+        client.fetch(playersQuery, {}, { next: { revalidate: 60 } }),
+        client.fetch(staffQuery, {}, { next: { revalidate: 60 } }),
         client.fetch(fixturesQuery, {}, { next: { revalidate: 60 } }),
-        freshClient.fetch(settingsQuery, {}, { cache: 'no-store' }),
+        client.fetch(settingsQuery, {}, { next: { revalidate: 60 } }),
       ])
       return NextResponse.json(
         { players, staff, fixtures, settings: correctSettings(settings) },
-        { headers: { 'Cache-Control': 'no-store, max-age=0' } }
+        { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' } }
       )
     }
 
