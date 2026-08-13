@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
     const query = queries[type]
     if (!query) return NextResponse.json({ error: 'Unknown content type' }, { status: 400 })
 
-    if (type === 'settings' || type === 'players' || type === 'staff' || type === 'programmes' || type === 'matchReports') {
+    if (type === 'settings' || type === 'players' || type === 'staff' || type === 'programmes' || type === 'matchReports' || type === 'news') {
       const data = await freshClient.fetch(query, {}, { cache: 'no-store' })
       return NextResponse.json(
         type === 'settings' ? correctSettings(data) : data,
