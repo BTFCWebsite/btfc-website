@@ -148,14 +148,14 @@ export default function HomeNextFixture() {
 
   return (
     <style>{`
-      .hero-cards > div:nth-child(2) {
+      .hero-cards > :nth-child(2) {
         position: relative;
       }
-      .hero-cards > div:nth-child(2) > div:nth-child(2),
-      .hero-cards > div:nth-child(2) > div:nth-child(3) {
+      .hero-cards > :nth-child(2) > div:nth-child(2),
+      .hero-cards > :nth-child(2) > div:nth-child(3) {
         visibility: hidden;
       }
-      .hero-cards > div:nth-child(2)::after {
+      .hero-cards > :nth-child(2)::after {
         content: 'Loading next fixture…';
         display: block;
         font-family: 'Barlow Condensed', sans-serif;
@@ -165,11 +165,11 @@ export default function HomeNextFixture() {
         letter-spacing: .03em;
         line-height: 1.2;
       }
-      .hero-cards > div:nth-child(2).next-fixture-loaded > div:nth-child(2),
-      .hero-cards > div:nth-child(2).next-fixture-loaded > div:nth-child(3) {
+      .hero-cards > :nth-child(2).next-fixture-loaded > div:nth-child(2),
+      .hero-cards > :nth-child(2).next-fixture-loaded > div:nth-child(3) {
         visibility: visible;
       }
-      .hero-cards > div:nth-child(2).next-fixture-loaded::after {
+      .hero-cards > :nth-child(2).next-fixture-loaded::after {
         display: none;
       }
     `}</style>

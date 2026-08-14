@@ -189,13 +189,13 @@ export default async function HomePage() {
                 {lastResult.date ? formatDate(lastResult.date) : ''} · {lastResult.competition}
               </div>
             </a>
-            <div style={{ ...fixtureCardBase, background: 'rgba(17,73,216,.3)', borderLeft: '4px solid #1149D8' }}>
+            <Link href="/matchday" aria-label="View Matchday information for the next fixture" style={{ ...fixtureCardBase, background: 'rgba(17,73,216,.3)', borderLeft: '4px solid #1149D8', textDecoration: 'none' }}>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: 'rgba(255,255,255,.5)', letterSpacing: '.16em', textTransform: 'uppercase', marginBottom: 6 }}>Next Fixture</div>
               <div style={fixtureTitle}>BTFC vs {nextFixture.opponent}</div>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: 'rgba(255,255,255,.4)', marginTop: 7, lineHeight: 1.35, overflowWrap: 'anywhere' }}>
                 {nextFixture.date ? `${formatDate(nextFixture.date)}${nextFixture.kickoff ? ` · ${nextFixture.kickoff}` : ''}` : nextFixture.competition}
               </div>
-            </div>
+            </Link>
           </div>
         </div>
 

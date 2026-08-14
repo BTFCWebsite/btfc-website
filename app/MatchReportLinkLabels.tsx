@@ -50,11 +50,12 @@ export default function MatchReportLinkLabels() {
     function updateLinks() {
       document.querySelectorAll<HTMLAnchorElement>('a[href*="fulltime.thefa.com"]').forEach((link) => {
         const text = link.textContent?.trim()
+        const isFixtureDetailsLink = text === 'Full-Time details' || text === 'Full-Time details →'
         if (text === 'Full-Time details') link.textContent = 'Match Report'
         if (text === 'Full-Time details →') link.textContent = 'Match Report →'
 
         const localReport = reportLinks.get(normaliseUrl(link.href))
-        if (localReport) {
+        if (isFixtureDetailsLink && localReport) {
           link.href = localReport
           link.removeAttribute('target')
           link.removeAttribute('rel')
