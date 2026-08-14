@@ -103,9 +103,12 @@ export default function MatchdayPage() {
               <h1 style={{fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(32px, 6vw, 48px)', fontWeight: 800, margin: '0 0 10px', lineHeight: 1}}>{loadingFixture ? 'Loading next home fixture…' : nextHomeGame ? `BTFC v ${nextHomeGame.opponent}` : 'Next home fixture to be confirmed'}</h1>
               <p style={{fontFamily: "'Montserrat', sans-serif", margin: 0, color: 'rgba(255,255,255,.76)', fontSize: 13, lineHeight: 1.7}}>📅 {fixtureDate} · ⏰ {nextHomeGame?.kickoff || 'TBC'} · 📍 {groundName}</p>
             </div>
-            {programme?.programmeUrl && (
-              <a href="/programme" target="_blank" rel="noopener noreferrer" style={{background: '#1149D8', padding: '13px 22px', borderRadius: 6, fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 18, color: '#fff', textDecoration: 'none', whiteSpace: 'nowrap'}}>📖 View Match Programme</a>
-            )}
+            <div style={{display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap'}}>
+              {programme?.programmeUrl && (
+                <a href="/programme" target="_blank" rel="noopener noreferrer" style={{background: '#1149D8', padding: '13px 22px', borderRadius: 6, fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 18, color: '#fff', textDecoration: 'none', whiteSpace: 'nowrap'}}>📖 View Match Programme</a>
+              )}
+              <a href="/programmes" style={{background: 'rgba(255,255,255,.1)', border: '1px solid rgba(255,255,255,.45)', padding: '12px 22px', borderRadius: 6, fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 18, color: '#fff', textDecoration: 'none', whiteSpace: 'nowrap'}}>2026/27 Programme Archive</a>
+            </div>
           </div>
         </div>
 
