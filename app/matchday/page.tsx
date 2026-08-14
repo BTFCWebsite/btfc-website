@@ -103,13 +103,18 @@ export default function MatchdayPage() {
               <h1 style={{fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(32px, 6vw, 48px)', fontWeight: 800, margin: '0 0 10px', lineHeight: 1}}>{loadingFixture ? 'Loading next home fixture…' : nextHomeGame ? `BTFC v ${nextHomeGame.opponent}` : 'Next home fixture to be confirmed'}</h1>
               <p style={{fontFamily: "'Montserrat', sans-serif", margin: 0, color: 'rgba(255,255,255,.76)', fontSize: 13, lineHeight: 1.7}}>📅 {fixtureDate} · ⏰ {nextHomeGame?.kickoff || 'TBC'} · 📍 {groundName}</p>
             </div>
-            <div style={{display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap'}}>
+            <div className="matchday-hero-actions" style={{display: 'flex', gap: 10, alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', marginLeft: 'auto'}}>
               {programme?.programmeUrl && (
                 <a href="/programme" target="_blank" rel="noopener noreferrer" style={{background: '#1149D8', padding: '13px 22px', borderRadius: 6, fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 18, color: '#fff', textDecoration: 'none', whiteSpace: 'nowrap'}}>📖 View Match Programme</a>
               )}
               <a href="/programmes" style={{background: 'rgba(255,255,255,.1)', border: '1px solid rgba(255,255,255,.45)', padding: '12px 22px', borderRadius: 6, fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 18, color: '#fff', textDecoration: 'none', whiteSpace: 'nowrap'}}>2026/27 Programme Archive</a>
             </div>
           </div>
+          <style>{`
+            @media(max-width:768px) {
+              .matchday-hero-actions { width: 100%; margin-left: 0 !important; justify-content: flex-start !important; }
+            }
+          `}</style>
         </div>
 
         <div className="mobile-card-grid" style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20, marginBottom: 52}}>
