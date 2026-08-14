@@ -14,9 +14,24 @@ type MatchData = {
   sourceUrl?: string
 }
 
+type PortableSpan = {
+  _key?: string
+  _type?: string
+  text?: string
+  marks?: string[]
+}
+
+type PortableBlock = {
+  _key?: string
+  _type?: string
+  style?: string
+  listItem?: string
+  children?: PortableSpan[]
+}
+
 type MatchReport = {
   headline: string
-  report: string
+  report: string | PortableBlock[]
   matchData: string
 }
 
@@ -35,6 +50,52 @@ function inlineBold(text: string) {
       ? <strong key={index}>{part.slice(2, -2)}</strong>
       : part
   )
+}
+
+function renderSpan(span: PortableSpan, index: number) {
+  let content: React.ReactNode = span.text || ''
+  const marks = span.marks || []
+  if (marks.includes('strong')) content = <strong>{content}</strong>
+  if (marks.includes('em')) content = <em>{content}</em>
+  if (marks.includes('underline')) content = <u>{content}</u>
+  return <span key={span._key || index}>{content}</span>
+}
+
+function renderRichReport(blocks: PortableBlock[]) {
+  return blocks.map((block, index) => {
+    if (!block || block._type !== 'block') return null
+    const content = (block.children || []).map(renderSpan)
+    const key = block._key || index
+
+    if (block.listItem === 'bullet') {
+      return <ul key={key} style={{ margin: '0 0 22px', paddingLeft: 24 }}><li>{content}</li></ul>
+    }
+    if (block.listItem === 'number') {
+      return <ol key={key} style={{ margin: '0 0 22px', paddingLeft: 24 }}><li>{content}</li></ol>
+    }
+    if (block.style === 'h3') {
+      return <h3 key={key} style={{ margin: '30px 0 12px', color: '#041B5F', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 26, lineHeight: 1.1 }}>{content}</h3>
+    }
+    if (block.style === 'blockquote') {
+      return <blockquote key={key} style={{ margin: '0 0 22px', padding: '4px 0 4px 18px', borderLeft: '4px solid #1149D8', color: '#4B5563', fontStyle: 'italic' }}>{content}</blockquote>
+    }
+    return <p key={key} style={{ margin: '0 0 22px' }}>{content}</p>
+  })
+}
+
+function renderReportBody(report: string | PortableBlock[]) {
+  if (Array.isArray(report)) return renderRichReport(report)
+
+  const paragraphs = String(report || '')
+    .split(/\n\s*\n/)
+    .map(paragraph => paragraph.trim())
+    .filter(Boolean)
+
+  return paragraphs.map((paragraph, index) => (
+    <p key={index} style={{ margin: '0 0 22px' }}>
+      {inlineBold(paragraph)}
+    </p>
+  ))
 }
 
 export default async function MatchReportPage({ params }: { params: { slug: string } }) {
@@ -64,11 +125,6 @@ export default async function MatchReportPage({ params }: { params: { slug: stri
       : `${match.opponent} ${opponentScore}–${btfcScore} Brimscombe & Thrupp`
     : match.opponent || 'Brimscombe & Thrupp FC'
 
-  const paragraphs = (report.report || '')
-    .split(/\n\s*\n/)
-    .map(paragraph => paragraph.trim())
-    .filter(Boolean)
-
   return (
     <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '54px 24px 100px' }}>
       <article style={{ maxWidth: 900, margin: '0 auto', background: '#fff', borderRadius: 10, overflow: 'hidden', boxShadow: '0 10px 30px rgba(4,27,95,.10)' }}>
@@ -89,11 +145,7 @@ export default async function MatchReportPage({ params }: { params: { slug: stri
 
         <div style={{ padding: '42px clamp(24px,6vw,58px) 46px' }}>
           <div style={{ fontFamily: "'Montserrat',sans-serif", color: '#28344D', fontSize: 15, lineHeight: 1.85 }}>
-            {paragraphs.map((paragraph, index) => (
-              <p key={index} style={{ margin: index === 0 ? '0 0 22px' : '0 0 22px' }}>
-                {inlineBold(paragraph)}
-              </p>
-            ))}
+            {renderReportBody(report.report)}
           </div>
 
           <div style={{ marginTop: 36, paddingTop: 24, borderTop: '1px solid #E5E7EB' }}>
