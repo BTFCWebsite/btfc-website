@@ -97,22 +97,22 @@ export default function MatchdayPage() {
       <section style={{maxWidth: 980, margin: '0 auto', padding: '52px 24px'}}>
         <div className="mobile-feature-card" style={{background: '#041B5F', borderRadius: 10, padding: '28px 30px', color: '#fff', marginBottom: 44, boxShadow: '0 12px 32px rgba(4,27,95,.18)'}}>
           <div style={{fontFamily: "'Montserrat', sans-serif", fontSize: 10, letterSpacing: '.14em', opacity: .65, textTransform: 'uppercase', marginBottom: 12}}>Your Matchday · Next Home Fixture</div>
-          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 24, flexWrap: 'wrap'}}>
+          <div>
+            <div style={{fontFamily: "'Montserrat', sans-serif", fontSize: 11, fontWeight: 800, color: '#93C5FD', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 6}}>{nextHomeGame?.competition || settings.seasonYear || 'First XI'}</div>
+            <h1 style={{fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(32px, 6vw, 48px)', fontWeight: 800, margin: '0 0 10px', lineHeight: 1}}>{loadingFixture ? 'Loading next home fixture…' : nextHomeGame ? `BTFC v ${nextHomeGame.opponent}` : 'Next home fixture to be confirmed'}</h1>
+            <p style={{fontFamily: "'Montserrat', sans-serif", margin: 0, color: 'rgba(255,255,255,.76)', fontSize: 13, lineHeight: 1.7}}>📅 {fixtureDate} · ⏰ {nextHomeGame?.kickoff || 'TBC'} · 📍 {groundName}</p>
+          </div>
+          <div className="matchday-hero-actions" style={{display: 'flex', gap: 10, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', width: '100%', marginTop: 22}}>
             <div>
-              <div style={{fontFamily: "'Montserrat', sans-serif", fontSize: 11, fontWeight: 800, color: '#93C5FD', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 6}}>{nextHomeGame?.competition || settings.seasonYear || 'First XI'}</div>
-              <h1 style={{fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(32px, 6vw, 48px)', fontWeight: 800, margin: '0 0 10px', lineHeight: 1}}>{loadingFixture ? 'Loading next home fixture…' : nextHomeGame ? `BTFC v ${nextHomeGame.opponent}` : 'Next home fixture to be confirmed'}</h1>
-              <p style={{fontFamily: "'Montserrat', sans-serif", margin: 0, color: 'rgba(255,255,255,.76)', fontSize: 13, lineHeight: 1.7}}>📅 {fixtureDate} · ⏰ {nextHomeGame?.kickoff || 'TBC'} · 📍 {groundName}</p>
-            </div>
-            <div className="matchday-hero-actions" style={{display: 'flex', gap: 10, alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', marginLeft: 'auto'}}>
               {programme?.programmeUrl && (
                 <a href="/programme" target="_blank" rel="noopener noreferrer" style={{background: '#1149D8', padding: '13px 22px', borderRadius: 6, fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 18, color: '#fff', textDecoration: 'none', whiteSpace: 'nowrap'}}>📖 View Match Programme</a>
               )}
-              <a href="/programmes" style={{background: 'rgba(255,255,255,.1)', border: '1px solid rgba(255,255,255,.45)', padding: '12px 22px', borderRadius: 6, fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 18, color: '#fff', textDecoration: 'none', whiteSpace: 'nowrap'}}>2026/27 Programme Archive</a>
             </div>
+            <a href="/programmes" style={{background: 'rgba(255,255,255,.1)', border: '1px solid rgba(255,255,255,.45)', padding: '12px 22px', borderRadius: 6, fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: 18, color: '#fff', textDecoration: 'none', whiteSpace: 'nowrap'}}>2026/27 Programme Archive</a>
           </div>
           <style>{`
             @media(max-width:768px) {
-              .matchday-hero-actions { width: 100%; margin-left: 0 !important; justify-content: flex-start !important; }
+              .matchday-hero-actions { align-items: flex-start !important; flex-direction: column !important; }
             }
           `}</style>
         </div>
