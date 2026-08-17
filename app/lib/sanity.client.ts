@@ -25,7 +25,18 @@ async function fetchContent<T>(type: string, params?: Record<string, string>): P
 export async function getSiteSettings() { return fetchContent<any>('settings') }
 export async function getNewsArticles() { return fetchContent<any[]>('news') }
 export async function getFixtures() { return fetchContent<any[]>('fixtures') }
-export async function getMatchFeeds() { return fetchContent<any[]>('matchFeeds') }
+export async function getMatchFeeds() {
+  const feeds = await fetchContent<any[]>('matchFeeds')
+  const firstXiSnippet = `<div><a href="https://fulltime.thefa.com/index.html?divisionseason=320568525">First XI</a></div>\n<script>var lrcode = '969980533'</script>`
+  const withoutFirstXi = (feeds || []).filter((feed: any) => {
+    const value = String(feed?.team || '').toLowerCase().replace(/[^a-z0-9]/g, '')
+    return !value.includes('first')
+  })
+  return [
+    ...withoutFirstXi,
+    { team: 'First XI', snippet: firstXiSnippet },
+  ]
+}
 export async function getMatchdayProgrammes() { return fetchContent<any[]>('programmes') }
 export async function getSponsors() { return fetchContent<any[]>('sponsors') }
 export async function getSponsorshipPackages() { return fetchContent<any[]>('sponsorshipPackages') }
