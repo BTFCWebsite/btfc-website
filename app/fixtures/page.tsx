@@ -240,15 +240,18 @@ export default function FixturesPage() {
           if (normalised.includes('first')) return 'First XI'
           return value
         }
-        const reservesSnippet = `<div id="lrep625925242" style="width: 350px;">Data loading....<a href="https://fulltime.thefa.com/index.html?divisionseason=222455275">click here for Division 2</a><br/><br/><a href="http://www.thefa.com/FULL-TIME">FULL-TIME Home</a></div>
+        const reservesFallbackSnippet = `<div id="lrep625925242" style="width: 350px;">Data loading....<a href="https://fulltime.thefa.com/index.html?divisionseason=222455275">click here for Division 2</a><br/><br/><a href="http://www.thefa.com/FULL-TIME">FULL-TIME Home</a></div>
 <script language="javascript" type="text/javascript">
 var lrcode = '625925242'
 </script>
 <script language="Javascript" type="text/javascript" src="https://fulltime.thefa.com/client/api/cs1.js"></script>`
         const sanityFeeds = (feeds || [])
           .map((feed: any) => ({ team: canonicalTeam(feed?.team), snippet: feed?.snippet || '' }))
-          .filter((feed: any) => feed.team && feed.snippet && feed.team !== 'Reserves')
-        const activeFeeds = [...sanityFeeds, { team: 'Reserves', snippet: reservesSnippet }]
+          .filter((feed: any) => feed.team && feed.snippet)
+        const hasReservesFeed = sanityFeeds.some((feed: any) => feed.team === 'Reserves')
+        const activeFeeds = hasReservesFeed
+          ? sanityFeeds
+          : [...sanityFeeds, { team: 'Reserves', snippet: reservesFallbackSnippet }]
         setFeedSnippets(Object.fromEntries(activeFeeds.map((feed: any) => [feed.team, feed.snippet])))
 
         const results = await Promise.all(activeFeeds.map(async (feed: any) => {
@@ -256,9 +259,11 @@ var lrcode = '625925242'
           const divisionSeason = feed.snippet.match(/[?&]divisionseason=(\d+)/i)?.[1]
           const tableParams = new URLSearchParams({ team: feed.team })
           const matchWidgets = feed.team === 'Reserves'
-            ? reservesFullTime.matchWidgets
+            ? (configuredWidget ? [configuredWidget] : reservesFullTime.matchWidgets)
             : (configuredWidget ? [configuredWidget] : [])
-          const division = feed.team === 'Reserves' ? reservesFullTime.division : divisionSeason
+          const division = feed.team === 'Reserves'
+            ? (divisionSeason || reservesFullTime.division)
+            : divisionSeason
           if (division) tableParams.set('division', division)
 
           const [matchesResponses, tableResponse] = await Promise.all([
