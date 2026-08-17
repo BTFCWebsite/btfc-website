@@ -24,18 +24,47 @@ async function fetchContent<T>(type: string, params?: Record<string, string>): P
 
 export async function getSiteSettings() { return fetchContent<any>('settings') }
 export async function getNewsArticles() { return fetchContent<any[]>('news') }
-export async function getFixtures() { return fetchContent<any[]>('fixtures') }
+export async function getFixtures() {
+  const [manualResult, liveResult] = await Promise.allSettled([
+    fetchContent<any[]>('fixtures'),
+    fetch('/api/full-time?team=First%20XI&widget=969980533&division=320568525&kind=matches', { cache: 'no-store' })
+      .then(response => response.ok ? response.json() : { matches: [] }),
+  ])
+
+  const manualFixtures = manualResult.status === 'fulfilled' ? (manualResult.value || []) : []
+  const liveFixtures = liveResult.status === 'fulfilled' && Array.isArray(liveResult.value?.matches)
+    ? liveResult.value.matches
+    : []
+
+  const combined = [...liveFixtures, ...manualFixtures]
+  return combined.filter((fixture: any, index: number, all: any[]) =>
+    all.findIndex((candidate: any) =>
+      candidate?._id === fixture?._id ||
+      (
+        candidate?.date === fixture?.date &&
+        candidate?.team === fixture?.team &&
+        String(candidate?.opponent || '').toLowerCase() === String(fixture?.opponent || '').toLowerCase()
+      )
+    ) === index
+  )
+}
 export async function getMatchFeeds() {
-  const feeds = await fetchContent<any[]>('matchFeeds')
   const firstXiSnippet = `<div><a href="https://fulltime.thefa.com/index.html?divisionseason=320568525">First XI</a></div>\n<script>var lrcode = '969980533'</script>`
-  const withoutFirstXi = (feeds || []).filter((feed: any) => {
-    const value = String(feed?.team || '').toLowerCase().replace(/[^a-z0-9]/g, '')
-    return !value.includes('first')
-  })
-  return [
-    ...withoutFirstXi,
-    { team: 'First XI', snippet: firstXiSnippet },
-  ]
+
+  try {
+    const feeds = await fetchContent<any[]>('matchFeeds')
+    const withoutFirstXi = (feeds || []).filter((feed: any) => {
+      const value = String(feed?.team || '').toLowerCase().replace(/[^a-z0-9]/g, '')
+      return !value.includes('first')
+    })
+    return [
+      ...withoutFirstXi,
+      { team: 'First XI', snippet: firstXiSnippet },
+    ]
+  } catch (error) {
+    console.warn('Match feed configuration could not be loaded; using First XI fallback.', error)
+    return [{ team: 'First XI', snippet: firstXiSnippet }]
+  }
 }
 export async function getMatchdayProgrammes() { return fetchContent<any[]>('programmes') }
 export async function getSponsors() { return fetchContent<any[]>('sponsors') }
