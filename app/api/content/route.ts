@@ -62,6 +62,20 @@ function correctSettings(data: any) {
     : data
 }
 
+function mergeFixtures(live: any[], manual: any[]) {
+  const combined = [...(live || []), ...(manual || [])]
+  return combined.filter((fixture: any, index: number, all: any[]) =>
+    all.findIndex((candidate: any) =>
+      candidate?._id === fixture?._id ||
+      (
+        candidate?.date === fixture?.date &&
+        String(candidate?.team || '').toLowerCase() === String(fixture?.team || '').toLowerCase() &&
+        String(candidate?.opponent || '').toLowerCase() === String(fixture?.opponent || '').toLowerCase()
+      )
+    ) === index
+  )
+}
+
 export async function GET(request: NextRequest) {
   const type = request.nextUrl.searchParams.get('type') || ''
 
@@ -93,6 +107,32 @@ export async function GET(request: NextRequest) {
         { cache: 'no-store' }
       )
       return NextResponse.json(player, { headers: { 'Cache-Control': 'no-store, max-age=0' } })
+    }
+
+    if (type === 'fixtures') {
+      const manualFixtures = await freshClient.fetch(fixturesQuery, {}, { cache: 'no-store' })
+      let liveFirstXi: any[] = []
+
+      try {
+        const fullTimeUrl = new URL('/api/full-time', request.nextUrl.origin)
+        fullTimeUrl.searchParams.set('team', 'First XI')
+        fullTimeUrl.searchParams.set('widget', '969980533')
+        fullTimeUrl.searchParams.set('division', '320568525')
+        fullTimeUrl.searchParams.set('kind', 'matches')
+
+        const response = await fetch(fullTimeUrl, { cache: 'no-store' })
+        if (response.ok) {
+          const payload = await response.json()
+          liveFirstXi = Array.isArray(payload?.matches) ? payload.matches : []
+        }
+      } catch (error) {
+        console.error('Unable to merge live Full-Time fixtures into content feed:', error)
+      }
+
+      return NextResponse.json(
+        mergeFixtures(liveFirstXi, manualFixtures || []),
+        { headers: { 'Cache-Control': 'no-store, max-age=0' } }
+      )
     }
 
     const query = queries[type]
