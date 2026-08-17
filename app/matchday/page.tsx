@@ -8,6 +8,8 @@ const FALLBACK_MAP_URL = 'https://maps.google.com/?q=Brimscombe+and+Thrupp+FC,+L
 const FALLBACK_BUS_URL = 'https://www.stagecoachbus.com/routes/west/67/bussage-cashes-green/xsao067.o'
 const FALLBACK_W3W = 'debit.query.solutions'
 const FALLBACK_W3W_URL = 'https://what3words.com/debit.query.solutions'
+const FALLBACK_FIRST_TEAM_WIDGET = '969980533'
+const FALLBACK_FIRST_TEAM_DIVISION = '320568525'
 
 const h2 = {fontFamily: "'Barlow Condensed', sans-serif", fontSize: 36, fontWeight: 800, color: '#2D2D2D', margin: '0 0 6px', letterSpacing: '0.03em'} as const
 const h3 = {fontFamily: "'Barlow Condensed', sans-serif", fontSize: 22, fontWeight: 800, color: '#2D2D2D', margin: '0 0 10px', lineHeight: 1.1} as const
@@ -34,11 +36,9 @@ function normalise(value: string) {
 function firstTeamFeedParams(feeds: any[]) {
   const feed = (feeds || []).find((item: any) => normalise(item?.team).includes('first'))
   const snippet = String(feed?.snippet || '')
-  const widget = snippet.match(/\blrcode\s*=\s*['\"](\d+)['\"]/i)?.[1]
-  const division = snippet.match(/[?&]divisionseason=(\d+)/i)?.[1]
-  const params = new URLSearchParams({kind: 'matches', team: 'First XI'})
-  if (widget) params.set('widget', widget)
-  if (division) params.set('division', division)
+  const widget = snippet.match(/\blrcode\s*=\s*['\"](\d+)['\"]/i)?.[1] || FALLBACK_FIRST_TEAM_WIDGET
+  const division = snippet.match(/[?&]divisionseason=(\d+)/i)?.[1] || FALLBACK_FIRST_TEAM_DIVISION
+  const params = new URLSearchParams({kind: 'matches', team: 'First XI', widget, division})
   return params.toString()
 }
 
@@ -51,24 +51,32 @@ export default function MatchdayPage() {
   useEffect(() => {
     async function loadMatchday() {
       try {
-        const [siteSettings, manualFixtures, programmes, feeds] = await Promise.all([
+        const settled = await Promise.allSettled([
           getSiteSettings(),
           getFixtures(),
           getMatchdayProgrammes(),
           getMatchFeeds(),
         ])
 
+        const siteSettings = settled[0].status === 'fulfilled' ? settled[0].value : {}
+        const manualFixtures = settled[1].status === 'fulfilled' ? settled[1].value : []
+        const programmes = settled[2].status === 'fulfilled' ? settled[2].value : []
+        const feeds = settled[3].status === 'fulfilled' ? settled[3].value : []
+
+        setSettings(siteSettings || {})
+
         const fullTimeParams = firstTeamFeedParams(feeds || [])
         const fullTimeResponse = await fetch(`/api/full-time?${fullTimeParams}`, {cache: 'no-store'})
         const fullTime = fullTimeResponse.ok ? await fullTimeResponse.json() : {matches: []}
 
-        setSettings(siteSettings || {})
         const today = new Date().toISOString().slice(0, 10)
-        const allFixtures = [...(fullTime?.matches || []), ...(manualFixtures || [])]
+        const liveFixtures = Array.isArray(fullTime?.matches) ? fullTime.matches : []
+        const allFixtures = [...liveFixtures, ...(manualFixtures || [])]
         const next = allFixtures
           .filter((fixture: any) => fixture.team === 'First XI' && fixture.venue === 'Home' && fixture.date >= today && !fixture.played)
           .filter((fixture: any, index: number, all: any[]) => all.findIndex(candidate => candidate._id === fixture._id || (candidate.date === fixture.date && normalise(candidate.opponent) === normalise(fixture.opponent))) === index)
           .sort((a: any, b: any) => String(a.date).localeCompare(String(b.date)))[0]
+
         setNextHomeGame(next || null)
 
         const matched = next ? (programmes || []).find((item: any) => {
@@ -78,7 +86,7 @@ export default function MatchdayPage() {
         }) : null
         setProgramme(matched || null)
       } catch (error) {
-        console.error('Failed to load Matchday information:', error)
+        console.error('Failed to load Matchday fixture:', error)
       } finally {
         setLoadingFixture(false)
       }
