@@ -1,4 +1,4 @@
-export const revalidate = 60
+export const revalidate = 300
 
 import Link from 'next/link'
 import { client } from './lib/sanity.client'
@@ -17,19 +17,19 @@ function formatDate(dateStr: string) {
 
 const FALLBACK_LAST = {
   _id: '',
-  opponent: 'Cheltenham Saracens',
-  btfcScore: 1,
-  opponentScore: 2,
-  date: '2026-08-15',
+  opponent: 'Bromyard Town',
+  btfcScore: 2,
+  opponentScore: 4,
+  date: '2026-08-08',
   competition: 'HL1',
   sourceUrl: undefined as string | undefined,
 }
 
 const FALLBACK_NEXT = {
-  opponent: 'Lydney Town',
-  date: '2026-08-18' as string | null,
+  opponent: 'Cheltenham Saracens',
+  date: '2026-08-15' as string | null,
   competition: 'Hellenic League Division One',
-  kickoff: '19:45',
+  kickoff: '15:00',
   sourceUrl: undefined as string | undefined,
 }
 
@@ -51,24 +51,23 @@ export default async function HomePage() {
   let seasonTicketIntro = FALLBACK_SETTINGS.seasonTicketIntro
 
   try {
-    const [fixtureResponse, settings] = await Promise.all([
-      fetch('https://btfc-website.vercel.app/api/content?type=fixtures', {
-        cache: 'no-store',
-      }).then(response => response.ok ? response.json() : []),
+    const [fullTimeResponse, settings] = await Promise.all([
+      fetch('https://btfc-website.vercel.app/api/full-time?team=First%20XI&widget=969980533&division=320568525&kind=matches', {
+        next: { revalidate: 300 },
+      }).then(response => response.ok ? response.json() : { matches: [] }),
       client.fetch(
         `*[_type == "siteSettings"][0] { leaguePosition, seasonYear, seasonTicketAdult, seasonTicketConcession, seasonTicketIntro }`,
         {},
-        { next: { revalidate: 60 } }
+        { next: { revalidate: 300 } }
       ),
     ])
 
-    const matches = (Array.isArray(fixtureResponse) ? fixtureResponse : [])
-      .filter((match: any) => match?.team === 'First XI' && match?.date && match?.opponent)
+    const matches = Array.isArray(fullTimeResponse?.matches) ? fullTimeResponse.matches : []
     const played = matches
-      .filter((match: any) => match?.played === true)
+      .filter((match: any) => match?.played === true && match?.date && match?.opponent)
       .sort((a: any, b: any) => String(b.date).localeCompare(String(a.date)))[0]
     const upcoming = matches
-      .filter((match: any) => match?.played !== true)
+      .filter((match: any) => match?.played !== true && match?.date && match?.opponent)
       .sort((a: any, b: any) => String(a.date).localeCompare(String(b.date)))[0]
 
     if (played) lastResult = played
@@ -79,7 +78,7 @@ export default async function HomePage() {
     if (settings?.seasonTicketConcession) seasonTicketConcession = settings.seasonTicketConcession
     if (settings?.seasonTicketIntro) seasonTicketIntro = settings.seasonTicketIntro
   } catch (e) {
-    // Use current safe fallbacks if live fixture or Sanity data is temporarily unavailable.
+    // Use current safe fallbacks if Full-Time or Sanity is temporarily unavailable.
   }
 
   const lastScore = `${lastResult.btfcScore ?? 0}–${lastResult.opponentScore ?? 0}`
