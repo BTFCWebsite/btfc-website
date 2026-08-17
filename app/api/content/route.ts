@@ -18,6 +18,7 @@ const fixturesQuery = `*[_type == "fixture"] | order(date asc) {
   btfcScore, opponentScore, played,
   "programmeUrl": programmePdf.asset->url
 }`
+const matchFeedsQuery = `*[_type == "matchFeed" && active == true] | order(order asc) { team, snippet }`
 const playersQuery = `*[_type == "player" && active == true] | order(order asc, squadNumber asc) {
   _id, name, squadNumber, position, team, active, order,
   "imageUrl": coalesce(photo.asset->url, image.asset->url), bio,
@@ -38,7 +39,7 @@ const queries: Record<string, string> = {
   matchReports: `*[_type == "matchReport" && published == true] | order(_updatedAt desc) {
     _id, headline, matchData, report, "slug": slug.current, published
   }`,
-  matchFeeds: `*[_type == "matchFeed" && active == true] | order(order asc) { team, snippet }`,
+  matchFeeds: matchFeedsQuery,
   players: playersQuery,
   staff: staffQuery,
   news: `*[_type == "newsArticle"] | order(date desc) {
@@ -62,6 +63,14 @@ function correctSettings(data: any) {
     : data
 }
 
+function canonicalTeam(value = '') {
+  const normalised = String(value).toLowerCase().replace(/[^a-z0-9]/g, '')
+  if (normalised.includes('u17') || normalised.includes('under17')) return 'Under 17s'
+  if (normalised.includes('reserve')) return 'Reserves'
+  if (normalised.includes('first')) return 'First XI'
+  return value
+}
+
 function mergeFixtures(live: any[], manual: any[]) {
   const combined = [...(live || []), ...(manual || [])]
   return combined.filter((fixture: any, index: number, all: any[]) =>
@@ -76,6 +85,47 @@ function mergeFixtures(live: any[], manual: any[]) {
   )
 }
 
+async function fetchLiveMatches(request: NextRequest, team: string, widgets: string[], division?: string) {
+  const payloads = await Promise.allSettled(widgets.map(async widget => {
+    const fullTimeUrl = new URL('/api/full-time', request.nextUrl.origin)
+    fullTimeUrl.searchParams.set('team', team)
+    fullTimeUrl.searchParams.set('widget', widget)
+    if (division) fullTimeUrl.searchParams.set('division', division)
+    fullTimeUrl.searchParams.set('kind', 'matches')
+    const response = await fetch(fullTimeUrl, { cache: 'no-store' })
+    if (!response.ok) return []
+    const payload = await response.json()
+    return Array.isArray(payload?.matches) ? payload.matches : []
+  }))
+
+  return payloads.flatMap(result => result.status === 'fulfilled' ? result.value : [])
+}
+
+async function getCombinedFixtures(request: NextRequest) {
+  const [manualFixtures, feeds] = await Promise.all([
+    freshClient.fetch(fixturesQuery, {}, { cache: 'no-store' }),
+    freshClient.fetch(matchFeedsQuery, {}, { cache: 'no-store' }),
+  ])
+
+  const feedMap = new Map<string, string>()
+  for (const feed of feeds || []) {
+    const team = canonicalTeam(feed?.team)
+    if (team && feed?.snippet) feedMap.set(team, String(feed.snippet))
+  }
+
+  const u17Snippet = feedMap.get('Under 17s') || ''
+  const u17Widget = u17Snippet.match(/\blrcode\s*=\s*['\"](\d+)['\"]/i)?.[1]
+  const u17Division = u17Snippet.match(/[?&]divisionseason=(\d+)/i)?.[1]
+
+  const [firstXi, reserves, under17s] = await Promise.all([
+    fetchLiveMatches(request, 'First XI', ['969980533'], '320568525'),
+    fetchLiveMatches(request, 'Reserves', ['625925242', '681011209'], '222455275'),
+    u17Widget ? fetchLiveMatches(request, 'Under 17s', [u17Widget], u17Division) : Promise.resolve([]),
+  ])
+
+  return mergeFixtures([...firstXi, ...reserves, ...under17s], manualFixtures || [])
+}
+
 export async function GET(request: NextRequest) {
   const type = request.nextUrl.searchParams.get('type') || ''
 
@@ -84,12 +134,12 @@ export async function GET(request: NextRequest) {
       const [players, staff, fixtures, settings] = await Promise.all([
         client.fetch(playersQuery, {}, { next: { revalidate: 60 } }),
         client.fetch(staffQuery, {}, { next: { revalidate: 60 } }),
-        client.fetch(fixturesQuery, {}, { next: { revalidate: 60 } }),
+        getCombinedFixtures(request),
         client.fetch(settingsQuery, {}, { next: { revalidate: 60 } }),
       ])
       return NextResponse.json(
         { players, staff, fixtures, settings: correctSettings(settings) },
-        { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' } }
+        { headers: { 'Cache-Control': 'no-store, max-age=0' } }
       )
     }
 
@@ -110,27 +160,8 @@ export async function GET(request: NextRequest) {
     }
 
     if (type === 'fixtures') {
-      const manualFixtures = await freshClient.fetch(fixturesQuery, {}, { cache: 'no-store' })
-      let liveFirstXi: any[] = []
-
-      try {
-        const fullTimeUrl = new URL('/api/full-time', request.nextUrl.origin)
-        fullTimeUrl.searchParams.set('team', 'First XI')
-        fullTimeUrl.searchParams.set('widget', '969980533')
-        fullTimeUrl.searchParams.set('division', '320568525')
-        fullTimeUrl.searchParams.set('kind', 'matches')
-
-        const response = await fetch(fullTimeUrl, { cache: 'no-store' })
-        if (response.ok) {
-          const payload = await response.json()
-          liveFirstXi = Array.isArray(payload?.matches) ? payload.matches : []
-        }
-      } catch (error) {
-        console.error('Unable to merge live Full-Time fixtures into content feed:', error)
-      }
-
       return NextResponse.json(
-        mergeFixtures(liveFirstXi, manualFixtures || []),
+        await getCombinedFixtures(request),
         { headers: { 'Cache-Control': 'no-store, max-age=0' } }
       )
     }
