@@ -259,10 +259,10 @@ var lrcode = '625925242'
           const divisionSeason = feed.snippet.match(/[?&]divisionseason=(\d+)/i)?.[1]
           const tableParams = new URLSearchParams({ team: feed.team })
           const matchWidgets = feed.team === 'Reserves'
-            ? (configuredWidget ? [configuredWidget] : reservesFullTime.matchWidgets)
+            ? reservesFullTime.matchWidgets
             : (configuredWidget ? [configuredWidget] : [])
           const division = feed.team === 'Reserves'
-            ? (divisionSeason || reservesFullTime.division)
+            ? reservesFullTime.division
             : divisionSeason
           if (division) tableParams.set('division', division)
 
