@@ -24,41 +24,8 @@ async function fetchContent<T>(type: string, params?: Record<string, string>): P
 
 export async function getSiteSettings() { return fetchContent<any>('settings') }
 export async function getNewsArticles() { return fetchContent<any[]>('news') }
-export async function getFixtures() {
-  const [manualResult, firstTeamResult] = await Promise.allSettled([
-    fetchContent<any[]>('fixtures'),
-    fetch('/api/full-time?team=First%20XI&widget=969980533&division=320568525&kind=matches', { cache: 'no-store' })
-      .then(response => response.ok ? response.json() : { matches: [] }),
-  ])
-
-  const manualFixtures = manualResult.status === 'fulfilled' ? (manualResult.value || []) : []
-  const liveFirstTeam = firstTeamResult.status === 'fulfilled' && Array.isArray(firstTeamResult.value?.matches)
-    ? firstTeamResult.value.matches
-    : []
-
-  if (!liveFirstTeam.length) return manualFixtures
-
-  const combined = [...liveFirstTeam, ...manualFixtures]
-  return combined.filter((fixture: any, index: number, all: any[]) =>
-    all.findIndex((candidate: any) =>
-      candidate?._id === fixture?._id ||
-      (candidate?.date === fixture?.date && candidate?.team === fixture?.team && String(candidate?.opponent || '').toLowerCase() === String(fixture?.opponent || '').toLowerCase())
-    ) === index
-  )
-}
-export async function getMatchFeeds() {
-  try {
-    return await fetchContent<any[]>('matchFeeds')
-  } catch (error) {
-    console.warn('Match feed configuration could not be loaded; using First XI fallback.', error)
-    return [
-      {
-        team: 'First XI',
-        snippet: `<div><a href="https://fulltime.thefa.com/index.html?divisionseason=320568525">First XI</a></div>\n<script>var lrcode = '969980533'</script>`,
-      },
-    ]
-  }
-}
+export async function getFixtures() { return fetchContent<any[]>('fixtures') }
+export async function getMatchFeeds() { return fetchContent<any[]>('matchFeeds') }
 export async function getMatchdayProgrammes() { return fetchContent<any[]>('programmes') }
 export async function getSponsors() { return fetchContent<any[]>('sponsors') }
 export async function getSponsorshipPackages() { return fetchContent<any[]>('sponsorshipPackages') }

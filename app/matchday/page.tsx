@@ -1,15 +1,13 @@
 'use client'
 
 import {useEffect, useMemo, useState} from 'react'
-import {getFixtures, getMatchFeeds, getMatchdayProgrammes, getSiteSettings} from '../lib/sanity.client'
+import {getFixtures, getMatchdayProgrammes, getSiteSettings} from '../lib/sanity.client'
 
 const FALLBACK_MAP_EMBED = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d737.3188611688546!2d-2.196166640744735!3d51.72201894723951!2m3!1f0!2f0!3f0!3m2!1i1024!1i768!4f13.1!3m3!1m2!1s0x48710c418313cc5f%3A0x6e0c3c089afa1c4d!2sBrimscombe%20and%20Thrupp%20Football%20Club!5e1!3m2!1sen!2suk!4v1780823602873!5m2!1sen!2suk'
 const FALLBACK_MAP_URL = 'https://maps.google.com/?q=Brimscombe+and+Thrupp+FC,+London+Road,+Brimscombe,+GL5+2SD'
 const FALLBACK_BUS_URL = 'https://www.stagecoachbus.com/routes/west/67/bussage-cashes-green/xsao067.o'
 const FALLBACK_W3W = 'debit.query.solutions'
 const FALLBACK_W3W_URL = 'https://what3words.com/debit.query.solutions'
-const FALLBACK_FIRST_TEAM_WIDGET = '969980533'
-const FALLBACK_FIRST_TEAM_DIVISION = '320568525'
 
 const h2 = {fontFamily: "'Barlow Condensed', sans-serif", fontSize: 36, fontWeight: 800, color: '#2D2D2D', margin: '0 0 6px', letterSpacing: '0.03em'} as const
 const h3 = {fontFamily: "'Barlow Condensed', sans-serif", fontSize: 22, fontWeight: 800, color: '#2D2D2D', margin: '0 0 10px', lineHeight: 1.1} as const
@@ -33,15 +31,6 @@ function normalise(value: string) {
   return String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '')
 }
 
-function firstTeamFeedParams(feeds: any[]) {
-  const feed = (feeds || []).find((item: any) => normalise(item?.team).includes('first'))
-  const snippet = String(feed?.snippet || '')
-  const widget = snippet.match(/\blrcode\s*=\s*['\"](\d+)['\"]/i)?.[1] || FALLBACK_FIRST_TEAM_WIDGET
-  const division = snippet.match(/[?&]divisionseason=(\d+)/i)?.[1] || FALLBACK_FIRST_TEAM_DIVISION
-  const params = new URLSearchParams({kind: 'matches', team: 'First XI', widget, division})
-  return params.toString()
-}
-
 export default function MatchdayPage() {
   const [settings, setSettings] = useState<any>({})
   const [nextHomeGame, setNextHomeGame] = useState<any>(null)
@@ -49,34 +38,20 @@ export default function MatchdayPage() {
   const [loadingFixture, setLoadingFixture] = useState(true)
 
   useEffect(() => {
-    async function loadMatchday() {
-      try {
-        const settled = await Promise.allSettled([
-          getSiteSettings(),
-          getFixtures(),
-          getMatchdayProgrammes(),
-          getMatchFeeds(),
-        ])
-
-        const siteSettings = settled[0].status === 'fulfilled' ? settled[0].value : {}
-        const manualFixtures = settled[1].status === 'fulfilled' ? settled[1].value : []
-        const programmes = settled[2].status === 'fulfilled' ? settled[2].value : []
-        const feeds = settled[3].status === 'fulfilled' ? settled[3].value : []
-
+    Promise.all([
+      getSiteSettings(),
+      getFixtures(),
+      getMatchdayProgrammes(),
+      fetch('/api/full-time?kind=matches&team=First%20XI', {cache: 'no-store'}).then(r => r.ok ? r.json() : {matches: []}),
+    ])
+      .then(([siteSettings, manualFixtures, programmes, fullTime]) => {
         setSettings(siteSettings || {})
-
-        const fullTimeParams = firstTeamFeedParams(feeds || [])
-        const fullTimeResponse = await fetch(`/api/full-time?${fullTimeParams}`, {cache: 'no-store'})
-        const fullTime = fullTimeResponse.ok ? await fullTimeResponse.json() : {matches: []}
-
         const today = new Date().toISOString().slice(0, 10)
-        const liveFixtures = Array.isArray(fullTime?.matches) ? fullTime.matches : []
-        const allFixtures = [...liveFixtures, ...(manualFixtures || [])]
+        const allFixtures = [...(fullTime?.matches || []), ...(manualFixtures || [])]
         const next = allFixtures
           .filter((fixture: any) => fixture.team === 'First XI' && fixture.venue === 'Home' && fixture.date >= today && !fixture.played)
           .filter((fixture: any, index: number, all: any[]) => all.findIndex(candidate => candidate._id === fixture._id || (candidate.date === fixture.date && normalise(candidate.opponent) === normalise(fixture.opponent))) === index)
           .sort((a: any, b: any) => String(a.date).localeCompare(String(b.date)))[0]
-
         setNextHomeGame(next || null)
 
         const matched = next ? (programmes || []).find((item: any) => {
@@ -85,14 +60,9 @@ export default function MatchdayPage() {
             (selected?.date === next.date && normalise(selected?.opponent) === normalise(next.opponent))
         }) : null
         setProgramme(matched || null)
-      } catch (error) {
-        console.error('Failed to load Matchday fixture:', error)
-      } finally {
-        setLoadingFixture(false)
-      }
-    }
-
-    loadMatchday()
+      })
+      .catch(error => console.error('Failed to load Matchday information:', error))
+      .finally(() => setLoadingFixture(false))
   }, [])
 
   const groundName = settings.groundName || 'Brackenfern Meadow'

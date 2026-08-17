@@ -43,12 +43,7 @@ img {
   height: auto;
 }
 
-/* Mobile-first fixture visibility: cards are the default; the desktop table takes over on wider screens. */
 .fixtures-mobile-list {
-  display: block;
-}
-
-.fixtures-desktop-table {
   display: none;
 }
 
@@ -58,14 +53,6 @@ img {
 
 /* Keep the Club page community tiles balanced on desktop. */
 @media (min-width: 701px) {
-  .fixtures-mobile-list {
-    display: none;
-  }
-
-  .fixtures-desktop-table {
-    display: block;
-  }
-
   .community-youth-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     justify-content: center;
@@ -172,6 +159,14 @@ img {
 
   .matchday-fixture-button {
     width: 100%;
+  }
+
+  .fixtures-desktop-table {
+    display: none;
+  }
+
+  .fixtures-mobile-list {
+    display: block;
   }
 
   .league-table-scroll-hint {
@@ -537,4 +532,169 @@ img {
   font-weight: 800;
   letter-spacing: .12em;
   text-transform: uppercase;
+}
+
+.player-sponsor-panel {
+  min-height: 76px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-top: 4px solid #1149d8;
+  color: #041b5f;
+}
+
+.player-sponsor-panel span { font-size: 8px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #718096; }
+.player-sponsor-panel strong { margin-top: 4px; font-family: 'Barlow Condensed', sans-serif; font-size: 16px; line-height: 1; text-transform: uppercase; }
+.player-sponsor-panel:not(.has-sponsor) { background: #f2f5fb; }
+
+.player-detail-shell {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.player-detail-back {
+  display: inline-block;
+  margin-bottom: 22px;
+  color: #1149d8;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.player-detail-card {
+  display: grid;
+  grid-template-columns: minmax(260px, 380px) minmax(0, 1fr);
+  overflow: hidden;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 12px 34px rgba(4, 27, 95, .18);
+}
+
+.player-detail-photo {
+  min-height: 500px;
+}
+
+.player-detail-copy {
+  padding: 40px;
+}
+
+.player-detail-copy h1 {
+  margin: 0;
+  color: #041b5f;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(38px, 6vw, 58px);
+  font-weight: 900;
+  line-height: .95;
+  text-transform: uppercase;
+}
+
+.player-detail-position {
+  margin: 10px 0 28px;
+  color: #1149d8;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.player-detail-bio {
+  margin: 0;
+  color: #4b5563;
+  font-size: 14px;
+  line-height: 1.75;
+  white-space: pre-line;
+}
+
+.player-detail-sponsor {
+  margin-top: 32px;
+  padding: 24px;
+  border-top: 4px solid #1149d8;
+  border-radius: 8px;
+  background: #f2f5fb;
+  color: #041b5f;
+}
+
+.player-detail-sponsor-label {
+  margin: 0 0 12px;
+  color: #718096;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.player-detail-sponsor img {
+  display: block;
+  max-width: 190px;
+  max-height: 72px;
+  margin: 0 0 14px;
+  object-fit: contain;
+}
+
+.player-detail-sponsor h2 {
+  margin: 0;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 27px;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.player-detail-sponsor-message {
+  margin: 14px 0 0;
+  color: #4b5563;
+  font-size: 13px;
+  line-height: 1.65;
+  white-space: pre-line;
+}
+
+.player-detail-sponsor-link {
+  display: inline-block;
+  margin-top: 18px;
+  padding: 10px 16px;
+  border-radius: 5px;
+  background: #1149d8;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.player-detail-status {
+  padding: 80px 24px;
+  color: #041b5f;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+@media (max-width: 480px) {
+  .squad-player-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .management-profile-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .player-profile-identity { padding: 30px 10px 10px; }
+  .player-profile-identity h4 { font-size: 19px; }
+  .player-sponsor-panel { min-height: 68px; padding: 10px 7px; }
+  .player-sponsor-panel strong { font-size: 14px; }
+}
+
+@media (max-width: 720px) {
+  .player-detail-card {
+    grid-template-columns: 1fr;
+  }
+
+  .player-detail-photo {
+    min-height: 0;
+  }
+
+  .player-detail-copy {
+    padding: 26px 20px;
+  }
 }
