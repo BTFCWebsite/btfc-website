@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BTFC Full-Time fixture bridge</title>
+  <style>
+    html,body{margin:0;padding:0;background:#fff;font-family:Arial,sans-serif}
+    body{overflow:hidden}
+  </style>
+</head>
+<body>
+  <div id="lrep969980533" style="width:100%;">Data loading....</div>
+  <script>
+    var lrcode='969980533';
+  </script>
+  <script src="https://fulltime.thefa.com/client/api/cs1.js"></script>
+  <script>
+    (function () {
+      var MONTHS = {jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+
+      function cleanText(value) {
+        return String(value || '').replace(/\s+/g, ' ').trim();
+      }
+
+      function normalise(value) {
+        return cleanText(value).toLowerCase().replace(/[^a-z0-9]/g, '');
+      }
+
+      function isBtfc(value) {
+        var cleaned = normalise(value);
+        return cleaned.indexOf('brimscombe') !== -1 && cleaned.indexOf('thrupp') !== -1;
+      }
+
+      function parseDateLabel(value) {
+        var text = cleanText(value).replace(/\bSept\b/i, 'Sep').replace(/,/g, ' ');
+        var match = text.match(/(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)?\s*(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{4})(?:\s+(\d{1,2})[:.](\d{2}))?/i);
+        if (!match) return null;
+        var day = Number(match[1]);
+        var month = MONTHS[match[2].toLowerCase()];
+        var year = Number(match[3]);
+        if (!day || !month || !year) return null;
+        return {
+          date: year + '-' + String(month).padStart(2, '0') + '-' + String(day).padStart(2, '0'),
+          kickoff: match[4] && match[5] ? String(Number(match[4])).padStart(2, '0') + ':' + match[5] : 'TBC'
+        };
+      }
+
+      function parseFixtures() {
+        var fixtures = [];
+        var currentDate = null;
+        var rows = Array.prototype.slice.call(document.querySelectorAll('tr'));
+
+        rows.forEach(function (row) {
+          var cells = Array.prototype.slice.call(row.children).filter(function (node) {
+            return node.tagName === 'TD' || node.tagName === 'TH';
+          });
+
+          if (cells.length === 1) {
+            var parsed = parseDateLabel(cells[0].textContent || '');
+            if (parsed) currentDate = parsed;
+            return;
+          }
+
+          if (!currentDate || cells.length < 5) return;
+
+          var values = cells.map(function (cell) { return cleanText(cell.textContent); });
+          var competition = values[0] || 'League';
+          var homeTeam = '';
+          var awayTeam = '';
+          var homeScore = '';
+          var awayScore = '';
+          var played = false;
+          var location = values[values.length - 1] || '';
+
+          if (cells.length >= 7) {
+            homeTeam = values[1];
+            homeScore = values[2];
+            var separator = (values[3] || '').toLowerCase();
+            awayScore = values[4];
+            awayTeam = values[5];
+            location = values[6] || location;
+            played = (separator === '-' || separator === '–') && /^\d+$/.test(homeScore) && /^\d+$/.test(awayScore);
+          } else {
+            homeTeam = values[1];
+            awayTeam = values[values.length - 2];
+            var middle = values.slice(2, -2).join(' ');
+            var score = middle.match(/(\d+)\s*[-–]\s*(\d+)/);
+            if (score) {
+              homeScore = score[1];
+              awayScore = score[2];
+              played = true;
+            }
+          }
+
+          var isHome = isBtfc(homeTeam);
+          var isAway = isBtfc(awayTeam);
+          if (!isHome && !isAway) return;
+
+          var link = row.querySelector('a[href]');
+          var sourceUrl = link ? link.href : '';
+          var sourceIdMatch = sourceUrl.match(/[?&]id=(\d+)/);
+          var opponent = isHome ? awayTeam : homeTeam;
+          var id = sourceIdMatch
+            ? 'full-time-' + sourceIdMatch[1]
+            : 'full-time-First-XI-' + currentDate.date + '-' + normalise(opponent);
+
+          fixtures.push({
+            _id: id,
+            date: currentDate.date,
+            opponent: opponent,
+            team: 'First XI',
+            venue: isHome ? 'Home' : 'Away',
+            competition: competition,
+            kickoff: currentDate.kickoff,
+            btfcScore: played ? Number(isHome ? homeScore : awayScore) : undefined,
+            opponentScore: played ? Number(isHome ? awayScore : homeScore) : undefined,
+            played: played,
+            location: location,
+            sourceUrl: sourceUrl,
+            source: 'Full-Time'
+          });
+        });
+
+        return fixtures.filter(function (fixture, index, all) {
+          return all.findIndex(function (candidate) {
+            return candidate._id === fixture._id ||
+              (candidate.date === fixture.date && normalise(candidate.opponent) === normalise(fixture.opponent));
+          }) === index;
+        });
+      }
+
+      var started = Date.now();
+      var timer = window.setInterval(function () {
+        try {
+          var fixtures = parseFixtures();
+          if (fixtures.length > 0) {
+            window.clearInterval(timer);
+            window.parent.postMessage({source:'btfc-fulltime-bridge', type:'fixtures', fixtures:fixtures}, '*');
+            return;
+          }
+        } catch (error) {
+          // Keep polling while Full-Time renders.
+        }
+
+        if (Date.now() - started > 20000) {
+          window.clearInterval(timer);
+          window.parent.postMessage({source:'btfc-fulltime-bridge', type:'error', message:'Full-Time fixture widget did not render in time'}, '*');
+        }
+      }, 300);
+    })();
+  </script>
+</body>
+</html>
