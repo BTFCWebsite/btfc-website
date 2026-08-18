@@ -14,11 +14,39 @@ type FeedConfig = {
   division: string
 }
 
+type LeagueRow = {
+  position: number
+  team: string
+  played: number
+  won: number
+  drawn: number
+  lost: number
+  goalDifference: number
+  points: number
+}
+
 const DEFAULTS: Record<TeamId, FeedConfig> = {
   first: { team: 'First XI', widgets: ['969980533'], division: '320568525' },
-  reserves: { team: 'Reserves', widgets: ['625925242', '681011209'], division: '222455275' },
-  u17s: { team: 'Under 17s', widgets: [], division: '' },
+  reserves: { team: 'Reserves', widgets: ['681011209'], division: '222455275' },
+  u17s: { team: 'Under 17s', widgets: [], division: '761524402' },
 }
+
+const FIRST_XI_TABLE_WIDGET = '251176067'
+const RESERVES_FIXTURES_WIDGET = '681011209'
+const RESERVES_TABLE_WIDGET = '625925242'
+
+const UNDER17_OPENING_TABLE: LeagueRow[] = [
+  { position: 1, team: 'Brimscombe & Thrupp U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
+  { position: 2, team: 'FC Lakeside Youth U17 Whites', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
+  { position: 3, team: 'Kempsey Colts U17 Falcons', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
+  { position: 4, team: 'Leckhampton Rovers Youth U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
+  { position: 5, team: 'Longlevens Youth U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
+  { position: 6, team: 'Perdiswell Colts U17 Tigers', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
+  { position: 7, team: 'Prestbury Phantoms Youth U17 Jets', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
+  { position: 8, team: 'Southside Star Youth U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
+  { position: 9, team: 'Stonehouse Town Youth U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
+  { position: 10, team: 'Westfields Youth U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
+]
 
 const TEAM_DETAILS = {
   first: { label: 'First XI', heading: 'BTFC First XI' },
@@ -61,13 +89,13 @@ function formFor(fixture: Fixture) {
   return 'D'
 }
 
-function OfficialWidget({ widget, title }: { widget: string; title: string }) {
+function OfficialWidget({ widget, title, minHeight = 1100 }: { widget: string; title: string; minHeight?: number }) {
   return (
-    <div style={{ background: '#fff', border: '1px solid #DCE3F1', borderRadius: 10, overflow: 'hidden', boxShadow: '0 8px 24px rgba(4,27,95,.06)', marginBottom: 20 }}>
+    <div style={{ background: '#fff', border: '1px solid #DCE3F1', borderRadius: 10, overflow: 'hidden', boxShadow: '0 8px 24px rgba(4,27,95,.06)' }}>
       <iframe
         srcDoc={fullTimeWidgetDocument(widget)}
         title={title}
-        style={{ display: 'block', width: '100%', minHeight: 1100, border: 0, background: '#fff' }}
+        style={{ display: 'block', width: '100%', minHeight, border: 0, background: '#fff' }}
       />
     </div>
   )
@@ -82,7 +110,7 @@ export default function ReliableFixtures() {
   const [liveFixtures, setLiveFixtures] = useState<Record<TeamId, Fixture[]>>({ first: [], reserves: [], u17s: [] })
   const [loading, setLoading] = useState<Record<TeamId, boolean>>({ first: true, reserves: false, u17s: true })
   const [failed, setFailed] = useState<Record<TeamId, boolean>>({ first: false, reserves: false, u17s: false })
-  const [tableRows, setTableRows] = useState<any[]>([])
+  const [tableRows, setTableRows] = useState<LeagueRow[]>([])
   const [tableLoading, setTableLoading] = useState(false)
 
   useEffect(() => {
@@ -167,26 +195,24 @@ export default function ReliableFixtures() {
 
     async function loadTable() {
       setTableRows([])
-      if (view !== 'table' || team === 'first') {
+      if (view !== 'table' || team !== 'u17s') {
         setTableLoading(false)
         return
       }
 
-      const division = configs[team].division
-      if (!division) {
-        setTableLoading(false)
-        return
-      }
-
+      const division = configs.u17s.division || DEFAULTS.u17s.division
       setTableLoading(true)
       try {
-        const response = await fetch(`/api/full-time?kind=table&division=${division}&team=${encodeURIComponent(configs[team].team)}`, { cache: 'no-store' })
+        const response = await fetch(`/api/full-time?kind=table&division=${division}&team=${encodeURIComponent(configs.u17s.team)}`, { cache: 'no-store' })
         if (!cancelled && response.ok) {
           const payload = await response.json()
-          setTableRows(Array.isArray(payload?.table) ? payload.table : [])
+          const rows = Array.isArray(payload?.table) ? payload.table : []
+          setTableRows(rows.length ? rows : UNDER17_OPENING_TABLE)
+        } else if (!cancelled) {
+          setTableRows(UNDER17_OPENING_TABLE)
         }
       } catch {
-        // Keep the official Full-Time link available below.
+        if (!cancelled) setTableRows(UNDER17_OPENING_TABLE)
       } finally {
         if (!cancelled) setTableLoading(false)
       }
@@ -253,10 +279,7 @@ export default function ReliableFixtures() {
             </div>
 
             {team === 'reserves' ? (
-              <div>
-                <OfficialWidget widget="625925242" title="Official BTFC Reserves fixtures and results feed 1" />
-                <OfficialWidget widget="681011209" title="Official BTFC Reserves fixtures and results feed 2" />
-              </div>
+              <OfficialWidget widget={RESERVES_FIXTURES_WIDGET} title="Official BTFC Reserves fixtures and results" minHeight={1450} />
             ) : (
               <>
                 {loading[team] && combined.length === 0 && <div style={{ padding: 44, background: '#fff', borderRadius: 8, textAlign: 'center', fontFamily: "'Montserrat',sans-serif", color: '#6B7280' }}>Loading official fixtures…</div>}
@@ -288,24 +311,18 @@ export default function ReliableFixtures() {
           <section>
             <h1 style={{ margin: '0 0 20px', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: 'clamp(30px,5vw,42px)', color: '#041B5F', textTransform: 'uppercase' }}>{selected.heading} League Table</h1>
 
-            {team === 'first' ? (
-              <div style={{ background: '#fff', border: '1px solid #DCE3F1', borderRadius: 10, overflow: 'hidden', boxShadow: '0 8px 24px rgba(4,27,95,.06)' }}>
-                <iframe
-                  src="/full-time/first-team.html"
-                  title="Official First XI Hellenic League Division One table"
-                  style={{ display: 'block', width: '100%', minHeight: 1450, border: 0, background: '#fff' }}
-                />
-              </div>
-            ) : (
+            {team === 'first' && (
+              <OfficialWidget widget={FIRST_XI_TABLE_WIDGET} title="Official First XI Hellenic League Division One table" minHeight={1000} />
+            )}
+
+            {team === 'reserves' && (
+              <OfficialWidget widget={RESERVES_TABLE_WIDGET} title="Official BTFC Reserves Division 2 league table" minHeight={1000} />
+            )}
+
+            {team === 'u17s' && (
               <>
                 {tableLoading && <div style={{ padding: 40, background: '#fff', borderRadius: 8, textAlign: 'center' }}>Loading league table…</div>}
-                {!tableLoading && tableRows.length > 0 && <LeagueTable rows={tableRows} />}
-                {!tableLoading && tableRows.length === 0 && (
-                  <div style={{ background: '#fff', border: '1px solid #DCE3F1', borderRadius: 8, padding: 32, textAlign: 'center' }}>
-                    <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 13, color: '#6B7280', margin: '0 0 18px' }}>The live league table cannot currently be read by the website.</p>
-                    {configs[team].division && <a href={`https://fulltime.thefa.com/index.html?divisionseason=${configs[team].division}`} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', background: '#1149D8', color: '#fff', padding: '12px 20px', borderRadius: 6, textDecoration: 'none', fontFamily: "'Montserrat',sans-serif", fontWeight: 800, fontSize: 12 }}>View Official League Table on Full-Time →</a>}
-                  </div>
-                )}
+                {!tableLoading && <LeagueTable rows={tableRows.length ? tableRows : UNDER17_OPENING_TABLE} />}
               </>
             )}
           </section>
@@ -330,7 +347,7 @@ function DesktopRows({ month, fixtures }: { month: string; fixtures: Fixture[] }
   return <><tr><th colSpan={8} style={{ padding: '13px 14px', textAlign: 'left', background: '#EEF3FC', color: '#041B5F', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 17, fontWeight: 800, textTransform: 'uppercase' }}>{month}</th></tr>{fixtures.map((fixture) => { const form = formFor(fixture); const colour = form === 'W' ? '#22C55E' : form === 'L' ? '#EF4444' : '#F59E0B'; const info = dateInfo(fixture.date); return <tr key={fixture._id} style={{ borderBottom: '1px solid #E5E7EB' }}><td style={cell}>{info.day}</td><td style={cell}>{fixture.kickoff || 'TBC'}</td><td style={cell}>{fixture.venue}</td><td style={{ ...cell, fontWeight: 700, color: '#041B5F' }}>{fixture.opponent}</td><td style={cell}>{fixture.competition || 'TBC'}</td><td style={{ ...cell, fontWeight: 800 }}>{resultFor(fixture)}</td><td style={cell}>{form ? <span style={{ display: 'inline-flex', width: 32, height: 32, alignItems: 'center', justifyContent: 'center', background: colour, color: '#fff', borderRadius: 4, fontWeight: 800 }}>{form}</span> : '—'}</td><td style={cell}>{fixture.played && fixture.sourceUrl ? <a href={fixture.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#1149D8', fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}>Match Details</a> : '—'}</td></tr> })}</>
 }
 
-function LeagueTable({ rows }: { rows: any[] }) {
+function LeagueTable({ rows }: { rows: LeagueRow[] }) {
   return <div style={{ background: '#fff', border: '1px solid #DCE3F1', borderRadius: 8, overflowX: 'auto' }}><table style={{ width: '100%', minWidth: 650, borderCollapse: 'collapse', fontFamily: "'Montserrat',sans-serif" }}><thead><tr style={{ background: '#041B5F' }}>{['Pos','Team','P','W','D','L','GD','Pts'].map((heading) => <th key={heading} style={{ padding: '14px 12px', color: '#fff', textAlign: heading === 'Team' ? 'left' : 'center' }}>{heading}</th>)}</tr></thead><tbody>{rows.map((row) => <tr key={`${row.position}-${row.team}`} style={{ borderBottom: '1px solid #E5E7EB', background: normalise(row.team).includes('brimscombe') ? '#E8F0FF' : '#fff' }}><td style={tableCell}>{row.position}</td><td style={{ ...tableCell, textAlign: 'left', fontWeight: 700 }}>{row.team}</td><td style={tableCell}>{row.played}</td><td style={tableCell}>{row.won}</td><td style={tableCell}>{row.drawn}</td><td style={tableCell}>{row.lost}</td><td style={tableCell}>{row.goalDifference}</td><td style={{ ...tableCell, fontWeight: 800 }}>{row.points}</td></tr>)}</tbody></table></div>
 }
 
