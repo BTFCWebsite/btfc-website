@@ -33,6 +33,11 @@ const MONTHS: Record<string, number> = {
 const inflightFixtureLoads = new Map<string, Promise<FullTimeFixture[]>>()
 const inflightTableLoads = new Map<string, Promise<FullTimeLeagueRow[]>>()
 
+const TABLE_API: Record<string, { division: string; team: string }> = {
+  '251176067': { division: '320568525', team: 'First XI' },
+  '625925242': { division: '222455275', team: 'Reserves' },
+}
+
 function normalise(value: string) {
   return String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '')
 }
@@ -145,8 +150,8 @@ function parseWidgetFixtures(doc: Document, team: string): FullTimeFixture[] {
 }
 
 function numeric(value: string) {
-  const cleaned = cleanText(value).replace(/[^0-9-]/g, '')
-  if (!cleaned || cleaned === '-') return 0
+  const cleaned = cleanText(value).replace(/[^0-9.-]/g, '')
+  if (!cleaned || cleaned === '-' || cleaned === '.') return 0
   const parsed = Number(cleaned)
   return Number.isFinite(parsed) ? parsed : 0
 }
@@ -161,11 +166,10 @@ function parseWidgetTable(doc: Document): FullTimeLeagueRow[] {
     if (cells.length < 8) continue
 
     const values = cells.map((cell) => cleanText(cell.textContent))
-    if (!/^\d+$/.test(values[0])) continue
+    if (!/^\d+$/.test(values[0]) || !values[1]) continue
 
-    const position = numeric(values[0])
-    const team = values[1]
-    if (!position || !team) continue
+    const stats = values.slice(2).filter((value) => /^-?\d+(?:\.\d+)?$/.test(value))
+    if (stats.length < 6) continue
 
     let played = 0
     let won = 0
@@ -174,35 +178,40 @@ function parseWidgetTable(doc: Document): FullTimeLeagueRow[] {
     let goalDifference = 0
     let points = 0
 
-    if (values.length >= 18) {
-      // Full-Time's expanded table contains P, then Home, Away and Overall blocks,
-      // followed by GD, PPG and PTS. Read the overall figures from the end so
-      // minor column-count changes do not affect the parser.
-      played = numeric(values[2])
-      won = numeric(values[values.length - 8])
-      drawn = numeric(values[values.length - 7])
-      lost = numeric(values[values.length - 6])
-      goalDifference = numeric(values[values.length - 3])
-      points = numeric(values[values.length - 1])
-    } else if (values.length >= 10) {
-      // Compact Full-Time table: Pos, Team, P, W, D, L, F, A, GD, Pts.
-      played = numeric(values[2])
-      won = numeric(values[3])
-      drawn = numeric(values[4])
-      lost = numeric(values[5])
-      goalDifference = numeric(values[8])
-      points = numeric(values[9])
+    if (stats.length >= 15) {
+      played = numeric(stats[0])
+      const overall = stats.slice(-8)
+      won = numeric(overall[0])
+      drawn = numeric(overall[1])
+      lost = numeric(overall[2])
+      goalDifference = numeric(overall[5])
+      points = numeric(overall[7])
+    } else if (stats.length >= 8) {
+      played = numeric(stats[0])
+      won = numeric(stats[1])
+      drawn = numeric(stats[2])
+      lost = numeric(stats[3])
+      goalDifference = numeric(stats[stats.length - 2])
+      points = numeric(stats[stats.length - 1])
     } else {
-      // Standard table: Pos, Team, P, W, D, L, GD, Pts.
-      played = numeric(values[2])
-      won = numeric(values[3])
-      drawn = numeric(values[4])
-      lost = numeric(values[5])
-      goalDifference = numeric(values[6])
-      points = numeric(values[7])
+      played = numeric(stats[0])
+      won = numeric(stats[1])
+      drawn = numeric(stats[2])
+      lost = numeric(stats[3])
+      goalDifference = numeric(stats[4])
+      points = numeric(stats[5])
     }
 
-    rows.push({ position, team, played, won, drawn, lost, goalDifference, points })
+    rows.push({
+      position: numeric(values[0]),
+      team: values[1],
+      played,
+      won,
+      drawn,
+      lost,
+      goalDifference,
+      points,
+    })
   }
 
   return rows.filter((row, index, all) =>
@@ -272,7 +281,7 @@ function createFixtureLoad(widgetCode: string, team: string, timeoutMs: number):
   })
 }
 
-function createTableLoad(widgetCode: string, timeoutMs: number): Promise<FullTimeLeagueRow[]> {
+function createTableWidgetLoad(widgetCode: string, timeoutMs: number): Promise<FullTimeLeagueRow[]> {
   return new Promise((resolve, reject) => {
     let iframe: HTMLIFrameElement
     try {
@@ -308,6 +317,23 @@ function createTableLoad(widgetCode: string, timeoutMs: number): Promise<FullTim
   })
 }
 
+async function loadTableFromApi(widgetCode: string) {
+  const config = TABLE_API[widgetCode]
+  if (!config) return null
+
+  const params = new URLSearchParams({
+    kind: 'table',
+    division: config.division,
+    team: config.team,
+  })
+  const response = await fetch(`/api/full-time?${params.toString()}`, { cache: 'no-store' })
+  if (!response.ok) throw new Error(`Full-Time table API failed (${response.status})`)
+  const payload = await response.json()
+  const rows = Array.isArray(payload?.table) ? payload.table : []
+  if (!rows.length) throw new Error('Full-Time table API returned no rows')
+  return rows as FullTimeLeagueRow[]
+}
+
 export function loadFullTimeWidgetMatches(widgetCode: string, team: string, timeoutMs = 15000): Promise<FullTimeFixture[]> {
   const key = `${widgetCode}:${team}`
   const existing = inflightFixtureLoads.get(key)
@@ -325,7 +351,16 @@ export function loadFullTimeWidgetTable(widgetCode: string, timeoutMs = 15000): 
   const existing = inflightTableLoads.get(widgetCode)
   if (existing) return existing
 
-  const load = createTableLoad(widgetCode, timeoutMs)
+  const load = (async () => {
+    try {
+      const apiRows = await loadTableFromApi(widgetCode)
+      if (apiRows) return apiRows
+    } catch {
+      // Fall back to the official browser widget only if the same-origin API fails.
+    }
+    return createTableWidgetLoad(widgetCode, Math.min(timeoutMs, 5000))
+  })()
+
   inflightTableLoads.set(widgetCode, load)
   load.finally(() => {
     if (inflightTableLoads.get(widgetCode) === load) inflightTableLoads.delete(widgetCode)
