@@ -40,9 +40,12 @@ export default function LeagueTableMobileScrollCue() {
           content: 'Scroll  →';
           display: block;
           position: sticky;
-          left: 0;
+          left: auto;
+          right: 0;
           width: fit-content;
+          margin-left: auto;
           padding: 9px 12px 7px;
+          text-align: right;
           font-family: 'Montserrat', sans-serif;
           font-size: 10px;
           font-weight: 800;
