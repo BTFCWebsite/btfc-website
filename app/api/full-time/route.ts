@@ -102,27 +102,78 @@ function parseMatches(script: string, team: string) {
   return matches
 }
 
+function numeric(value: string) {
+  const cleaned = value.replace(/[^0-9.-]/g, '')
+  if (!cleaned || cleaned === '-' || cleaned === '.') return 0
+  const parsed = Number(cleaned)
+  return Number.isFinite(parsed) ? parsed : 0
+}
+
 function parseTable(html: string) {
   const section = html.match(/<section id="league-table">([\s\S]*?)<\/section>/i)?.[1] || html
-  const table = section.match(/<table class="cell-dividers">([\s\S]*?)<\/table>/i)?.[1]
-  const body = table?.match(/<tbody>([\s\S]*?)<\/tbody>/i)?.[1]
+  const table = section.match(/<table[^>]*>([\s\S]*?)<\/table>/i)?.[1]
+  const body = table?.match(/<tbody[^>]*>([\s\S]*?)<\/tbody>/i)?.[1]
   if (!body) return []
 
   return Array.from(body.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)).flatMap(row => {
     const cells = Array.from(row[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)).map(cell => textFromHtml(cell[1]))
-    if (cells.length < 7) return []
-    const hasGoalDifference = cells.length >= 8
+    if (cells.length < 8 || !/^\d+$/.test(cells[0]) || !cells[1]) return []
+
+    const stats = cells.slice(2).filter(value => /^-?\d+(?:\.\d+)?$/.test(value))
+    if (stats.length < 6) return []
+
+    const position = numeric(cells[0])
+    const team = cells[1]
+    let played = 0
+    let won = 0
+    let drawn = 0
+    let lost = 0
+    let goalDifference = 0
+    let points = 0
+
+    if (stats.length >= 15) {
+      // Expanded FA layout:
+      // P | Home W D L F A | Away W D L F A | Overall W D L F A GD PPG PTS
+      played = numeric(stats[0])
+      const overall = stats.slice(-8)
+      won = numeric(overall[0])
+      drawn = numeric(overall[1])
+      lost = numeric(overall[2])
+      goalDifference = numeric(overall[5])
+      points = numeric(overall[7])
+    } else if (stats.length >= 8) {
+      // Compact layout: P W D L F A GD PTS
+      played = numeric(stats[0])
+      won = numeric(stats[1])
+      drawn = numeric(stats[2])
+      lost = numeric(stats[3])
+      goalDifference = numeric(stats[stats.length - 2])
+      points = numeric(stats[stats.length - 1])
+    } else {
+      // Minimal layout: P W D L GD PTS
+      played = numeric(stats[0])
+      won = numeric(stats[1])
+      drawn = numeric(stats[2])
+      lost = numeric(stats[3])
+      goalDifference = numeric(stats[4])
+      points = numeric(stats[5])
+    }
+
     return [{
-      position: Number(cells[0]), team: cells[1], played: Number(cells[2]),
-      won: Number(cells[3]), drawn: Number(cells[4]), lost: Number(cells[5]),
-      goalDifference: hasGoalDifference ? Number(cells[6]) : 0,
-      points: Number(cells[hasGoalDifference ? 7 : 6]),
+      position,
+      team,
+      played,
+      won,
+      drawn,
+      lost,
+      goalDifference,
+      points,
     }]
   })
 }
 
 const publicHeaders = {
-  'Cache-Control': 'public, s-maxage=1800, stale-while-revalidate=86400',
+  'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=1800',
   'Access-Control-Allow-Origin': '*',
 }
 
@@ -137,9 +188,9 @@ export async function GET(request: NextRequest) {
     const team = ['First XI', 'Reserves', 'Under 17s'].includes(requestedTeam) ? requestedTeam : 'First XI'
 
     const requestOptions = {
-      headers: { 'User-Agent': 'BTFCWebsite/1.0 (+https://btfc-website.vercel.app)' },
-      next: { revalidate: 1800 },
-    } as const
+      headers: { 'User-Agent': 'BTFCWebsite/1.0 (+https://brimscombeandthruppfc.co.uk)' },
+      cache: 'no-store' as const,
+    }
 
     let matches: ReturnType<typeof parseMatches> = []
     let table: ReturnType<typeof parseTable> = []
