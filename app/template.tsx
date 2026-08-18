@@ -17,16 +17,16 @@ export default function Template({ children }: { children: ReactNode }) {
       <style>{`
         .hero-cards > a,
         .hero-cards > div {
-          background: rgba(0, 0, 0, 0.14) !important;
-          border-color: rgba(255, 255, 255, 0.34) !important;
-          backdrop-filter: none !important;
-          -webkit-backdrop-filter: none !important;
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.10);
+          background: rgba(8, 18, 40, 0.20) !important;
+          border-color: rgba(255, 255, 255, 0.30) !important;
+          backdrop-filter: blur(10px) saturate(110%) !important;
+          -webkit-backdrop-filter: blur(10px) saturate(110%) !important;
+          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.14);
         }
 
         .hero-cards > a > div,
         .hero-cards > div > div {
-          text-shadow: 0 2px 6px rgba(0, 0, 0, 0.92);
+          text-shadow: 0 2px 5px rgba(0, 0, 0, 0.82);
         }
 
         .hero-cards > a > div:first-child,
@@ -47,18 +47,18 @@ export default function Template({ children }: { children: ReactNode }) {
         @media (min-width: 769px) {
           .hero-cards > a,
           .hero-cards > div {
-            background: rgba(18, 20, 24, 0.38) !important;
-            border-color: rgba(255, 255, 255, 0.34) !important;
-            backdrop-filter: blur(7px) saturate(90%) !important;
-            -webkit-backdrop-filter: blur(7px) saturate(90%) !important;
-            box-shadow: 0 7px 18px rgba(0, 0, 0, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.10) !important;
+            background: rgba(8, 18, 40, 0.16) !important;
+            border-color: rgba(255, 255, 255, 0.32) !important;
+            backdrop-filter: blur(14px) saturate(115%) !important;
+            -webkit-backdrop-filter: blur(14px) saturate(115%) !important;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.16) !important;
             padding-top: 8px !important;
             padding-bottom: 8px !important;
           }
 
           .hero-cards > a > div,
           .hero-cards > div > div {
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95), 0 0 6px rgba(0, 0, 0, 0.65) !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.82), 0 0 5px rgba(0, 0, 0, 0.42) !important;
           }
         }
       `}</style>
