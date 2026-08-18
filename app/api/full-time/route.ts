@@ -6,7 +6,6 @@ const FALLBACK_DIVISION_SEASON = '320568525'
 const BTFC = 'Brimscombe & Thrupp'
 
 export const dynamic = 'force-dynamic'
-export const runtime = 'edge'
 
 function textFromHtml(value: string) {
   return value
@@ -15,6 +14,8 @@ function textFromHtml(value: string) {
     .replace(/&nbsp;/g, ' ')
     .replace(/&#39;|&apos;/g, "'")
     .replace(/&quot;/g, '"')
+    .replace(/&ndash;|&#8211;/g, '–')
+    .replace(/&minus;|&#8722;/g, '-')
     .replace(/\s+/g, ' ')
     .trim()
 }
@@ -45,18 +46,19 @@ function parseFullTimeDate(value: string) {
 }
 
 function hrefFromHtml(value: string) {
-  const match = value.match(/href="([^"]+)"/i)
+  const match = value.match(/href=["']([^"']+)["']/i)
   if (!match) return undefined
   return match[1].startsWith('http') ? match[1] : FULL_TIME_ORIGIN + match[1]
 }
 
 function isBtfcTeam(value: string) {
-  return value.toLowerCase().includes(BTFC.toLowerCase())
+  const clean = value.toLowerCase()
+  return clean.includes('brimscombe') && clean.includes('thrupp')
 }
 
 function parseMatches(script: string, team: string) {
   const matches = []
-  const rowPattern = /<tr[^>]*>\s*<td[^>]*colspan="7"[^>]*>([\s\S]*?)<\/td>\s*<\/tr>\s*<tr[^>]*>([\s\S]*?)<\/tr>/gi
+  const rowPattern = /<tr[^>]*>\s*<td[^>]*colspan=["']?7["']?[^>]*>([\s\S]*?)<\/td>\s*<\/tr>\s*<tr[^>]*>([\s\S]*?)<\/tr>/gi
   let row: RegExpExecArray | null
 
   while ((row = rowPattern.exec(script))) {
@@ -78,8 +80,8 @@ function parseMatches(script: string, team: string) {
     const isAway = isBtfcTeam(awayTeam)
     if (!isHome && !isAway) continue
 
-    const played = separator === '-' && /^\d+$/.test(homeScore) && /^\d+$/.test(awayScore)
-    const sourceUrl = hrefFromHtml(cells[0]) || hrefFromHtml(cells[1])
+    const played = (separator === '-' || separator === '–') && /^\d+$/.test(homeScore) && /^\d+$/.test(awayScore)
+    const sourceUrl = hrefFromHtml(cells[0]) || hrefFromHtml(cells[1]) || hrefFromHtml(cells[5])
     const sourceId = sourceUrl?.match(/[?&]id=(\d+)/)?.[1]
 
     matches.push({
@@ -88,7 +90,7 @@ function parseMatches(script: string, team: string) {
       opponent: isHome ? awayTeam : homeTeam,
       team,
       venue: isHome ? 'Home' : 'Away',
-      competition: competition || 'Hellenic League Division One',
+      competition: competition || 'League',
       kickoff: parsedDate.kickoff,
       btfcScore: played ? Number(isHome ? homeScore : awayScore) : undefined,
       opponentScore: played ? Number(isHome ? awayScore : homeScore) : undefined,
@@ -102,28 +104,92 @@ function parseMatches(script: string, team: string) {
   return matches
 }
 
-function parseTable(html: string) {
-  const section = html.match(/<section id="league-table">([\s\S]*?)<\/section>/i)?.[1] || html
-  const table = section.match(/<table class="cell-dividers">([\s\S]*?)<\/table>/i)?.[1]
-  const body = table?.match(/<tbody>([\s\S]*?)<\/tbody>/i)?.[1]
-  if (!body) return []
+function normaliseHeader(value: string) {
+  return textFromHtml(value).toLowerCase().replace(/[^a-z0-9]/g, '')
+}
 
-  return Array.from(body.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)).flatMap(row => {
-    const cells = Array.from(row[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)).map(cell => textFromHtml(cell[1]))
-    if (cells.length < 7) return []
-    const hasGoalDifference = cells.length >= 8
-    return [{
-      position: Number(cells[0]), team: cells[1], played: Number(cells[2]),
-      won: Number(cells[3]), drawn: Number(cells[4]), lost: Number(cells[5]),
-      goalDifference: hasGoalDifference ? Number(cells[6]) : 0,
-      points: Number(cells[hasGoalDifference ? 7 : 6]),
-    }]
-  })
+function findHeaderIndex(headers: string[], names: string[]) {
+  return headers.findIndex(header => names.includes(header))
+}
+
+function numberAt(cells: string[], index: number, fallback = 0) {
+  if (index < 0 || index >= cells.length) return fallback
+  const value = Number(String(cells[index]).replace(/[^0-9-]/g, ''))
+  return Number.isFinite(value) ? value : fallback
+}
+
+function parseTable(html: string) {
+  const tables = Array.from(html.matchAll(/<table[^>]*>([\s\S]*?)<\/table>/gi)).map(match => match[1])
+  let best: any[] = []
+
+  for (const table of tables) {
+    const rowBlocks = Array.from(table.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)).map(match => match[1])
+    let headers: string[] = []
+    const rows: any[] = []
+
+    for (const row of rowBlocks) {
+      const th = Array.from(row.matchAll(/<th[^>]*>([\s\S]*?)<\/th>/gi)).map(cell => cell[1])
+      if (th.length) {
+        headers = th.map(normaliseHeader)
+        continue
+      }
+
+      const rawCells = Array.from(row.matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)).map(cell => cell[1])
+      if (rawCells.length < 7) continue
+      const cells = rawCells.map(textFromHtml)
+
+      const posIndex = findHeaderIndex(headers, ['pos','position']) >= 0 ? findHeaderIndex(headers, ['pos','position']) : 0
+      const teamIndex = findHeaderIndex(headers, ['team','club']) >= 0 ? findHeaderIndex(headers, ['team','club']) : 1
+      const playedIndex = findHeaderIndex(headers, ['p','pl','played']) >= 0 ? findHeaderIndex(headers, ['p','pl','played']) : 2
+      const wonIndex = findHeaderIndex(headers, ['w','won']) >= 0 ? findHeaderIndex(headers, ['w','won']) : 3
+      const drawnIndex = findHeaderIndex(headers, ['d','drawn']) >= 0 ? findHeaderIndex(headers, ['d','drawn']) : 4
+      const lostIndex = findHeaderIndex(headers, ['l','lost']) >= 0 ? findHeaderIndex(headers, ['l','lost']) : 5
+      let gdIndex = findHeaderIndex(headers, ['gd','goaldifference','diff'])
+      let ptsIndex = findHeaderIndex(headers, ['pts','points','point'])
+
+      if (ptsIndex < 0) ptsIndex = cells.length - 1
+      if (gdIndex < 0) gdIndex = Math.max(6, ptsIndex - 1)
+
+      const position = numberAt(cells, posIndex, NaN)
+      const team = cells[teamIndex] || ''
+      const played = numberAt(cells, playedIndex, NaN)
+      if (!Number.isFinite(position) || position <= 0 || !team || !Number.isFinite(played)) continue
+
+      rows.push({
+        position,
+        team,
+        played,
+        won: numberAt(cells, wonIndex),
+        drawn: numberAt(cells, drawnIndex),
+        lost: numberAt(cells, lostIndex),
+        goalDifference: numberAt(cells, gdIndex),
+        points: numberAt(cells, ptsIndex),
+      })
+    }
+
+    if (rows.length > best.length) best = rows
+  }
+
+  return best
 }
 
 const publicHeaders = {
-  'Cache-Control': 'public, s-maxage=1800, stale-while-revalidate=86400',
+  'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=1800',
   'Access-Control-Allow-Origin': '*',
+}
+
+async function fetchFullTimeHtml(url: string) {
+  const response = await fetch(url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/142 Safari/537.36',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'Accept-Language': 'en-GB,en;q=0.9',
+      'Referer': 'https://fulltime.thefa.com/',
+    },
+    cache: 'no-store',
+  })
+  if (!response.ok) throw new Error(`Full-Time request failed (${response.status})`)
+  return response.text()
 }
 
 export async function GET(request: NextRequest) {
@@ -136,22 +202,19 @@ export async function GET(request: NextRequest) {
     const requestedTeam = request.nextUrl.searchParams.get('team') || 'First XI'
     const team = ['First XI', 'Reserves', 'Under 17s'].includes(requestedTeam) ? requestedTeam : 'First XI'
 
-    const requestOptions = {
-      headers: { 'User-Agent': 'BTFCWebsite/1.0 (+https://btfc-website.vercel.app)' },
-      next: { revalidate: 1800 },
-    } as const
-
     let matches: ReturnType<typeof parseMatches> = []
     let table: ReturnType<typeof parseTable> = []
 
     if (kind === 'matches') {
-      const response = await fetch(`${FULL_TIME_ORIGIN}/js/cs1.html?cs=${widgetCode}`, requestOptions)
-      if (!response.ok) throw new Error('Full-Time fixtures request failed')
-      matches = parseMatches(await response.text(), team)
+      const html = await fetchFullTimeHtml(`${FULL_TIME_ORIGIN}/js/cs1.html?cs=${widgetCode}`)
+      matches = parseMatches(html, team)
     } else if (kind === 'table') {
-      const response = await fetch(`${FULL_TIME_ORIGIN}/table.html?divisionseason=${divisionSeason}`, requestOptions)
-      if (!response.ok) throw new Error('Full-Time table request failed')
-      table = parseTable(await response.text())
+      const primary = await fetchFullTimeHtml(`${FULL_TIME_ORIGIN}/table.html?divisionseason=${divisionSeason}`)
+      table = parseTable(primary)
+      if (!table.length) {
+        const fallback = await fetchFullTimeHtml(`${FULL_TIME_ORIGIN}/index.html?divisionseason=${divisionSeason}`)
+        table = parseTable(fallback)
+      }
     } else {
       throw new Error('A Full-Time data kind is required')
     }
@@ -160,7 +223,9 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Unable to refresh Full-Time data:', error)
     return NextResponse.json({
-      matches: [], table: [], error: 'Full-Time data is temporarily unavailable.',
+      matches: [],
+      table: [],
+      error: 'Full-Time data is temporarily unavailable.',
       upstreamError: error instanceof Error ? error.message : 'Unknown upstream error',
     }, { status: 502, headers: { 'Access-Control-Allow-Origin': '*' } })
   }
