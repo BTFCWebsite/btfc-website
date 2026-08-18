@@ -1,28 +1,16 @@
 'use client'
 
 import { useEffect } from 'react'
+import { loadFullTimeWidgetMatches, type FullTimeFixture } from './lib/fulltime.browser'
 
-type Fixture = {
-  date?: string
-  opponent?: string
-  venue?: string
-  competition?: string
-  kickoff?: string
-  played?: boolean
-  btfcScore?: number
-  opponentScore?: number
-  sourceUrl?: string
-}
+const FIRST_XI_WIDGET = '969980533'
 
-function formatDate(value: string) {
-  const date = new Date(value)
+function formatDate(value: string, long = false) {
+  const date = new Date(`${value}T12:00:00`)
   if (Number.isNaN(date.getTime())) return ''
-  return date.toLocaleDateString('en-GB', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
+  return date.toLocaleDateString('en-GB', long
+    ? { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }
+    : { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
 }
 
 function findFixtureCard(labelText: string) {
@@ -32,118 +20,98 @@ function findFixtureCard(labelText: string) {
   return label?.parentElement as HTMLElement | null
 }
 
-function updateLatestResult(fixtures: Fixture[]) {
+function updateHomepage(fixtures: FullTimeFixture[]) {
   const latest = fixtures
-    .filter((fixture) =>
-      fixture?.played === true &&
-      fixture?.date &&
-      fixture?.opponent &&
-      fixture.btfcScore != null &&
-      fixture.opponentScore != null
-    )
-    .sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime())[0]
+    .filter((fixture) => fixture.played && fixture.date && fixture.opponent)
+    .sort((a, b) => b.date.localeCompare(a.date))[0]
 
-  if (!latest?.date || !latest?.opponent) return
+  const today = new Date().toISOString().slice(0, 10)
+  const next = fixtures
+    .filter((fixture) => !fixture.played && fixture.date >= today && fixture.opponent)
+    .sort((a, b) => a.date.localeCompare(b.date))[0]
 
-  const card = findFixtureCard('Latest Result')
-  if (!card) return
-
-  const rows = Array.from(card.children) as HTMLElement[]
-  const title = rows[1]
-  const details = rows[2]
-  if (!title || !details) return
-
-  const score = document.createElement('span')
-  score.style.color = '#EF4444'
-  score.textContent = `${latest.btfcScore}–${latest.opponentScore}`
-  title.replaceChildren(
-    document.createTextNode('BTFC '),
-    score,
-    document.createTextNode(` ${latest.opponent}`)
-  )
-
-  details.textContent = `${formatDate(latest.date)}${latest.competition ? ` · ${latest.competition}` : ''}`
-
-  if (latest.sourceUrl) {
-    const link = card.closest('a') as HTMLAnchorElement | null
-    if (link) {
-      link.href = latest.sourceUrl
-      link.target = '_blank'
-      link.rel = 'noopener noreferrer'
-    } else {
-      card.style.cursor = 'pointer'
-      card.setAttribute('role', 'link')
-      card.setAttribute('tabindex', '0')
-      const openFullTime = () => window.open(latest.sourceUrl, '_blank', 'noopener,noreferrer')
-      card.onclick = openFullTime
-      card.onkeydown = (event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault()
-          openFullTime()
+  if (latest) {
+    const card = findFixtureCard('Latest Result')
+    if (card) {
+      const rows = Array.from(card.children) as HTMLElement[]
+      const title = rows[1]
+      const details = rows[2]
+      if (title) title.textContent = `BTFC ${latest.btfcScore ?? 0}–${latest.opponentScore ?? 0} ${latest.opponent}`
+      if (details) details.textContent = `${formatDate(latest.date)}${latest.competition ? ` · ${latest.competition}` : ''}`
+      if (latest.sourceUrl) {
+        const link = card.closest('a') as HTMLAnchorElement | null
+        if (link) {
+          link.href = latest.sourceUrl
+          link.target = '_blank'
+          link.rel = 'noopener noreferrer'
         }
       }
     }
   }
+
+  if (next) {
+    const card = findFixtureCard('Next Fixture')
+    if (card) {
+      const rows = Array.from(card.children) as HTMLElement[]
+      const title = rows[1]
+      const details = rows[2]
+      if (title) title.textContent = next.venue === 'Away' ? `${next.opponent} vs BTFC` : `BTFC vs ${next.opponent}`
+      if (details) details.textContent = `${formatDate(next.date)}${next.kickoff ? ` · ${next.kickoff}` : ''}`
+      card.classList.add('next-fixture-loaded')
+    }
+  }
 }
 
-function updateNextFixture(fixtures: Fixture[]) {
-  const startOfToday = new Date()
-  startOfToday.setHours(0, 0, 0, 0)
+function updateMatchday(fixtures: FullTimeFixture[]) {
+  const today = new Date().toISOString().slice(0, 10)
+  const nextHome = fixtures
+    .filter((fixture) => !fixture.played && fixture.venue === 'Home' && fixture.date >= today)
+    .sort((a, b) => a.date.localeCompare(b.date))[0]
+  if (!nextHome) return
 
-  const next = fixtures
-    .filter((fixture) => {
-      if (!fixture?.date || !fixture?.opponent || fixture.played === true) return false
-      const fixtureDate = new Date(fixture.date).getTime()
-      return Number.isFinite(fixtureDate) && fixtureDate >= startOfToday.getTime()
-    })
-    .sort((a, b) =>
-      new Date(a.date || 0).getTime() - new Date(b.date || 0).getTime()
-    )[0]
-
-  if (!next?.date || !next?.opponent) return
-
-  const card = findFixtureCard('Next Fixture')
+  const marker = Array.from(document.querySelectorAll('div')).find(
+    element => element.textContent?.trim() === 'Your Matchday · Next Home Fixture'
+  )
+  const card = marker?.parentElement as HTMLElement | null
   if (!card) return
 
-  const rows = Array.from(card.children) as HTMLElement[]
-  const title = rows[1]
-  const details = rows[2]
-  if (!title || !details) return
-
-  title.textContent = next.venue === 'Away'
-    ? `${next.opponent} vs BTFC`
-    : `BTFC vs ${next.opponent}`
-
-  const time = next.kickoff ? ` · ${next.kickoff}` : ''
-  details.textContent = `${formatDate(next.date)}${time}`
-  card.classList.add('next-fixture-loaded')
+  const heading = card.querySelector('h1') as HTMLElement | null
+  const details = Array.from(card.querySelectorAll('p')).find((element) => element.textContent?.includes('📅')) as HTMLElement | undefined
+  if (heading) heading.textContent = `BTFC v ${nextHome.opponent}`
+  if (details) details.textContent = `📅 ${formatDate(nextHome.date, true)} · ⏰ ${nextHome.kickoff || 'TBC'} · 📍 Brackenfern Meadow`
 }
 
 export default function HomeNextFixture() {
   useEffect(() => {
+    const path = window.location.pathname
+    if (path !== '/' && path !== '/matchday') return
+
     let cancelled = false
+    let timers: number[] = []
 
-    async function loadHomepageFixtures() {
+    async function loadOfficialFixtures() {
       try {
-        const response = await fetch(
-          '/api/full-time?team=First%20XI&widget=969980533&division=320568525&kind=matches',
-          { cache: 'no-store' }
-        )
-        if (!response.ok || cancelled) return
-
-        const payload = await response.json()
+        const fixtures = await loadFullTimeWidgetMatches(FIRST_XI_WIDGET, 'First XI', 18000)
         if (cancelled) return
 
-        const fixtures = (payload?.matches || []) as Fixture[]
-        updateLatestResult(fixtures)
-        updateNextFixture(fixtures)
+        const apply = () => {
+          if (cancelled) return
+          if (window.location.pathname === '/') updateHomepage(fixtures)
+          if (window.location.pathname === '/matchday') updateMatchday(fixtures)
+        }
+
+        apply()
+        timers = [500, 1500, 3000].map((delay) => window.setTimeout(apply, delay))
       } catch (error) {
-        console.error('Unable to load the homepage fixtures', error)
+        console.error('Unable to load the official Full-Time browser widget', error)
       }
     }
 
-    loadHomepageFixtures()
-    return () => { cancelled = true }
+    loadOfficialFixtures()
+    return () => {
+      cancelled = true
+      timers.forEach((timer) => window.clearTimeout(timer))
+    }
   }, [])
 
   return (
