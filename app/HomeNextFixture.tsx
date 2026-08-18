@@ -35,11 +35,18 @@ function resizeHomepageFixtureCards() {
     const title = card.children[1] as HTMLElement | undefined
     if (!title) continue
 
-    // Size each card from the actual rendered team-name line rather than the
-    // server-side fallback name. This keeps longer live FA team names inside
-    // the tile without shrinking or clipping the title.
-    const requiredWidth = Math.ceil(title.scrollWidth + 84)
-    const cardWidth = Math.max(420, requiredWidth)
+    // Measure the text itself, not the current width of its container. Using
+    // scrollWidth here caused the cards to grow again each time the live feed
+    // reapplied, because scrollWidth included the already-expanded card width.
+    const range = document.createRange()
+    range.selectNodeContents(title)
+    const textWidth = Math.ceil(range.getBoundingClientRect().width)
+    range.detach()
+
+    // Allow enough breathing room for the existing horizontal padding while
+    // keeping the cards compact. Long club names still get the space they need.
+    const requiredWidth = textWidth + 64
+    const cardWidth = Math.min(460, Math.max(350, requiredWidth))
     card.style.flex = '0 0 auto'
     card.style.width = `${cardWidth}px`
     card.style.maxWidth = 'none'
