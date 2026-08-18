@@ -20,6 +20,37 @@ function findFixtureCard(labelText: string) {
   return label?.parentElement as HTMLElement | null
 }
 
+function resizeHomepageFixtureCards() {
+  if (window.innerWidth <= 768) return
+  const container = document.querySelector('.hero-cards') as HTMLElement | null
+  if (!container) return
+
+  const cards = Array.from(container.children).filter(
+    (element) => element instanceof HTMLElement
+  ) as HTMLElement[]
+  if (!cards.length) return
+
+  let totalWidth = 0
+  for (const card of cards) {
+    const title = card.children[1] as HTMLElement | undefined
+    if (!title) continue
+
+    // Size each card from the actual rendered team-name line rather than the
+    // server-side fallback name. This keeps longer live FA team names inside
+    // the tile without shrinking or clipping the title.
+    const requiredWidth = Math.ceil(title.scrollWidth + 84)
+    const cardWidth = Math.max(420, requiredWidth)
+    card.style.flex = '0 0 auto'
+    card.style.width = `${cardWidth}px`
+    card.style.maxWidth = 'none'
+    totalWidth += cardWidth
+  }
+
+  const gap = cards.length > 1 ? 16 * (cards.length - 1) : 0
+  container.style.width = `${totalWidth + gap}px`
+  container.style.maxWidth = 'calc(100vw - 48px)'
+}
+
 function updateHomepage(fixtures: FullTimeFixture[]) {
   const latest = fixtures
     .filter((fixture) => fixture.played && fixture.date && fixture.opponent)
@@ -60,6 +91,8 @@ function updateHomepage(fixtures: FullTimeFixture[]) {
       card.classList.add('next-fixture-loaded')
     }
   }
+
+  window.requestAnimationFrame(resizeHomepageFixtureCards)
 }
 
 function updateMatchday(fixtures: FullTimeFixture[]) {
@@ -89,6 +122,11 @@ export default function HomeNextFixture() {
     let cancelled = false
     let timers: number[] = []
 
+    const handleResize = () => {
+      if (window.location.pathname === '/') resizeHomepageFixtureCards()
+    }
+    window.addEventListener('resize', handleResize)
+
     async function loadOfficialFixtures() {
       try {
         const fixtures = await loadFullTimeWidgetMatches(FIRST_XI_WIDGET, 'First XI', 18000)
@@ -107,10 +145,12 @@ export default function HomeNextFixture() {
       }
     }
 
+    if (path === '/') window.requestAnimationFrame(resizeHomepageFixtureCards)
     loadOfficialFixtures()
     return () => {
       cancelled = true
       timers.forEach((timer) => window.clearTimeout(timer))
+      window.removeEventListener('resize', handleResize)
     }
   }, [])
 
@@ -139,6 +179,17 @@ export default function HomeNextFixture() {
       }
       .hero-cards > :nth-child(2).next-fixture-loaded::after {
         display: none;
+      }
+      @media(max-width:768px) {
+        .hero-cards {
+          width: 100% !important;
+          max-width: none !important;
+        }
+        .hero-cards > * {
+          width: 100% !important;
+          max-width: none !important;
+          flex: 1 1 auto !important;
+        }
       }
     `}</style>
   )
