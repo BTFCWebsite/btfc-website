@@ -53,11 +53,13 @@ export default function MatchReportLinkLabels() {
         const isFixtureDetailsLink =
           text === 'Full-Time details' ||
           text === 'Full-Time details →' ||
+          text === 'Match Details' ||
+          text === 'Match Details →' ||
           text === 'Match Report' ||
           text === 'Match Report →'
 
-        if (text === 'Full-Time details') link.textContent = 'Match Report'
-        if (text === 'Full-Time details →') link.textContent = 'Match Report →'
+        if (text === 'Full-Time details' || text === 'Match Details') link.textContent = 'Match Report'
+        if (text === 'Full-Time details →' || text === 'Match Details →') link.textContent = 'Match Report →'
 
         const localReport = reportLinks.get(normaliseUrl(link.href))
         if (isFixtureDetailsLink && localReport) {
