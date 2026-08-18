@@ -1,13 +1,11 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import Link from 'next/link'
 import { getFixtures, getMatchFeeds } from './lib/sanity.client'
 import { fullTimeWidgetDocument, loadFullTimeWidgetMatches, type FullTimeFixture } from './lib/fulltime.browser'
 
 type TeamId = 'first' | 'reserves' | 'u17s'
 type ViewId = 'matches' | 'table'
-
 type Fixture = FullTimeFixture & { programmeUrl?: string }
 
 type FeedConfig = {
@@ -63,13 +61,15 @@ function formFor(fixture: Fixture) {
   return 'D'
 }
 
-function OfficialWidget({ widget }: { widget: string }) {
+function OfficialWidget({ widget, title }: { widget: string; title: string }) {
   return (
-    <iframe
-      srcDoc={fullTimeWidgetDocument(widget)}
-      title={`Official Full-Time fixtures ${widget}`}
-      style={{ width: '100%', minHeight: 1450, border: 0, background: '#fff', borderRadius: 10 }}
-    />
+    <div style={{ background: '#fff', border: '1px solid #DCE3F1', borderRadius: 10, overflow: 'hidden', boxShadow: '0 8px 24px rgba(4,27,95,.06)', marginBottom: 20 }}>
+      <iframe
+        srcDoc={fullTimeWidgetDocument(widget)}
+        title={title}
+        style={{ display: 'block', width: '100%', minHeight: 1100, border: 0, background: '#fff' }}
+      />
+    </div>
   )
 }
 
@@ -77,9 +77,10 @@ export default function ReliableFixtures() {
   const [team, setTeam] = useState<TeamId>('first')
   const [view, setView] = useState<ViewId>('matches')
   const [configs, setConfigs] = useState<Record<TeamId, FeedConfig>>(DEFAULTS)
+  const [configReady, setConfigReady] = useState(false)
   const [manualFixtures, setManualFixtures] = useState<any[]>([])
   const [liveFixtures, setLiveFixtures] = useState<Record<TeamId, Fixture[]>>({ first: [], reserves: [], u17s: [] })
-  const [loading, setLoading] = useState<Record<TeamId, boolean>>({ first: true, reserves: true, u17s: true })
+  const [loading, setLoading] = useState<Record<TeamId, boolean>>({ first: true, reserves: false, u17s: true })
   const [failed, setFailed] = useState<Record<TeamId, boolean>>({ first: false, reserves: false, u17s: false })
   const [tableRows, setTableRows] = useState<any[]>([])
   const [tableLoading, setTableLoading] = useState(false)
@@ -100,6 +101,7 @@ export default function ReliableFixtures() {
           const snippet = String(feed.snippet)
           const widget = snippet.match(/\blrcode\s*=\s*['\"](\d+)['\"]/i)?.[1] || ''
           const division = snippet.match(/[?&]divisionseason=(\d+)/i)?.[1] || ''
+
           if (id === 'reserves') {
             next.reserves = DEFAULTS.reserves
           } else {
@@ -113,6 +115,8 @@ export default function ReliableFixtures() {
         setConfigs(next)
       } catch (error) {
         console.error('Unable to load Full-Time feed configuration', error)
+      } finally {
+        if (!cancelled) setConfigReady(true)
       }
     }
 
@@ -121,9 +125,10 @@ export default function ReliableFixtures() {
   }, [])
 
   useEffect(() => {
+    if (!configReady) return
     let cancelled = false
 
-    async function loadTeam(teamId: TeamId) {
+    async function loadTeam(teamId: 'first' | 'u17s') {
       const config = configs[teamId]
       if (!config.widgets.length) {
         if (!cancelled) {
@@ -146,24 +151,33 @@ export default function ReliableFixtures() {
           (candidate.date === fixture.date && normalise(candidate.opponent) === normalise(fixture.opponent))
         ) === index
       )
+
       setLiveFixtures((state) => ({ ...state, [teamId]: deduped }))
       setFailed((state) => ({ ...state, [teamId]: deduped.length === 0 }))
       setLoading((state) => ({ ...state, [teamId]: false }))
     }
 
     loadTeam('first')
-    loadTeam('reserves')
     loadTeam('u17s')
     return () => { cancelled = true }
-  }, [configs])
+  }, [configs, configReady])
 
   useEffect(() => {
     let cancelled = false
+
     async function loadTable() {
-      if (view !== 'table') return
-      const division = configs[team].division
       setTableRows([])
-      if (!division) return
+      if (view !== 'table' || team === 'first') {
+        setTableLoading(false)
+        return
+      }
+
+      const division = configs[team].division
+      if (!division) {
+        setTableLoading(false)
+        return
+      }
+
       setTableLoading(true)
       try {
         const response = await fetch(`/api/full-time?kind=table&division=${division}&team=${encodeURIComponent(configs[team].team)}`, { cache: 'no-store' })
@@ -172,11 +186,12 @@ export default function ReliableFixtures() {
           setTableRows(Array.isArray(payload?.table) ? payload.table : [])
         }
       } catch {
-        // The official Full-Time link below remains available.
+        // Keep the official Full-Time link available below.
       } finally {
         if (!cancelled) setTableLoading(false)
       }
     }
+
     loadTable()
     return () => { cancelled = true }
   }, [team, view, configs])
@@ -212,6 +227,7 @@ export default function ReliableFixtures() {
           .reliable-mobile { display:block !important; }
         }
       `}</style>
+
       <div style={{ maxWidth: 1180, margin: '0 auto' }}>
         <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginBottom: 18, flexWrap: 'wrap' }}>
           {(Object.keys(TEAM_DETAILS) as TeamId[]).map((id) => (
@@ -236,25 +252,34 @@ export default function ReliableFixtures() {
               <div style={{ background: '#fff', border: '2px solid #1149D8', borderRadius: 6, padding: '10px 16px', fontFamily: "'Montserrat',sans-serif", fontSize: 12, fontWeight: 800, color: '#041B5F', textTransform: 'uppercase' }}>Season 2026/27</div>
             </div>
 
-            {loading[team] && combined.length === 0 && <div style={{ padding: 44, background: '#fff', borderRadius: 8, textAlign: 'center', fontFamily: "'Montserrat',sans-serif", color: '#6B7280' }}>Loading official fixtures…</div>}
-
-            {!loading[team] && combined.length > 0 && (
-              <>
-                <div className="reliable-desktop" style={{ background: '#fff', border: '1px solid #DCE3F1', borderTop: '5px solid #1149D8', borderRadius: 8, overflowX: 'auto', boxShadow: '0 8px 24px rgba(4,27,95,.06)' }}>
-                  <table style={{ width: '100%', minWidth: 900, borderCollapse: 'collapse', fontFamily: "'Montserrat',sans-serif", color: '#172554' }}>
-                    <thead><tr style={{ background: '#041B5F' }}>{['Date','KO','Home/Away','Opponent','Competition','Result','Form','Details'].map((heading) => <th key={heading} style={{ padding: '16px 14px', textAlign: 'left', color: '#fff', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 15, fontWeight: 800, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{heading}</th>)}</tr></thead>
-                    <tbody>{Object.entries(grouped).map(([month, fixtures]) => <DesktopRows key={month} month={month} fixtures={fixtures} />)}</tbody>
-                  </table>
-                </div>
-                <div className="reliable-mobile">{Object.entries(grouped).map(([month, fixtures]) => <MobileMonth key={month} month={month} fixtures={fixtures} />)}</div>
-              </>
-            )}
-
-            {!loading[team] && failed[team] && (
-              <div style={{ marginTop: 24 }}>
-                <div style={{ padding: '14px 18px', background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 8, marginBottom: 14, fontFamily: "'Montserrat',sans-serif", fontSize: 12, color: '#9A3412' }}>Our formatted fixture view could not read the FA feed, so the official Full-Time widget is shown below.</div>
-                {configs[team].widgets.map((widget) => <OfficialWidget key={widget} widget={widget} />)}
+            {team === 'reserves' ? (
+              <div>
+                <OfficialWidget widget="625925242" title="Official BTFC Reserves fixtures and results feed 1" />
+                <OfficialWidget widget="681011209" title="Official BTFC Reserves fixtures and results feed 2" />
               </div>
+            ) : (
+              <>
+                {loading[team] && combined.length === 0 && <div style={{ padding: 44, background: '#fff', borderRadius: 8, textAlign: 'center', fontFamily: "'Montserrat',sans-serif", color: '#6B7280' }}>Loading official fixtures…</div>}
+
+                {!loading[team] && combined.length > 0 && (
+                  <>
+                    <div className="reliable-desktop" style={{ background: '#fff', border: '1px solid #DCE3F1', borderTop: '5px solid #1149D8', borderRadius: 8, overflowX: 'auto', boxShadow: '0 8px 24px rgba(4,27,95,.06)' }}>
+                      <table style={{ width: '100%', minWidth: 900, borderCollapse: 'collapse', fontFamily: "'Montserrat',sans-serif", color: '#172554' }}>
+                        <thead><tr style={{ background: '#041B5F' }}>{['Date','KO','Home/Away','Opponent','Competition','Result','Form','Details'].map((heading) => <th key={heading} style={{ padding: '16px 14px', textAlign: 'left', color: '#fff', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 15, fontWeight: 800, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{heading}</th>)}</tr></thead>
+                        <tbody>{Object.entries(grouped).map(([month, fixtures]) => <DesktopRows key={month} month={month} fixtures={fixtures} />)}</tbody>
+                      </table>
+                    </div>
+                    <div className="reliable-mobile">{Object.entries(grouped).map(([month, fixtures]) => <MobileMonth key={month} month={month} fixtures={fixtures} />)}</div>
+                  </>
+                )}
+
+                {!loading[team] && failed[team] && (
+                  <div style={{ marginTop: 24 }}>
+                    <div style={{ padding: '14px 18px', background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 8, marginBottom: 14, fontFamily: "'Montserrat',sans-serif", fontSize: 12, color: '#9A3412' }}>Our formatted fixture view could not read the FA feed, so the official Full-Time widget is shown below.</div>
+                    {configs[team].widgets.map((widget) => <OfficialWidget key={widget} widget={widget} title={`Official ${configs[team].team} fixtures and results`} />)}
+                  </div>
+                )}
+              </>
             )}
           </section>
         )}
@@ -262,13 +287,26 @@ export default function ReliableFixtures() {
         {view === 'table' && (
           <section>
             <h1 style={{ margin: '0 0 20px', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: 'clamp(30px,5vw,42px)', color: '#041B5F', textTransform: 'uppercase' }}>{selected.heading} League Table</h1>
-            {tableLoading && <div style={{ padding: 40, background: '#fff', borderRadius: 8, textAlign: 'center' }}>Loading league table…</div>}
-            {!tableLoading && tableRows.length > 0 && <LeagueTable rows={tableRows} />}
-            {!tableLoading && tableRows.length === 0 && (
-              <div style={{ background: '#fff', border: '1px solid #DCE3F1', borderRadius: 8, padding: 32, textAlign: 'center' }}>
-                <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 13, color: '#6B7280', margin: '0 0 18px' }}>The live league table cannot currently be read by the website.</p>
-                {configs[team].division && <a href={`https://fulltime.thefa.com/index.html?divisionseason=${configs[team].division}`} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', background: '#1149D8', color: '#fff', padding: '12px 20px', borderRadius: 6, textDecoration: 'none', fontFamily: "'Montserrat',sans-serif", fontWeight: 800, fontSize: 12 }}>View Official League Table on Full-Time →</a>}
+
+            {team === 'first' ? (
+              <div style={{ background: '#fff', border: '1px solid #DCE3F1', borderRadius: 10, overflow: 'hidden', boxShadow: '0 8px 24px rgba(4,27,95,.06)' }}>
+                <iframe
+                  src="/full-time/first-team.html"
+                  title="Official First XI Hellenic League Division One table"
+                  style={{ display: 'block', width: '100%', minHeight: 1450, border: 0, background: '#fff' }}
+                />
               </div>
+            ) : (
+              <>
+                {tableLoading && <div style={{ padding: 40, background: '#fff', borderRadius: 8, textAlign: 'center' }}>Loading league table…</div>}
+                {!tableLoading && tableRows.length > 0 && <LeagueTable rows={tableRows} />}
+                {!tableLoading && tableRows.length === 0 && (
+                  <div style={{ background: '#fff', border: '1px solid #DCE3F1', borderRadius: 8, padding: 32, textAlign: 'center' }}>
+                    <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 13, color: '#6B7280', margin: '0 0 18px' }}>The live league table cannot currently be read by the website.</p>
+                    {configs[team].division && <a href={`https://fulltime.thefa.com/index.html?divisionseason=${configs[team].division}`} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', background: '#1149D8', color: '#fff', padding: '12px 20px', borderRadius: 6, textDecoration: 'none', fontFamily: "'Montserrat',sans-serif", fontWeight: 800, fontSize: 12 }}>View Official League Table on Full-Time →</a>}
+                  </div>
+                )}
+              </>
             )}
           </section>
         )}
