@@ -19,6 +19,8 @@ const MONTHS: Record<string, number> = {
   jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12,
 }
 
+const inflightLoads = new Map<string, Promise<FullTimeFixture[]>>()
+
 function normalise(value: string) {
   return String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '')
 }
@@ -51,31 +53,56 @@ function parseWidgetDocument(doc: Document, team: string): FullTimeFixture[] {
   let currentDate: { date: string; kickoff: string } | null = null
 
   for (const row of Array.from(doc.querySelectorAll('tr'))) {
-    const cells = Array.from(row.children).filter((node) => node.tagName === 'TD') as HTMLTableCellElement[]
+    const cells = Array.from(row.children).filter(
+      (node) => node.tagName === 'TD' || node.tagName === 'TH'
+    ) as HTMLTableCellElement[]
+
     if (cells.length === 1) {
       const parsed = parseDateLabel(cells[0].textContent || '')
       if (parsed) currentDate = parsed
       continue
     }
 
-    if (!currentDate || cells.length < 7) continue
+    if (!currentDate || cells.length < 5) continue
 
     const text = (index: number) => String(cells[index]?.textContent || '').replace(/\s+/g, ' ').trim()
     const competition = text(0)
-    const homeTeam = text(1)
-    const homeScore = text(2)
-    const separator = text(3).toLowerCase()
-    const awayScore = text(4)
-    const awayTeam = text(5)
-    const location = text(6)
+
+    let homeTeam = ''
+    let awayTeam = ''
+    let homeScore = ''
+    let awayScore = ''
+    let played = false
+    let location = ''
+
+    if (cells.length >= 7) {
+      homeTeam = text(1)
+      homeScore = text(2)
+      const separator = text(3).toLowerCase()
+      awayScore = text(4)
+      awayTeam = text(5)
+      location = text(6)
+      played = (separator === '-' || separator === '–') && /^\d+$/.test(homeScore) && /^\d+$/.test(awayScore)
+    } else {
+      // Current FA Full-Time widgets commonly use five logical columns:
+      // competition | home | score/v | away | venue.
+      homeTeam = text(1)
+      const scoreOrVersus = text(2)
+      awayTeam = text(3)
+      location = text(4)
+      const score = scoreOrVersus.match(/^(\d+)\s*[-–]\s*(\d+)$/)
+      if (score) {
+        homeScore = score[1]
+        awayScore = score[2]
+        played = true
+      }
+    }
+
     const isHome = isBtfc(homeTeam)
     const isAway = isBtfc(awayTeam)
     if (!isHome && !isAway) continue
 
-    const played = (separator === '-' || separator === '–') && /^\d+$/.test(homeScore) && /^\d+$/.test(awayScore)
-    const link = cells[0].querySelector('a[href]') as HTMLAnchorElement | null
-      || cells[1].querySelector('a[href]') as HTMLAnchorElement | null
-      || cells[5].querySelector('a[href]') as HTMLAnchorElement | null
+    const link = row.querySelector('a[href]') as HTMLAnchorElement | null
     const sourceUrl = link?.href
     const sourceId = sourceUrl?.match(/[?&]id=(\d+)/)?.[1]
     const opponent = isHome ? awayTeam : homeTeam
@@ -110,7 +137,7 @@ export function fullTimeWidgetDocument(widgetCode: string) {
   return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;background:#fff;font-family:Arial,sans-serif}body{overflow-x:auto}div[id^="lrep"]{width:100%!important}table{max-width:100%}</style></head><body><div id="lrep${safeCode}" style="width:100%;">Data loading....<br><br><a href="https://www.thefa.com/FULL-TIME">FULL-TIME Home</a></div><script>var lrcode='${safeCode}'</script><script src="https://fulltime.thefa.com/client/api/cs1.js"></script></body></html>`
 }
 
-export function loadFullTimeWidgetMatches(widgetCode: string, team: string, timeoutMs = 15000): Promise<FullTimeFixture[]> {
+function createWidgetLoad(widgetCode: string, team: string, timeoutMs: number): Promise<FullTimeFixture[]> {
   return new Promise((resolve, reject) => {
     if (typeof document === 'undefined' || !/^\d+$/.test(widgetCode)) {
       reject(new Error('A valid Full-Time widget code is required'))
@@ -155,4 +182,17 @@ export function loadFullTimeWidgetMatches(widgetCode: string, team: string, time
       }
     }, 300)
   })
+}
+
+export function loadFullTimeWidgetMatches(widgetCode: string, team: string, timeoutMs = 15000): Promise<FullTimeFixture[]> {
+  const key = `${widgetCode}:${team}`
+  const existing = inflightLoads.get(key)
+  if (existing) return existing
+
+  const load = createWidgetLoad(widgetCode, team, timeoutMs)
+  inflightLoads.set(key, load)
+  load.finally(() => {
+    if (inflightLoads.get(key) === load) inflightLoads.delete(key)
+  })
+  return load
 }
