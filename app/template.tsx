@@ -9,6 +9,7 @@ import ContactsMobileTileWidth from './ContactsMobileTileWidth'
 import SponsorTickerSync from './SponsorTickerSync'
 import SiteSeo from './SiteSeo'
 import LeagueTableMobileScrollCue from './LeagueTableMobileScrollCue'
+import MatchdayProgrammeHeroButton from './MatchdayProgrammeHeroButton'
 
 // Deployment marker: restored stable version from 1 August 2026.
 export default function Template({ children }: { children: ReactNode }) {
@@ -73,6 +74,7 @@ export default function Template({ children }: { children: ReactNode }) {
       <ContactsMobileTileWidth />
       <SponsorTickerSync />
       <LeagueTableMobileScrollCue />
+      <MatchdayProgrammeHeroButton />
     </>
   )
 }
