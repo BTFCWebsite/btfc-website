@@ -1,6 +1,15 @@
+import {createClient} from 'next-sanity'
 import {client} from '../lib/sanity.client'
 
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
+
+const freshClient = createClient({
+  projectId: 'vm0n9zl5',
+  dataset: 'production',
+  apiVersion: '2024-01-01',
+  useCdn: false,
+  token: undefined,
+})
 
 const FALLBACK_MAP_EMBED = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d737.3188611688546!2d-2.196166640744735!3d51.72201894723951!2m3!1f0!2f0!3f0!3m2!1i1024!1i768!4f13.1!3m3!1m2!1s0x48710c418313cc5f%3A0x6e0c3c089afa1c4d!2sBrimscombe%20and%20Thrupp%20Football%20Club!5e1!3m2!1sen!2suk!4v1780823602873!5m2!1sen!2suk'
 const FALLBACK_MAP_URL = 'https://maps.google.com/?q=Brimscombe+and+Thrupp+FC,+London+Road,+Brimscombe,+GL5+2SD'
@@ -30,6 +39,41 @@ function normalise(value: string) {
   return String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '')
 }
 
+function programmeMatchesFixture(programme: any, fixture: any) {
+  const selected = programmeFixture(programme)
+  if (!selected || !fixture) return false
+
+  const fixtureId = String(fixture._id || '')
+  const selectedId = String(selected?.id || '')
+  const strippedFixtureId = fixtureId.replace(/^full-time-/, '')
+  const strippedSelectedId = selectedId.replace(/^full-time-/, '')
+
+  if (selectedId && fixtureId && (
+    selectedId === fixtureId ||
+    selectedId === strippedFixtureId ||
+    strippedSelectedId === fixtureId ||
+    strippedSelectedId === strippedFixtureId
+  )) return true
+
+  const selectedDate = String(selected?.date || '')
+  const fixtureDate = String(fixture?.date || '')
+  if (selectedDate && fixtureDate && selectedDate === fixtureDate) {
+    const selectedOpponent = normalise(selected?.opponent || '')
+    const fixtureOpponent = normalise(fixture?.opponent || '')
+
+    // The date is the stable identifier for a programme. Opponent text can vary
+    // slightly between Full-Time and older saved Sanity records.
+    if (!selectedOpponent || !fixtureOpponent) return true
+    if (selectedOpponent === fixtureOpponent) return true
+    if (selectedOpponent.includes(fixtureOpponent) || fixtureOpponent.includes(selectedOpponent)) return true
+
+    // A First XI home programme can only belong to one fixture on a given date.
+    return selected?.venue !== 'Away'
+  }
+
+  return false
+}
+
 async function loadMatchdayData() {
   const settingsQuery = `*[_type == "siteSettings"] | order(_updatedAt desc)[0]`
   const manualFixturesQuery = `*[_type == "fixture"] | order(date asc) {
@@ -43,7 +87,7 @@ async function loadMatchdayData() {
   const [settingsResult, manualResult, programmeResult, fullTimeResult] = await Promise.allSettled([
     client.fetch(settingsQuery, {}, {next: {revalidate: 60}}),
     client.fetch(manualFixturesQuery, {}, {next: {revalidate: 60}}),
-    client.fetch(programmesQuery, {}, {next: {revalidate: 60}}),
+    freshClient.fetch(programmesQuery, {}, {cache: 'no-store'}),
     fetch('https://btfc-website.vercel.app/api/full-time?kind=matches&team=First%20XI&widget=969980533&division=320568525', {
       next: {revalidate: 300},
     }).then(async response => response.ok ? response.json() : {matches: []}),
@@ -64,13 +108,19 @@ async function loadMatchdayData() {
     ) === index)
     .sort((a: any, b: any) => String(a.date).localeCompare(String(b.date)))[0] || null
 
-  const programme = nextHomeGame ? programmes.find((item: any) => {
-    const selected = programmeFixture(item)
-    const nextId = String(nextHomeGame._id || '')
-    const selectedId = String(selected?.id || '')
-    return selectedId === nextId || selectedId === nextId.replace(/^full-time-/, '') ||
-      (selected?.date === nextHomeGame.date && normalise(selected?.opponent) === normalise(nextHomeGame.opponent))
-  }) || null : null
+  const publishedProgrammes = programmes.filter((item: any) => Boolean(item?.programmeUrl))
+  let programme = nextHomeGame
+    ? publishedProgrammes.find((item: any) => programmeMatchesFixture(item, nextHomeGame)) || null
+    : null
+
+  // Final safe fallback: if Full-Time has changed its fixture metadata, use a
+  // published programme saved for exactly the same date as the next home game.
+  if (!programme && nextHomeGame?.date) {
+    programme = publishedProgrammes.find((item: any) => {
+      const selected = programmeFixture(item)
+      return String(selected?.date || item?.matchDate || '') === String(nextHomeGame.date)
+    }) || null
+  }
 
   return {settings, nextHomeGame, programme}
 }
