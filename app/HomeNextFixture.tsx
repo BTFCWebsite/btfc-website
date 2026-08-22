@@ -35,16 +35,11 @@ function resizeHomepageFixtureCards() {
     const title = card.children[1] as HTMLElement | undefined
     if (!title) continue
 
-    // Measure the text itself, not the current width of its container. Using
-    // scrollWidth here caused the cards to grow again each time the live feed
-    // reapplied, because scrollWidth included the already-expanded card width.
     const range = document.createRange()
     range.selectNodeContents(title)
     const textWidth = Math.ceil(range.getBoundingClientRect().width)
     range.detach()
 
-    // Allow enough breathing room for the existing horizontal padding while
-    // keeping the cards compact. Long club names still get the space they need.
     const requiredWidth = textWidth + 64
     const cardWidth = Math.min(460, Math.max(350, requiredWidth))
     card.style.flex = '0 0 auto'
@@ -102,36 +97,14 @@ function updateHomepage(fixtures: FullTimeFixture[]) {
   window.requestAnimationFrame(resizeHomepageFixtureCards)
 }
 
-function updateMatchday(fixtures: FullTimeFixture[]) {
-  const today = new Date().toISOString().slice(0, 10)
-  const nextHome = fixtures
-    .filter((fixture) => !fixture.played && fixture.venue === 'Home' && fixture.date >= today)
-    .sort((a, b) => a.date.localeCompare(b.date))[0]
-  if (!nextHome) return
-
-  const marker = Array.from(document.querySelectorAll('div')).find(
-    element => element.textContent?.trim() === 'Your Matchday · Next Home Fixture'
-  )
-  const card = marker?.parentElement as HTMLElement | null
-  if (!card) return
-
-  const heading = card.querySelector('h1') as HTMLElement | null
-  const details = Array.from(card.querySelectorAll('p')).find((element) => element.textContent?.includes('📅')) as HTMLElement | undefined
-  if (heading) heading.textContent = `BTFC v ${nextHome.opponent}`
-  if (details) details.textContent = `📅 ${formatDate(nextHome.date, true)} · ⏰ ${nextHome.kickoff || 'TBC'} · 📍 Brackenfern Meadow`
-}
-
 export default function HomeNextFixture() {
   useEffect(() => {
-    const path = window.location.pathname
-    if (path !== '/' && path !== '/matchday') return
+    if (window.location.pathname !== '/') return
 
     let cancelled = false
     let timers: number[] = []
 
-    const handleResize = () => {
-      if (window.location.pathname === '/') resizeHomepageFixtureCards()
-    }
+    const handleResize = () => resizeHomepageFixtureCards()
     window.addEventListener('resize', handleResize)
 
     async function loadOfficialFixtures() {
@@ -141,8 +114,7 @@ export default function HomeNextFixture() {
 
         const apply = () => {
           if (cancelled) return
-          if (window.location.pathname === '/') updateHomepage(fixtures)
-          if (window.location.pathname === '/matchday') updateMatchday(fixtures)
+          updateHomepage(fixtures)
         }
 
         apply()
@@ -152,7 +124,7 @@ export default function HomeNextFixture() {
       }
     }
 
-    if (path === '/') window.requestAnimationFrame(resizeHomepageFixtureCards)
+    window.requestAnimationFrame(resizeHomepageFixtureCards)
     loadOfficialFixtures()
     return () => {
       cancelled = true
