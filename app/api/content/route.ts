@@ -49,9 +49,21 @@ const queries: Record<string, string> = {
     _id, name, tier, role, about, contactName, phone, email, website,
     "logoUrl": logo.asset->url
   }`,
-  sponsorshipPackages: `*[_type == "sponsorshipPackage"] | order(order asc) {
-    _id, name, icon, colour, featured, available, currentSponsor,
-    description, priceNote, benefits, order
+  sponsorshipPackages: `*[_type == "sponsorshipPackage"] | order(coalesce(displayOrder, order) asc) {
+    _id,
+    "name": select(
+      coalesce(title, name) == "Gold Partner" => "Premium Partner",
+      coalesce(title, name)
+    ),
+    icon,
+    colour,
+    featured,
+    available,
+    currentSponsor,
+    "description": coalesce(summary, description),
+    priceNote,
+    benefits,
+    "order": coalesce(displayOrder, order)
   }`,
 }
 
