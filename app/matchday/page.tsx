@@ -17,27 +17,49 @@ function normalise(value: string) {
   return String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '')
 }
 
+function parseFixtureValue(value: unknown) {
+  if (!value || typeof value !== 'string') return null
+  try { return JSON.parse(value) } catch { return null }
+}
+
 async function loadMatchdayData() {
   const settingsQuery = `*[_type == "siteSettings"] | order(_updatedAt desc)[0]`
   const manualFixturesQuery = `*[_type == "fixture"] | order(date asc) {
     _id, date, opponent, team, venue, competition, kickoff, btfcScore, opponentScore, played
   }`
+  const programmesQuery = `*[_type == "matchdayProgramme" && published != false] | order(_updatedAt desc) {
+    _id, fixture, selectedFixture, fullTimeFixtureId, opponent, matchDate
+  }`
 
-  const [settingsResult, manualResult, fullTimeResult] = await Promise.allSettled([
+  const [settingsResult, manualResult, programmeResult] = await Promise.allSettled([
     client.fetch(settingsQuery, {}, {next: {revalidate: 300}}),
     client.fetch(manualFixturesQuery, {}, {next: {revalidate: 300}}),
-    fetch('https://btfc-website.vercel.app/api/full-time?kind=matches&team=First%20XI&widget=969980533&division=320568525', {
-      cache: 'force-cache',
-      next: {revalidate: 300},
-    }).then(async response => response.ok ? response.json() : {matches: []}),
+    client.fetch(programmesQuery, {}, {next: {revalidate: 60}}),
   ])
 
   const settings = settingsResult.status === 'fulfilled' ? settingsResult.value || {} : {}
   const manualFixtures = manualResult.status === 'fulfilled' && Array.isArray(manualResult.value) ? manualResult.value : []
-  const fullTime = fullTimeResult.status === 'fulfilled' ? fullTimeResult.value : {matches: []}
+  const programmes = programmeResult.status === 'fulfilled' && Array.isArray(programmeResult.value) ? programmeResult.value : []
 
   const today = new Date().toISOString().slice(0, 10)
-  const allFixtures = [...(Array.isArray(fullTime?.matches) ? fullTime.matches : []), ...manualFixtures]
+  const programmeFixtures = programmes.flatMap((programme: any) => {
+    const selected = parseFixtureValue(programme.selectedFixture) || parseFixtureValue(programme.fixture)
+    const date = String(selected?.date || programme.matchDate || '')
+    const opponent = String(selected?.opponent || programme.opponent || '')
+    if (!date || !opponent || date < today) return []
+    return [{
+      _id: String(selected?.id || programme.fullTimeFixtureId || `programme-${programme._id}`),
+      date,
+      opponent,
+      team: 'First XI',
+      venue: selected?.venue || 'Home',
+      competition: selected?.competition || 'Hellenic League Division One',
+      kickoff: selected?.kickoff || 'TBC',
+      played: false,
+    }]
+  })
+
+  const allFixtures = [...manualFixtures, ...programmeFixtures]
   const nextHomeGame = allFixtures
     .filter((fixture: any) => fixture.team === 'First XI' && fixture.venue === 'Home' && fixture.date >= today && !fixture.played)
     .filter((fixture: any, index: number, all: any[]) => all.findIndex(candidate =>
@@ -85,9 +107,9 @@ export default async function MatchdayPage() {
         <div className="mobile-feature-card" style={{background: '#041B5F', borderRadius: 10, padding: '28px 30px', color: '#fff', marginBottom: 44, boxShadow: '0 12px 32px rgba(4,27,95,.18)'}}>
           <div style={{fontFamily: "'Montserrat', sans-serif", fontSize: 10, letterSpacing: '.14em', opacity: .65, textTransform: 'uppercase', marginBottom: 12}}>Your Matchday · Next Home Fixture</div>
           <div>
-            <div style={{fontFamily: "'Montserrat', sans-serif", fontSize: 11, fontWeight: 800, color: '#93C5FD', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 6}}>{nextHomeGame?.competition || settings.seasonYear || 'First XI'}</div>
-            <h1 style={{fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(32px, 6vw, 48px)', fontWeight: 800, margin: '0 0 10px', lineHeight: 1}}>{nextHomeGame ? `BTFC v ${nextHomeGame.opponent}` : 'Next home fixture to be confirmed'}</h1>
-            <p style={{fontFamily: "'Montserrat', sans-serif", margin: 0, color: 'rgba(255,255,255,.76)', fontSize: 13, lineHeight: 1.7}}>📅 {fixtureDate} · ⏰ {nextHomeGame?.kickoff || 'TBC'} · 📍 {groundName}</p>
+            <div className="matchday-fixture-competition" style={{fontFamily: "'Montserrat', sans-serif", fontSize: 11, fontWeight: 800, color: '#93C5FD', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 6}}>{nextHomeGame?.competition || settings.seasonYear || 'First XI'}</div>
+            <h1 className="matchday-fixture-title" style={{fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(32px, 6vw, 48px)', fontWeight: 800, margin: '0 0 10px', lineHeight: 1}}>{nextHomeGame ? `BTFC v ${nextHomeGame.opponent}` : 'Loading next home fixture…'}</h1>
+            <p className="matchday-fixture-details" style={{fontFamily: "'Montserrat', sans-serif", margin: 0, color: 'rgba(255,255,255,.76)', fontSize: 13, lineHeight: 1.7}}>📅 {fixtureDate} · ⏰ {nextHomeGame?.kickoff || 'TBC'} · 📍 {groundName}</p>
           </div>
           <div className="matchday-hero-actions" style={{display: 'flex', gap: 10, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', width: '100%', marginTop: 22}}>
             <div>
