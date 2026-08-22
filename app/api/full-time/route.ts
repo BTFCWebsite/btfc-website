@@ -5,7 +5,8 @@ const FALLBACK_WIDGET_CODE = '969980533'
 const FALLBACK_DIVISION_SEASON = '320568525'
 const BTFC = 'Brimscombe & Thrupp'
 
-export const revalidate = 300
+export const dynamic = 'force-dynamic'
+export const runtime = 'edge'
 
 function textFromHtml(value: string) {
   return value
@@ -131,8 +132,6 @@ function parseTable(html: string) {
     let points = 0
 
     if (stats.length >= 15) {
-      // Expanded FA layout:
-      // P | Home W D L F A | Away W D L F A | Overall W D L F A GD PPG PTS
       played = numeric(stats[0])
       const overall = stats.slice(-8)
       won = numeric(overall[0])
@@ -141,7 +140,6 @@ function parseTable(html: string) {
       goalDifference = numeric(overall[5])
       points = numeric(overall[7])
     } else if (stats.length >= 8) {
-      // Compact layout: P W D L F A GD PTS
       played = numeric(stats[0])
       won = numeric(stats[1])
       drawn = numeric(stats[2])
@@ -149,7 +147,6 @@ function parseTable(html: string) {
       goalDifference = numeric(stats[stats.length - 2])
       points = numeric(stats[stats.length - 1])
     } else {
-      // Minimal layout: P W D L GD PTS
       played = numeric(stats[0])
       won = numeric(stats[1])
       drawn = numeric(stats[2])
@@ -158,16 +155,7 @@ function parseTable(html: string) {
       points = numeric(stats[5])
     }
 
-    return [{
-      position,
-      team,
-      played,
-      won,
-      drawn,
-      lost,
-      goalDifference,
-      points,
-    }]
+    return [{ position, team, played, won, drawn, lost, goalDifference, points }]
   })
 }
 
@@ -188,7 +176,7 @@ export async function GET(request: NextRequest) {
 
     const requestOptions = {
       headers: { 'User-Agent': 'BTFCWebsite/1.0 (+https://brimscombeandthruppfc.co.uk)' },
-      next: { revalidate: 300 },
+      cache: 'no-store' as const,
     }
 
     let matches: ReturnType<typeof parseMatches> = []
