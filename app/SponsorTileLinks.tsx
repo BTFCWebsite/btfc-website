@@ -19,9 +19,17 @@ function findSponsorCard(start: Element, name: string) {
   while (current && current !== document.body) {
     const text = current.textContent || ''
     const rect = current.getBoundingClientRect()
-    const hasLogo = Boolean(current.querySelector('img'))
     const containsName = text.includes(name)
-    const looksLikeCard = rect.width >= 180 && rect.height >= 70 && hasLogo && containsName
+
+    // Sponsor cards are deliberately capped at 420px on the Sponsors page.
+    // Do not require an image here: a newly-added sponsor may not yet have a
+    // logo, and walking past its card can cause the entire sponsor grid to be
+    // mistaken for the sponsor tile.
+    const looksLikeCard =
+      rect.width >= 180 &&
+      rect.width <= 480 &&
+      rect.height >= 70 &&
+      containsName
 
     if (looksLikeCard) return current
     current = current.parentElement
