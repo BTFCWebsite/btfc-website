@@ -59,17 +59,35 @@ export default function SponsorsPage() {
     window.location.href = `mailto:${recipient}?subject=${subject}&body=${message}`
   }
 
-  const SponsorGrid = ({ items, compact = false }: { items: any[]; compact?: boolean }) => (
-    <div style={{ display: 'grid', gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, ${compact ? 220 : 280}px), 1fr))`, gap: 20 }}>
-      {items.map(s => (
-        <div key={s._id || s.name} style={{ ...card, textAlign: compact ? 'center' : 'left', width: '100%', maxWidth: compact ? 320 : 420, margin: '0 auto' }}>
-          {s.logoUrl && <div style={{ height: compact ? 70 : 100, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}><img src={s.logoUrl} alt={s.name} style={{ maxHeight: compact ? 52 : 70, maxWidth: '80%', objectFit: 'contain' }} /></div>}
-          <h3 style={h3}>{s.name}</h3>
-          {s.role && <p style={{ ...body, color: '#1149D8', fontWeight: 700 }}>{s.role}</p>}
-        </div>
-      ))}
-    </div>
-  )
+  const SponsorGrid = ({ items, compact = false, fullWidthSingle = false }: { items: any[]; compact?: boolean; fullWidthSingle?: boolean }) => {
+    const featuredSingle = fullWidthSingle && items.length === 1
+
+    return (
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, ${compact ? 220 : 280}px), 1fr))`, gap: 20 }}>
+        {items.map(s => (
+          <div
+            key={s._id || s.name}
+            style={{
+              ...card,
+              textAlign: featuredSingle || compact ? 'center' : 'left',
+              width: '100%',
+              maxWidth: featuredSingle ? 'none' : compact ? 320 : 420,
+              margin: '0 auto',
+              padding: featuredSingle ? '34px 40px' : 24,
+            }}
+          >
+            {s.logoUrl && (
+              <div style={{ height: featuredSingle ? 120 : compact ? 70 : 100, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                <img src={s.logoUrl} alt={s.name} style={{ maxHeight: featuredSingle ? 90 : compact ? 52 : 70, maxWidth: featuredSingle ? '60%' : '80%', objectFit: 'contain' }} />
+              </div>
+            )}
+            <h3 style={{ ...h3, fontSize: featuredSingle ? 28 : h3.fontSize }}>{s.name}</h3>
+            {s.role && <p style={{ ...body, color: '#1149D8', fontWeight: 700 }}>{s.role}</p>}
+          </div>
+        ))}
+      </div>
+    )
+  }
 
   return (
     <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '0 0 90px' }}>
@@ -77,7 +95,7 @@ export default function SponsorsPage() {
         <div style={{ marginBottom: 52 }}>
           <h2 style={h2}>Principal Partners</h2>
           <p style={subhead}>Our headline partners for the {season} season</p>
-          <SponsorGrid items={displayedSponsors.principal} />
+          <SponsorGrid items={displayedSponsors.principal} fullWidthSingle />
 
           {displayedSponsors.premium.length > 0 && <div style={{ marginTop: 32 }}><h3 style={h3}>Premium Partners</h3><SponsorGrid items={displayedSponsors.premium} compact /></div>}
           {displayedSponsors.club.length > 0 && <div style={{ marginTop: 32 }}><h3 style={h3}>Club Partners</h3><SponsorGrid items={displayedSponsors.club} compact /></div>}
