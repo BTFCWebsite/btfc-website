@@ -10,6 +10,7 @@ import SponsorTickerSync from './SponsorTickerSync'
 import SiteSeo from './SiteSeo'
 import LeagueTableMobileScrollCue from './LeagueTableMobileScrollCue'
 import MatchdayProgrammeHeroButton from './MatchdayProgrammeHeroButton'
+import LiveTeamResults from './LiveTeamResults'
 
 // Deployment marker: restored stable version from 1 August 2026.
 export default function Template({ children }: { children: ReactNode }) {
@@ -75,6 +76,7 @@ export default function Template({ children }: { children: ReactNode }) {
       <SponsorTickerSync />
       <LeagueTableMobileScrollCue />
       <MatchdayProgrammeHeroButton />
+      <LiveTeamResults />
     </>
   )
 }
