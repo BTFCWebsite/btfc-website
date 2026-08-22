@@ -5,8 +5,7 @@ const FALLBACK_WIDGET_CODE = '969980533'
 const FALLBACK_DIVISION_SEASON = '320568525'
 const BTFC = 'Brimscombe & Thrupp'
 
-export const dynamic = 'force-dynamic'
-export const runtime = 'edge'
+export const revalidate = 300
 
 function textFromHtml(value: string) {
   return value
@@ -189,7 +188,7 @@ export async function GET(request: NextRequest) {
 
     const requestOptions = {
       headers: { 'User-Agent': 'BTFCWebsite/1.0 (+https://brimscombeandthruppfc.co.uk)' },
-      cache: 'no-store' as const,
+      next: { revalidate: 300 },
     }
 
     let matches: ReturnType<typeof parseMatches> = []
