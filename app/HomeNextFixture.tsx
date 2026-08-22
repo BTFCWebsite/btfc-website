@@ -4,6 +4,8 @@ import { useEffect } from 'react'
 import { loadFullTimeWidgetMatches, type FullTimeFixture } from './lib/fulltime.browser'
 
 const FIRST_XI_WIDGET = '969980533'
+const FIXTURE_CACHE_KEY = 'btfc:first-xi-fixtures:v1'
+const FIXTURE_CACHE_MAX_AGE = 24 * 60 * 60 * 1000
 
 function formatDate(value: string, long = false) {
   const date = new Date(`${value}T12:00:00`)
@@ -11,6 +13,27 @@ function formatDate(value: string, long = false) {
   return date.toLocaleDateString('en-GB', long
     ? { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }
     : { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+function readFixtureCache(): FullTimeFixture[] {
+  try {
+    const raw = window.localStorage.getItem(FIXTURE_CACHE_KEY)
+    if (!raw) return []
+    const cached = JSON.parse(raw)
+    if (!cached?.savedAt || !Array.isArray(cached?.fixtures)) return []
+    if (Date.now() - Number(cached.savedAt) > FIXTURE_CACHE_MAX_AGE) return []
+    return cached.fixtures as FullTimeFixture[]
+  } catch {
+    return []
+  }
+}
+
+function writeFixtureCache(fixtures: FullTimeFixture[]) {
+  try {
+    window.localStorage.setItem(FIXTURE_CACHE_KEY, JSON.stringify({ savedAt: Date.now(), fixtures }))
+  } catch {
+    // Browsers with storage disabled can still use the live Full-Time widget.
+  }
 }
 
 function findFixtureCard(labelText: string) {
@@ -97,34 +120,64 @@ function updateHomepage(fixtures: FullTimeFixture[]) {
   window.requestAnimationFrame(resizeHomepageFixtureCards)
 }
 
+function updateMatchday(fixtures: FullTimeFixture[]) {
+  const today = new Date().toISOString().slice(0, 10)
+  const nextHome = fixtures
+    .filter((fixture) => !fixture.played && fixture.venue === 'Home' && fixture.date >= today && fixture.opponent)
+    .sort((a, b) => a.date.localeCompare(b.date))[0]
+  if (!nextHome) return
+
+  const competition = document.querySelector('.matchday-fixture-competition') as HTMLElement | null
+  const heading = document.querySelector('.matchday-fixture-title') as HTMLElement | null
+  const details = document.querySelector('.matchday-fixture-details') as HTMLElement | null
+
+  if (competition) competition.textContent = nextHome.competition || 'First XI'
+  if (heading) heading.textContent = `BTFC v ${nextHome.opponent}`
+  if (details) details.textContent = `📅 ${formatDate(nextHome.date, true)} · ⏰ ${nextHome.kickoff || 'TBC'} · 📍 Brackenfern Meadow`
+}
+
 export default function HomeNextFixture() {
   useEffect(() => {
-    if (window.location.pathname !== '/') return
+    const path = window.location.pathname
+    if (path !== '/' && path !== '/matchday' && path !== '/fixtures') return
 
     let cancelled = false
     let timers: number[] = []
 
-    const handleResize = () => resizeHomepageFixtureCards()
+    const cachedFixtures = readFixtureCache()
+    if (cachedFixtures.length) {
+      if (path === '/') updateHomepage(cachedFixtures)
+      if (path === '/matchday') updateMatchday(cachedFixtures)
+    }
+
+    const handleResize = () => {
+      if (window.location.pathname === '/') resizeHomepageFixtureCards()
+    }
     window.addEventListener('resize', handleResize)
 
     async function loadOfficialFixtures() {
       try {
         const fixtures = await loadFullTimeWidgetMatches(FIRST_XI_WIDGET, 'First XI', 18000)
         if (cancelled) return
+        writeFixtureCache(fixtures)
 
         const apply = () => {
           if (cancelled) return
-          updateHomepage(fixtures)
+          const currentPath = window.location.pathname
+          if (currentPath === '/') updateHomepage(fixtures)
+          if (currentPath === '/matchday') updateMatchday(fixtures)
         }
 
         apply()
-        timers = [500, 1500, 3000].map((delay) => window.setTimeout(apply, delay))
+        if (path !== '/fixtures') {
+          timers = [500, 1500, 3000].map((delay) => window.setTimeout(apply, delay))
+        }
       } catch (error) {
         console.error('Unable to load the official Full-Time browser widget', error)
       }
     }
 
-    window.requestAnimationFrame(resizeHomepageFixtureCards)
+    if (path === '/') window.requestAnimationFrame(resizeHomepageFixtureCards)
     loadOfficialFixtures()
     return () => {
       cancelled = true
