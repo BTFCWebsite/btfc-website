@@ -19,7 +19,7 @@ function resultLetter(fixture: FullTimeFixture) {
 function findResultsCard() {
   const heading = Array.from(document.querySelectorAll('div')).find((element) => {
     const text = element.textContent?.trim()
-    return text === 'Last 8 Results' || text === 'Last 10 Results'
+    return text === 'Last 8 Results' || text === 'Last 10 Results' || text === 'Last 10 League Results'
   }) as HTMLElement | undefined
 
   if (!heading) return null
@@ -48,7 +48,7 @@ function paintResults(fixtures: FullTimeFixture[]) {
   const card = findResultsCard()
   if (!card?.row) return
 
-  card.heading.textContent = 'Last 10 Results'
+  card.heading.textContent = 'Last 10 League Results'
   const latest = fixtures
     .filter((fixture) => fixture.played && fixture.date && fixture.btfcScore != null && fixture.opponentScore != null)
     .sort((a, b) => b.date.localeCompare(a.date))
@@ -97,7 +97,7 @@ export default function LiveTeamResults() {
 
     async function refresh() {
       const card = findResultsCard()
-      if (card) card.heading.textContent = 'Last 10 Results'
+      if (card) card.heading.textContent = 'Last 10 League Results'
 
       const label = selectedTeamLabel()
       if (label === activeTeam && cache.has(label)) {
