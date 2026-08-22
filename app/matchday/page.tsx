@@ -1,7 +1,7 @@
 import {createClient} from 'next-sanity'
 import {client} from '../lib/sanity.client'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 const freshClient = createClient({
   projectId: 'vm0n9zl5',
@@ -89,6 +89,7 @@ async function loadMatchdayData() {
     client.fetch(manualFixturesQuery, {}, {next: {revalidate: 60}}),
     freshClient.fetch(programmesQuery, {}, {cache: 'no-store'}),
     fetch('https://btfc-website.vercel.app/api/full-time?kind=matches&team=First%20XI&widget=969980533&division=320568525', {
+      cache: 'force-cache',
       next: {revalidate: 300},
     }).then(async response => response.ok ? response.json() : {matches: []}),
   ])
