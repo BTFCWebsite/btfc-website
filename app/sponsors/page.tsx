@@ -13,7 +13,7 @@ const inputStyle = { width: '100%', padding: '11px 14px', border: '1px solid #CB
 const fallbackPackages = [
   { name: 'Reserves Sponsor', icon: '⚽', colour: '#1149D8', available: true, featured: false, benefits: ['Reserves team shirt sponsorship', 'Logo on reserves matchday materials', 'Website sponsor page feature', 'Social media recognition', 'Complimentary match tickets'] },
   { name: 'Under 17s Sponsor', icon: '👶', colour: '#1149D8', available: true, featured: false, benefits: ['Under 17s team shirt sponsorship', 'Logo on youth matchday materials', 'Website sponsor page feature', 'Social media recognition', 'Community and youth development association'] },
-  { name: 'Gold Partner', icon: '🌟', colour: '#92400e', available: true, featured: false, benefits: ['Large format pitch side board', 'Logo on sponsors page', 'Social Media Shoutouts', 'Matchday programme listing', 'Complimentary match tickets'] },
+  { name: 'Premium Partner', icon: '🌟', colour: '#92400e', available: true, featured: false, benefits: ['Large format pitch side board', 'Logo on sponsors page', 'Social Media Shoutouts', 'Matchday programme listing', 'Complimentary match tickets'] },
   { name: 'Club Partner', icon: '🤝', colour: '#374151', available: true, featured: false, benefits: ['Standard pitch side board', 'Logo on sponsors page'] },
 ]
 
@@ -21,7 +21,7 @@ export default function SponsorsPage() {
   const [sponsors, setSponsors] = useState<any[]>([])
   const [packages, setPackages] = useState<any[]>([])
   const [settings, setSettings] = useState<any>({})
-  const [form, setForm] = useState({ name: '', business: '', email: '', phone: '', package: 'Gold Partner', message: '' })
+  const [form, setForm] = useState({ name: '', business: '', email: '', phone: '', package: 'Premium Partner', message: '' })
 
   useEffect(() => {
     Promise.all([getSponsors(), getSponsorshipPackages(), getSiteSettings()])
@@ -35,7 +35,7 @@ export default function SponsorsPage() {
 
   const displayedSponsors = useMemo(() => ({
     principal: sponsors.filter(s => s.tier === 'principal'),
-    gold: sponsors.filter(s => s.tier === 'official'),
+    premium: sponsors.filter(s => s.tier === 'official' || s.tier === 'premium'),
     club: sponsors.filter(s => s.tier === 'club'),
   }), [sponsors])
 
@@ -75,11 +75,11 @@ export default function SponsorsPage() {
     <main style={{ background: '#F2F2F2', minHeight: '100vh', padding: '0 0 90px' }}>
       <section style={{ maxWidth: 980, margin: '0 auto', padding: '52px 24px' }}>
         <div style={{ marginBottom: 52 }}>
-          <h2 style={h2}>Principal Sponsors</h2>
+          <h2 style={h2}>Principal Partners</h2>
           <p style={subhead}>Our headline partners for the {season} season</p>
           <SponsorGrid items={displayedSponsors.principal} />
 
-          {displayedSponsors.gold.length > 0 && <div style={{ marginTop: 32 }}><h3 style={h3}>Gold Partners</h3><SponsorGrid items={displayedSponsors.gold} compact /></div>}
+          {displayedSponsors.premium.length > 0 && <div style={{ marginTop: 32 }}><h3 style={h3}>Premium Partners</h3><SponsorGrid items={displayedSponsors.premium} compact /></div>}
           {displayedSponsors.club.length > 0 && <div style={{ marginTop: 32 }}><h3 style={h3}>Club Partners</h3><SponsorGrid items={displayedSponsors.club} compact /></div>}
         </div>
 
