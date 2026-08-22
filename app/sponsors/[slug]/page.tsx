@@ -14,9 +14,17 @@ function sponsorSlug(name: string) {
 
 function tierLabel(tier?: string) {
   if (tier === 'principal') return 'Principal Partner'
-  if (tier === 'official') return 'Gold Partner'
+  if (tier === 'official' || tier === 'premium') return 'Premium Partner'
   if (tier === 'club') return 'Club Partner'
-  return 'Club Sponsor'
+  return 'Club Partner'
+}
+
+function sponsorLabel(role?: string, tier?: string) {
+  const savedRole = String(role || '').trim()
+  if (savedRole === 'Principal Sponsor') return 'Principal Partner'
+  if (savedRole === 'Gold Partner' || savedRole === 'Official Partner' || savedRole === 'Official Sponsor') return 'Premium Partner'
+  if (savedRole === 'Club Sponsor') return 'Club Partner'
+  return savedRole || tierLabel(tier)
 }
 
 export default async function SponsorProfilePage({ params }: { params: Promise<{ slug: string }> }) {
@@ -62,7 +70,7 @@ export default async function SponsorProfilePage({ params }: { params: Promise<{
 
             <div style={{ textAlign: 'center', marginBottom: 34 }}>
               <div style={{ display: 'inline-block', background: '#E8EEFF', color: '#1149D8', padding: '5px 12px', borderRadius: 99, fontFamily: "'Montserrat', sans-serif", fontSize: 10, fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 12 }}>
-                {sponsor.role || tierLabel(sponsor.tier)}
+                {sponsorLabel(sponsor.role, sponsor.tier)}
               </div>
               <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(36px, 7vw, 54px)', lineHeight: 1, color: '#2D2D2D', margin: 0 }}>
                 {sponsor.name}
