@@ -114,7 +114,9 @@ export default function ClubDiaryPreGate() {
 
   const selectedNeedsPin = Boolean(selectedPerson && !selectedPerson.hasPin)
   const canUseSetupPin = selectedNeedsPin && mode === 'admin'
-  const loginDisabled = working || loadingNames || (!needsSetup && (!personId || (selectedNeedsPin && !canUseSetupPin)))
+  const personalPinRequired = Boolean(selectedPerson?.hasPin)
+  const personalPinValid = !personalPinRequired || /^\d{4,6}$/.test(pin)
+  const loginDisabled = working || loadingNames || (!needsSetup && (!personId || (selectedNeedsPin && !canUseSetupPin))) || !personalPinValid
 
   return <div style={pageStyle}>
     <form style={cardStyle} onSubmit={login}>
@@ -143,7 +145,7 @@ export default function ClubDiaryPreGate() {
       </>}
 
       <label style={labelStyle} htmlFor="diaryPin">
-        {needsSetup || canUseSetupPin ? 'Admin setup PIN' : 'Your personal 6-digit PIN'}
+        {needsSetup || canUseSetupPin ? 'Admin setup PIN' : 'Your personal 4–6 digit PIN'}
       </label>
       <input
         id="diaryPin"
@@ -153,7 +155,7 @@ export default function ClubDiaryPreGate() {
         autoComplete="off"
         required
         style={inputStyle}
-        placeholder={needsSetup || canUseSetupPin ? '' : '6 digits'}
+        placeholder={needsSetup || canUseSetupPin ? '' : '4–6 digits'}
       />
 
       <button type="submit" disabled={loginDisabled} style={primaryStyle}>
