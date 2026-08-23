@@ -15,14 +15,17 @@ export default function ClubDiaryClubLink() {
     }
 
     const section = document.querySelector('main > section')
-    const hero = section?.firstElementChild
-    if (!section || !hero) return
+    const hero = section?.firstElementChild as HTMLElement | null
+    if (!hero) return
+
+    const previousPosition = hero.style.position
+    hero.style.position = 'relative'
 
     let host = document.getElementById('club-diary-club-link') as HTMLElement | null
     if (!host) {
       host = document.createElement('div')
       host.id = 'club-diary-club-link'
-      hero.insertAdjacentElement('afterend', host)
+      hero.appendChild(host)
     }
 
     setMount(host)
@@ -30,80 +33,61 @@ export default function ClubDiaryClubLink() {
     return () => {
       setMount(null)
       host?.remove()
+      hero.style.position = previousPosition
     }
   }, [pathname])
 
   if (!mount) return null
 
   return createPortal(
-    <div style={{ marginBottom: 44 }}>
-      <a
-        href="/club-diary"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 18,
-          flexWrap: 'wrap',
-          padding: '20px 24px',
-          background: '#fff',
-          border: '1px solid #DCE3F3',
-          borderLeft: '5px solid #1149D8',
-          borderRadius: 8,
-          textDecoration: 'none',
-          boxShadow: '0 4px 14px rgba(4,27,95,.06)',
-        }}
-      >
-        <div style={{ minWidth: 0 }}>
-          <div style={{
-            fontFamily: "'Montserrat', sans-serif",
-            fontSize: 10,
-            fontWeight: 800,
-            color: '#1149D8',
-            letterSpacing: '.12em',
-            textTransform: 'uppercase',
-            marginBottom: 5,
-          }}>
-            🔒 Private Club Area
-          </div>
-          <div style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontSize: 25,
-            fontWeight: 800,
-            color: '#2D2D2D',
-            lineHeight: 1.05,
-            marginBottom: 5,
-          }}>
-            Committee &amp; Volunteer Login
-          </div>
-          <div style={{
-            fontFamily: "'Montserrat', sans-serif",
-            fontSize: 12,
-            color: '#6B7280',
-            lineHeight: 1.55,
-          }}>
-            Private access to the Club Diary for authorised club volunteers only.
-          </div>
-        </div>
-
-        <span style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: 42,
-          padding: '0 18px',
-          background: '#1149D8',
-          color: '#fff',
-          borderRadius: 6,
-          fontFamily: "'Barlow Condensed', sans-serif",
-          fontWeight: 800,
-          fontSize: 16,
-          whiteSpace: 'nowrap',
-        }}>
-          Club Login →
-        </span>
+    <>
+      <style>{`
+        #club-diary-club-link {
+          position: absolute;
+          top: 26px;
+          right: 30px;
+          z-index: 2;
+        }
+        #club-diary-club-link a {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          min-height: 42px;
+          padding: 0 17px;
+          border: 1px solid rgba(255,255,255,.34);
+          border-radius: 7px;
+          background: rgba(255,255,255,.11);
+          color: #fff;
+          text-decoration: none;
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: 16px;
+          font-weight: 800;
+          letter-spacing: .02em;
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          white-space: nowrap;
+        }
+        #club-diary-club-link a:hover {
+          background: rgba(255,255,255,.20);
+        }
+        @media (max-width: 760px) {
+          #club-diary-club-link {
+            position: static;
+            width: 100%;
+            margin-left: auto;
+            display: flex;
+            justify-content: flex-end;
+          }
+          #club-diary-club-link a {
+            width: auto;
+          }
+        }
+      `}</style>
+      <a href="/club-diary" aria-label="Open private Club Diary login">
+        🔒 Club Login →
       </a>
-    </div>,
+    </>,
     mount
   )
 }
