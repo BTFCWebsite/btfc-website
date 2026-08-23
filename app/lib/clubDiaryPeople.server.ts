@@ -90,7 +90,7 @@ export async function diaryPersonPinIsValid(id: string, pin: string) {
 export async function createDiaryPerson(name: string, isAdmin: boolean, pin?: string) {
   const cleanName = cleanText(name, 100)
   if (!cleanName) throw new Error('Add a name.')
-  if (pin !== undefined && pin !== '' && !validPersonalPin(pin)) throw new Error('Personal PIN must be exactly 6 digits.')
+  if (pin !== undefined && pin !== '' && !validPersonalPin(pin)) throw new Error('Personal PIN must be 4 to 6 digits.')
 
   const people = await loadDiaryPeople(true)
   if (people.some((person) => normaliseName(person.name) === normaliseName(cleanName))) {
@@ -163,7 +163,7 @@ export async function updateDiaryPerson(id: string, values: { name?: string; isA
 }
 
 export async function setDiaryPersonPin(id: string, pin: string) {
-  if (!validPersonalPin(pin)) throw new Error('Personal PIN must be exactly 6 digits.')
+  if (!validPersonalPin(pin)) throw new Error('Personal PIN must be 4 to 6 digits.')
   const doc = await loadDiaryPersonDocument(id)
   if (!doc) throw new Error('Person not found.')
 
