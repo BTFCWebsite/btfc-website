@@ -9,6 +9,32 @@ import { loadDiaryPeople } from '../../../../lib/clubDiaryPeople.server'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
+function responseFor(role: DiaryRole, people: Awaited<ReturnType<typeof loadDiaryPeople>>) {
+  const eligible = people
+    .filter((person) => role === 'member' || person.isAdmin)
+    .map((person) => ({ id: person.id, name: person.name }))
+
+  return NextResponse.json({
+    people: eligible,
+    needsSetup: role === 'admin' && people.length === 0,
+  }, {
+    headers: { 'Cache-Control': 'no-store, max-age=0' },
+  })
+}
+
+// Login names are intentionally available before PIN entry so both General and
+// Admin login screens can present a name dropdown. The diary itself remains PIN protected.
+export async function GET(request: NextRequest) {
+  try {
+    const role: DiaryRole = request.nextUrl.searchParams.get('role') === 'admin' ? 'admin' : 'member'
+    const people = await loadDiaryPeople(false)
+    return responseFor(role, people)
+  } catch (error) {
+    console.error('Unable to load Club Diary login names:', error)
+    return NextResponse.json({ error: 'Unable to load names.' }, { status: 500 })
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => ({}))
@@ -24,16 +50,7 @@ export async function POST(request: NextRequest) {
     }
 
     const people = await loadDiaryPeople(false)
-    const eligible = people
-      .filter((person) => role === 'member' || person.isAdmin)
-      .map((person) => ({ id: person.id, name: person.name }))
-
-    return NextResponse.json({
-      people: eligible,
-      needsSetup: role === 'admin' && people.length === 0,
-    }, {
-      headers: { 'Cache-Control': 'no-store, max-age=0' },
-    })
+    return responseFor(role, people)
   } catch (error) {
     console.error('Unable to load Club Diary login names:', error)
     return NextResponse.json({ error: 'Unable to load names.' }, { status: 500 })
