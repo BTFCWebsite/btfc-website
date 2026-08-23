@@ -72,20 +72,16 @@ export default function ClubDiaryClubLink() {
         }
         #club-diary-club-link a {
           display: inline-flex;
-          align-items: center;
+          flex-direction: column;
+          align-items: flex-end;
           justify-content: center;
-          gap: 7px;
-          min-height: 42px;
-          padding: 0 17px;
+          min-height: 54px;
+          padding: 7px 16px 8px;
           border: 1px solid rgba(255,255,255,.38);
           border-radius: 7px;
           background: rgba(255,255,255,.13);
           color: #fff;
           text-decoration: none;
-          font-family: 'Barlow Condensed', sans-serif;
-          font-size: 16px;
-          font-weight: 800;
-          letter-spacing: .02em;
           box-shadow: 0 4px 14px rgba(0,0,0,.12);
           backdrop-filter: blur(8px);
           -webkit-backdrop-filter: blur(8px);
@@ -94,20 +90,44 @@ export default function ClubDiaryClubLink() {
         #club-diary-club-link a:hover {
           background: rgba(255,255,255,.22);
         }
+        #club-diary-club-link .club-diary-internal {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 8px;
+          line-height: 1.2;
+          font-weight: 800;
+          letter-spacing: .09em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,.68);
+          margin-bottom: 3px;
+        }
+        #club-diary-club-link .club-diary-login {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: 17px;
+          line-height: 1.05;
+          font-weight: 800;
+          letter-spacing: .02em;
+          color: #fff;
+        }
         @media (max-width: 760px) {
           #club-diary-club-link {
-            top: 22px;
-            right: 20px;
+            top: 20px;
+            right: 18px;
           }
           #club-diary-club-link a {
-            min-height: 38px;
-            padding: 0 13px;
-            font-size: 14px;
+            min-height: 48px;
+            padding: 6px 11px 7px;
+          }
+          #club-diary-club-link .club-diary-internal {
+            font-size: 7px;
+          }
+          #club-diary-club-link .club-diary-login {
+            font-size: 15px;
           }
         }
       `}</style>
-      <a href="/club-diary" aria-label="Open private Club Diary login">
-        🔒 Club Login →
+      <a href="/club-diary" aria-label="Internal Club Diary login for club officials and volunteers">
+        <span className="club-diary-internal">🔒 Internal · Club Officials &amp; Volunteers Only</span>
+        <span className="club-diary-login">Club Login →</span>
       </a>
     </>,
     mount
