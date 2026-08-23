@@ -5,7 +5,14 @@ import ClubDiaryApp from './ClubDiaryApp'
 
 type Role = 'member' | 'admin'
 type LoginPerson = { id: string; name: string }
-type ManagedPerson = LoginPerson & { isAdmin: boolean; active: boolean; createdAt: string }
+type ManagedPerson = LoginPerson & {
+  email: string
+  mobile: string
+  isAdmin: boolean
+  active: boolean
+  hasPin: boolean
+  createdAt: string
+}
 
 type AuthState = {
   checking: boolean
@@ -40,6 +47,8 @@ export default function ClubDiaryGate() {
   const [manageOpen, setManageOpen] = useState(false)
   const [managedPeople, setManagedPeople] = useState<ManagedPerson[]>([])
   const [newName, setNewName] = useState('')
+  const [newEmail, setNewEmail] = useState('')
+  const [newMobile, setNewMobile] = useState('')
   const [newAdmin, setNewAdmin] = useState(false)
   const [manageError, setManageError] = useState('')
 
@@ -178,7 +187,13 @@ export default function ClubDiaryGate() {
     const response = await fetch('/api/club-diary/people', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'add', name: newName, isAdmin: newAdmin }),
+      body: JSON.stringify({
+        action: 'add',
+        name: newName,
+        email: newEmail,
+        mobile: newMobile,
+        isAdmin: newAdmin,
+      }),
     })
     const data = await response.json().catch(() => ({}))
     if (!response.ok) {
@@ -186,11 +201,13 @@ export default function ClubDiaryGate() {
       return
     }
     setNewName('')
+    setNewEmail('')
+    setNewMobile('')
     setNewAdmin(false)
     await loadManagedPeople()
   }
 
-  async function updatePerson(person: ManagedPerson, changes: Partial<Pick<ManagedPerson, 'name' | 'isAdmin' | 'active'>>) {
+  async function updatePerson(person: ManagedPerson, changes: Partial<Pick<ManagedPerson, 'name' | 'email' | 'mobile' | 'isAdmin' | 'active'>>) {
     setManageError('')
     const response = await fetch('/api/club-diary/people', {
       method: 'POST',
@@ -271,24 +288,33 @@ export default function ClubDiaryGate() {
     {manageOpen && <div style={overlayStyle} role="dialog" aria-modal="true" aria-label="People and access">
       <div style={manageCardStyle}>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'center' }}>
-          <div><h2 style={{ ...titleStyle, fontSize: 28, marginBottom: 3 }}>People &amp; access</h2><p style={{ ...copyStyle, margin: 0 }}>All active people appear under General access. Only people marked Admin appear under Admin login.</p></div>
+          <div>
+            <h2 style={{ ...titleStyle, fontSize: 28, marginBottom: 3 }}>People &amp; access</h2>
+            <p style={{ ...copyStyle, margin: 0 }}>Internal club directory. General users see all active names at login; Admin login only shows people with Admin security.</p>
+          </div>
           <button type="button" onClick={() => setManageOpen(false)} style={secondaryStyle}>Close</button>
         </div>
 
         <form onSubmit={addPerson} style={{ ...sectionStyle, marginTop: 20 }}>
           <strong style={{ fontFamily: condensed, fontSize: 20 }}>Add person</strong>
-          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(180px, 1fr) auto auto', gap: 10, marginTop: 10, alignItems: 'center' }}>
+          <div style={directoryGridStyle}>
             <input value={newName} onChange={(event) => setNewName(event.target.value)} placeholder="Full name" required style={{ ...inputStyle, margin: 0 }} />
-            <label style={checkStyle}><input type="checkbox" checked={newAdmin} onChange={(event) => setNewAdmin(event.target.checked)} /> Admin</label>
-            <button type="submit" style={{ ...primaryStyle, margin: 0 }}>Add</button>
+            <input type="email" value={newEmail} onChange={(event) => setNewEmail(event.target.value)} placeholder="Email address" required style={{ ...inputStyle, margin: 0 }} />
+            <input type="tel" value={newMobile} onChange={(event) => setNewMobile(event.target.value)} placeholder="Mobile number" required style={{ ...inputStyle, margin: 0 }} />
+            <select value={newAdmin ? 'admin' : 'member'} onChange={(event) => setNewAdmin(event.target.value === 'admin')} style={{ ...inputStyle, margin: 0 }} aria-label="Security level">
+              <option value="member">General access</option>
+              <option value="admin">Admin</option>
+            </select>
+            <button type="submit" style={{ ...primaryStyle, margin: 0 }}>Add person</button>
           </div>
         </form>
 
         {manageError && <div style={errorStyle}>{manageError}</div>}
 
         <div style={{ ...sectionStyle, marginTop: 14 }}>
-          <strong style={{ fontFamily: condensed, fontSize: 20 }}>Approved people</strong>
-          <div style={{ display: 'grid', gap: 9, marginTop: 10 }}>
+          <strong style={{ fontFamily: condensed, fontSize: 20 }}>Club officials &amp; volunteers</strong>
+          <p style={{ ...copyStyle, margin: '3px 0 0' }}>Edit a field and click elsewhere to save it. Contact details are only available to Admins.</p>
+          <div style={{ display: 'grid', gap: 10, marginTop: 10 }}>
             {managedPeople.map((person) => <PersonRow key={person.id} person={person} onUpdate={updatePerson} />)}
             {managedPeople.length === 0 && <div style={copyStyle}>No people added yet.</div>}
           </div>
@@ -298,16 +324,65 @@ export default function ClubDiaryGate() {
   </>
 }
 
-function PersonRow({ person, onUpdate }: { person: ManagedPerson; onUpdate: (person: ManagedPerson, changes: Partial<Pick<ManagedPerson, 'name' | 'isAdmin' | 'active'>>) => Promise<void> }) {
+function PersonRow({ person, onUpdate }: {
+  person: ManagedPerson
+  onUpdate: (person: ManagedPerson, changes: Partial<Pick<ManagedPerson, 'name' | 'email' | 'mobile' | 'isAdmin' | 'active'>>) => Promise<void>
+}) {
   const [name, setName] = useState(person.name)
-  useEffect(() => setName(person.name), [person.name])
+  const [email, setEmail] = useState(person.email || '')
+  const [mobile, setMobile] = useState(person.mobile || '')
 
-  return <div style={{ display: 'grid', gridTemplateColumns: 'minmax(180px, 1fr) auto auto auto', gap: 9, alignItems: 'center', padding: 10, border: '1px solid #E5E7EB', borderRadius: 8, background: person.active ? '#fff' : '#F3F4F6' }}>
-    <input value={name} onChange={(event) => setName(event.target.value)} onBlur={() => { if (name.trim() && name.trim() !== person.name) void onUpdate(person, { name: name.trim() }) }} style={{ ...inputStyle, margin: 0 }} />
-    <label style={checkStyle}><input type="checkbox" checked={person.isAdmin} onChange={(event) => void onUpdate(person, { isAdmin: event.target.checked })} /> Admin</label>
-    <label style={checkStyle}><input type="checkbox" checked={person.active} onChange={(event) => void onUpdate(person, { active: event.target.checked })} /> Active</label>
-    <span style={{ fontFamily: font, fontSize: 11, color: '#6B7280' }}>{person.active ? 'Available' : 'Hidden'}</span>
+  useEffect(() => setName(person.name), [person.name])
+  useEffect(() => setEmail(person.email || ''), [person.email])
+  useEffect(() => setMobile(person.mobile || ''), [person.mobile])
+
+  const saveText = (field: 'name' | 'email' | 'mobile', value: string, original: string) => {
+    const clean = value.trim()
+    if (field === 'name' && !clean) return
+    if (clean !== original) void onUpdate(person, { [field]: clean })
+  }
+
+  return <div style={{ padding: 12, border: '1px solid #E5E7EB', borderRadius: 8, background: person.active ? '#fff' : '#F3F4F6' }}>
+    <div style={personGridStyle}>
+      <div>
+        <span style={miniLabelStyle}>Full name</span>
+        <input value={name} onChange={(event) => setName(event.target.value)} onBlur={() => saveText('name', name, person.name)} style={{ ...inputStyle, margin: 0 }} />
+      </div>
+      <div>
+        <span style={miniLabelStyle}>Email</span>
+        <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} onBlur={() => saveText('email', email, person.email || '')} placeholder="Add email" style={{ ...inputStyle, margin: 0 }} />
+      </div>
+      <div>
+        <span style={miniLabelStyle}>Mobile</span>
+        <input type="tel" value={mobile} onChange={(event) => setMobile(event.target.value)} onBlur={() => saveText('mobile', mobile, person.mobile || '')} placeholder="Add mobile" style={{ ...inputStyle, margin: 0 }} />
+      </div>
+      <div>
+        <span style={miniLabelStyle}>Security level</span>
+        <select value={person.isAdmin ? 'admin' : 'member'} onChange={(event) => void onUpdate(person, { isAdmin: event.target.value === 'admin' })} style={{ ...inputStyle, margin: 0 }}>
+          <option value="member">General access</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+    </div>
+
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginTop: 10 }}>
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+        <label style={checkStyle}><input type="checkbox" checked={person.active} onChange={(event) => void onUpdate(person, { active: event.target.checked })} /> Active</label>
+        <span style={{ fontFamily: font, fontSize: 10, fontWeight: 700, color: person.hasPin ? '#166534' : '#9A3412' }}>{person.hasPin ? 'PIN set' : 'PIN not set'}</span>
+      </div>
+      <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
+        {person.email && <a href={`mailto:${person.email}`} style={contactLinkStyle}>Email</a>}
+        {person.mobile && <a href={whatsappHref(person.mobile)} target="_blank" rel="noopener noreferrer" style={contactLinkStyle}>WhatsApp</a>}
+      </div>
+    </div>
   </div>
+}
+
+function whatsappHref(mobile: string) {
+  let digits = String(mobile || '').replace(/\D/g, '')
+  if (digits.startsWith('00')) digits = digits.slice(2)
+  if (digits.startsWith('0')) digits = `44${digits.slice(1)}`
+  return `https://wa.me/${digits}`
 }
 
 const pageStyle = { minHeight: '70vh', background: '#F2F2F2', padding: '70px 20px', display: 'grid', placeItems: 'start center' } as const
@@ -315,6 +390,7 @@ const cardStyle = { width: '100%', maxWidth: 430, boxSizing: 'border-box', backg
 const titleStyle = { fontFamily: condensed, fontSize: 34, lineHeight: 1, fontWeight: 800, color: '#152B59', margin: '0 0 10px' } as const
 const copyStyle = { fontFamily: font, fontSize: 12, lineHeight: 1.55, color: '#6B7280' } as const
 const labelStyle = { display: 'block', fontFamily: font, fontSize: 11, fontWeight: 700, color: '#374151', marginBottom: 6 } as const
+const miniLabelStyle = { display: 'block', fontFamily: font, fontSize: 9, fontWeight: 800, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 4 } as const
 const inputStyle = { width: '100%', boxSizing: 'border-box', minHeight: 44, border: '1px solid #D1D5DB', borderRadius: 7, padding: '10px 12px', fontFamily: font, fontSize: 14, background: '#fff', color: '#111827', marginBottom: 12 } as const
 const primaryStyle = { width: '100%', minHeight: 44, border: 0, borderRadius: 7, background: '#1149D8', color: '#fff', padding: '10px 14px', fontFamily: font, fontWeight: 800, cursor: 'pointer', marginTop: 2 } as const
 const secondaryStyle = { minHeight: 40, border: '1px solid #D1D5DB', borderRadius: 7, background: '#fff', color: '#374151', padding: '8px 12px', fontFamily: font, fontWeight: 700, cursor: 'pointer', marginTop: 9 } as const
@@ -324,6 +400,9 @@ const tabStyle = (active: boolean) => ({ minHeight: 38, border: active ? '1px so
 const accountBarStyle = { maxWidth: 1180, margin: '18px auto 0', padding: '9px 14px', border: '1px solid #DDE3EE', borderRadius: 8, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', fontFamily: font, fontSize: 11, color: '#374151' } as const
 const accountButtonStyle = { minHeight: 34, border: '1px solid #CBD5E1', borderRadius: 6, background: '#F8FAFC', color: '#1E3A5F', padding: '6px 10px', fontFamily: font, fontSize: 11, fontWeight: 800, cursor: 'pointer' } as const
 const overlayStyle = { position: 'fixed', inset: 0, zIndex: 2000, background: 'rgba(5,15,35,.58)', padding: 18, overflowY: 'auto', display: 'grid', placeItems: 'start center' } as const
-const manageCardStyle = { width: '100%', maxWidth: 760, boxSizing: 'border-box', marginTop: 40, background: '#fff', borderRadius: 10, padding: 22, boxShadow: '0 20px 60px rgba(0,0,0,.25)' } as const
+const manageCardStyle = { width: '100%', maxWidth: 1040, boxSizing: 'border-box', marginTop: 30, background: '#fff', borderRadius: 10, padding: 22, boxShadow: '0 20px 60px rgba(0,0,0,.25)' } as const
 const sectionStyle = { border: '1px solid #E5E7EB', borderRadius: 8, padding: 14, background: '#F9FAFB' } as const
 const checkStyle = { display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap', fontFamily: font, fontSize: 11, color: '#374151' } as const
+const directoryGridStyle = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 10, marginTop: 10, alignItems: 'end' } as const
+const personGridStyle = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 9, alignItems: 'end' } as const
+const contactLinkStyle = { display: 'inline-flex', alignItems: 'center', minHeight: 30, padding: '5px 9px', border: '1px solid #CBD5E1', borderRadius: 6, background: '#F8FAFC', color: '#1E3A5F', textDecoration: 'none', fontFamily: font, fontSize: 10, fontWeight: 800 } as const
