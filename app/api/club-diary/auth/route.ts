@@ -5,6 +5,7 @@ import {
   cleanText,
   diarySessionValue,
   getDiaryClient,
+  validPersonalPin,
   type DiaryRole,
   type DiarySession,
 } from '../../../lib/clubDiary.server'
@@ -13,6 +14,7 @@ import {
   diaryPersonPinIsValid,
   getVerifiedDiarySession,
   loadDiaryPeople,
+  setDiaryPersonPin,
 } from '../../../lib/clubDiaryPeople.server'
 import { writeDiaryAudit } from '../../../lib/clubDiaryAudit.server'
 
@@ -55,21 +57,26 @@ export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({}))
   const requestedRole: DiaryRole = body?.role === 'admin' ? 'admin' : 'member'
   const pin = String(body?.pin || '')
+  const newPersonalPin = String(body?.newPersonalPin || '')
   const people = await loadDiaryPeople(true)
   let session: DiarySession | null = null
 
   if (people.length === 0) {
     if (requestedRole !== 'admin' || !adminPinIsValid(pin)) {
-      return NextResponse.json({ error: 'Use the Admin setup PIN to create the first administrator.' }, { status: 401 })
+      return NextResponse.json({ error: 'Incorrect Admin setup PIN.' }, { status: 401 })
     }
 
     const bootstrapName = cleanText(body?.name, 100)
     if (!bootstrapName) {
       return NextResponse.json({ error: 'Enter your name to create the first administrator.' }, { status: 400 })
     }
+    if (!validPersonalPin(newPersonalPin)) {
+      return NextResponse.json({ error: 'Choose a personal PIN of 4 to 6 digits.' }, { status: 400 })
+    }
 
-    const firstAdmin = await createDiaryPerson(bootstrapName, true)
+    const firstAdmin = await createDiaryPerson(bootstrapName, true, newPersonalPin)
     session = { role: 'admin', personId: firstAdmin.id, name: firstAdmin.name }
+    await writeDiaryAudit(session, 'person.pin', 'person', firstAdmin.id, `Set personal PIN for ${firstAdmin.name} during initial setup`)
   } else {
     const personId = cleanText(body?.personId, 200)
     const person = people.find((item) => item.id === personId && item.active)
@@ -81,23 +88,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'That person does not have administrator access.' }, { status: 403 })
     }
 
-    let pinValid = false
     if (person.hasPin) {
-      pinValid = await diaryPersonPinIsValid(person.id, pin)
+      const pinValid = await diaryPersonPinIsValid(person.id, pin)
+      if (!pinValid) {
+        return NextResponse.json({ error: 'Incorrect personal PIN.' }, { status: 401 })
+      }
     } else if (requestedRole === 'admin' && person.isAdmin) {
-      // Migration/bootstrap only: once this person has a personal PIN, the shared Admin PIN stops working for them.
-      pinValid = adminPinIsValid(pin)
+      if (!adminPinIsValid(pin)) {
+        return NextResponse.json({ error: 'Incorrect Admin setup PIN.' }, { status: 401 })
+      }
+      if (!validPersonalPin(newPersonalPin)) {
+        return NextResponse.json({ error: 'Choose a new personal PIN of 4 to 6 digits.' }, { status: 400 })
+      }
+
+      await setDiaryPersonPin(person.id, newPersonalPin)
+      session = { role: 'admin', personId: person.id, name: person.name }
+      await writeDiaryAudit(session, 'person.pin', 'person', person.id, `Set personal PIN for ${person.name} during Admin setup`)
+    } else {
+      return NextResponse.json({ error: 'A diary administrator needs to set your personal PIN first.' }, { status: 401 })
     }
 
-    if (!pinValid) {
-      return NextResponse.json({
-        error: person.hasPin
-          ? 'Incorrect personal PIN.'
-          : 'A diary administrator needs to set your personal PIN first.',
-      }, { status: 401 })
-    }
-
-    session = { role: requestedRole, personId: person.id, name: person.name }
+    if (!session) session = { role: requestedRole, personId: person.id, name: person.name }
   }
 
   await writeDiaryAudit(session, 'login', 'session', session.personId, `Logged in with ${session.role === 'admin' ? 'Admin' : 'General'} access`)
