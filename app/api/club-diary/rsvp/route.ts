@@ -7,6 +7,7 @@ import {
   normaliseName,
   shareTokenHash,
 } from '../../../lib/clubDiary.server'
+import { writeDiaryAudit } from '../../../lib/clubDiaryAudit.server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -127,6 +128,9 @@ export async function POST(request: NextRequest) {
       eventId: event.id,
       payload: encryptDiaryPayload(stored),
     })
+
+    const responseLabel = response === 'yes' ? 'Going' : response === 'maybe' ? 'Maybe' : 'Can’t make it'
+    await writeDiaryAudit(null, 'rsvp.update', 'workingParty', event.id, `${name} responded “${responseLabel}” to ${event.title}`, name)
 
     const responses = await loadResponses(event.id)
     return noStore({ ok: true, response, counts: countsFor(responses) }, 201)
