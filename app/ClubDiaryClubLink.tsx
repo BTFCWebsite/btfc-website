@@ -14,51 +14,45 @@ export default function ClubDiaryClubLink() {
       return
     }
 
-    let hero: HTMLElement | null = null
-    let host: HTMLElement | null = null
-    let observer: MutationObserver | null = null
     let cancelled = false
-    let previousPosition = ''
+    let timer: ReturnType<typeof setTimeout> | null = null
 
-    const attach = () => {
-      if (cancelled || host?.isConnected) return Boolean(host?.isConnected)
+    const mountLogin = () => {
+      if (cancelled) return
 
-      const section = document.querySelector('main > section')
-      hero = section?.firstElementChild as HTMLElement | null
-      if (!hero) return false
+      const section = document.querySelector('main > section') as HTMLElement | null
+      const hero = section?.firstElementChild as HTMLElement | null
+      if (!section || !hero) {
+        timer = setTimeout(mountLogin, 100)
+        return
+      }
 
-      previousPosition = hero.style.position
-      hero.style.position = 'relative'
+      const previousSectionPosition = section.style.position
+      section.style.position = 'relative'
 
-      host = document.getElementById('club-diary-club-link') as HTMLElement | null
+      let host = document.getElementById('club-diary-club-link') as HTMLElement | null
       if (!host) {
         host = document.createElement('div')
         host.id = 'club-diary-club-link'
-        hero.appendChild(host)
+        hero.insertAdjacentElement('afterend', host)
       }
 
+      host.dataset.previousSectionPosition = previousSectionPosition
       setMount(host)
-      observer?.disconnect()
-      return true
     }
 
-    if (!attach()) {
-      observer = new MutationObserver(() => {
-        attach()
-      })
-      observer.observe(document.body, { childList: true, subtree: true })
-
-      window.setTimeout(() => attach(), 100)
-      window.setTimeout(() => attach(), 350)
-      window.setTimeout(() => attach(), 800)
-    }
+    mountLogin()
 
     return () => {
       cancelled = true
-      observer?.disconnect()
+      if (timer) clearTimeout(timer)
       setMount(null)
+      const host = document.getElementById('club-diary-club-link') as HTMLElement | null
+      const section = document.querySelector('main > section') as HTMLElement | null
+      if (section && host?.dataset.previousSectionPosition !== undefined) {
+        section.style.position = host.dataset.previousSectionPosition
+      }
       host?.remove()
-      if (hero) hero.style.position = previousPosition
     }
   }, [pathname])
 
@@ -69,15 +63,18 @@ export default function ClubDiaryClubLink() {
       <style>{`
         #club-diary-club-link {
           position: absolute;
-          top: 26px;
-          right: 30px;
-          z-index: 5;
+          top: 28px;
+          right: 32px;
+          z-index: 20;
+          height: 0;
+          margin: 0;
+          padding: 0;
         }
         #club-diary-club-link a {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          gap: 8px;
+          gap: 7px;
           min-height: 42px;
           padding: 0 17px;
           border: 1px solid rgba(255,255,255,.38);
@@ -89,21 +86,23 @@ export default function ClubDiaryClubLink() {
           font-size: 16px;
           font-weight: 800;
           letter-spacing: .02em;
+          box-shadow: 0 4px 14px rgba(0,0,0,.12);
           backdrop-filter: blur(8px);
           -webkit-backdrop-filter: blur(8px);
           white-space: nowrap;
-          box-shadow: 0 4px 14px rgba(0,0,0,.12);
         }
         #club-diary-club-link a:hover {
           background: rgba(255,255,255,.22);
         }
         @media (max-width: 760px) {
           #club-diary-club-link {
-            position: static;
-            width: 100%;
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 4px;
+            top: 22px;
+            right: 20px;
+          }
+          #club-diary-club-link a {
+            min-height: 38px;
+            padding: 0 13px;
+            font-size: 14px;
           }
         }
       `}</style>
