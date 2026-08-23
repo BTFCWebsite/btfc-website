@@ -78,13 +78,20 @@ export async function createDiaryPerson(name: string, isAdmin: boolean) {
   return { id: created._id, ...stored } satisfies DiaryPerson
 }
 
-export async function updateDiaryPerson(id: string, values: { isAdmin?: boolean; active?: boolean }) {
+export async function updateDiaryPerson(id: string, values: { name?: string; isAdmin?: boolean; active?: boolean }) {
   const people = await loadDiaryPeople(true)
   const person = people.find((item) => item.id === id)
   if (!person) throw new Error('Person not found.')
 
+  const requestedName = values.name === undefined ? person.name : cleanText(values.name, 100)
+  if (!requestedName) throw new Error('Add a name.')
+  if (people.some((item) => item.id !== id && normaliseName(item.name) === normaliseName(requestedName))) {
+    throw new Error('That person is already on the list.')
+  }
+
   const updated: DiaryPerson = {
     ...person,
+    name: requestedName,
     isAdmin: typeof values.isAdmin === 'boolean' ? values.isAdmin : person.isAdmin,
     active: typeof values.active === 'boolean' ? values.active : person.active,
   }
@@ -95,7 +102,7 @@ export async function updateDiaryPerson(id: string, values: { isAdmin?: boolean;
   }
 
   const stored: StoredPerson = {
-    name: person.name,
+    name: updated.name,
     isAdmin: updated.isAdmin,
     active: updated.active,
     createdAt: person.createdAt,
@@ -111,7 +118,7 @@ export async function getVerifiedDiarySession(request: NextRequest): Promise<Dia
 
   const people = await loadDiaryPeople(true)
 
-  // Short-lived bootstrap admin session used only while the first people are being added.
+  // Bootstrap admin session used only while the first approved person is being created.
   if (!session.personId) {
     if (session.role === 'admin' && people.length === 0) return session
     return null
