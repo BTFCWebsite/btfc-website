@@ -9,6 +9,7 @@ type Category = 'unavailable' | 'clubhouse' | 'workingParty' | 'event' | 'meetin
 type Filter = 'all' | 'fixtures' | 'availability' | 'clubhouse' | 'workingParty'
 type TeamKey = 'first' | 'reserves' | 'u17s'
 type DiaryRole = 'member' | 'admin'
+type CalendarView = 'day' | 'week' | 'month'
 
 type Rsvp = { name: string; response: 'yes' | 'maybe' | 'no' }
 type DiaryEvent = {
@@ -37,6 +38,9 @@ type Fixture = {
   btfcScore?: number
   opponentScore?: number
 }
+type CalendarItem =
+  | { kind: 'fixture'; fixture: Fixture }
+  | { kind: 'diary'; event: DiaryEvent }
 
 const defaults: Record<TeamKey, { team: string; widgets: string[] }> = {
   first: { team: 'First XI', widgets: ['969980533'] },
@@ -53,6 +57,8 @@ const labels: Record<Category, string> = {
   other: 'Other',
 }
 
+const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+
 function teamKey(value = ''): TeamKey | null {
   const v = value.toLowerCase().replace(/[^a-z0-9]/g, '')
   if (v.includes('u17') || v.includes('under17')) return 'u17s'
@@ -65,15 +71,59 @@ function normalise(value = '') {
   return value.toLowerCase().replace(/[^a-z0-9]/g, '')
 }
 
+function isoFromDate(date: Date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+}
+
+function dateFromIso(value: string) {
+  const [year, month, day] = value.split('-').map(Number)
+  return new Date(year, Math.max(0, month - 1), day || 1, 12, 0, 0, 0)
+}
+
 function todayIso() {
-  const now = new Date()
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+  return isoFromDate(new Date())
+}
+
+function addDays(value: string, amount: number) {
+  const date = dateFromIso(value)
+  date.setDate(date.getDate() + amount)
+  return isoFromDate(date)
+}
+
+function addMonths(value: string, amount: number) {
+  const date = dateFromIso(value)
+  const day = date.getDate()
+  date.setDate(1)
+  date.setMonth(date.getMonth() + amount)
+  const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()
+  date.setDate(Math.min(day, lastDay))
+  return isoFromDate(date)
+}
+
+function mondayOf(value: string) {
+  const date = dateFromIso(value)
+  const day = date.getDay() || 7
+  date.setDate(date.getDate() - (day - 1))
+  return isoFromDate(date)
 }
 
 function prettyDate(value: string) {
-  const d = new Date(`${value}T12:00:00`)
-  if (Number.isNaN(d.getTime())) return value
-  return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
+  const date = dateFromIso(value)
+  if (Number.isNaN(date.getTime())) return value
+  return date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
+}
+
+function periodLabel(view: CalendarView, anchor: string) {
+  const date = dateFromIso(anchor)
+  if (view === 'day') return date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  if (view === 'month') return date.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })
+
+  const start = dateFromIso(mondayOf(anchor))
+  const end = dateFromIso(addDays(isoFromDate(start), 6))
+  if (start.getMonth() === end.getMonth()) {
+    return `${start.getDate()}–${end.getDate()} ${end.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}`
+  }
+  return `${start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} – ${end.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`
 }
 
 function fixtureStyle(team: string) {
@@ -81,6 +131,22 @@ function fixtureStyle(team: string) {
   if (key === 'reserves') return styles.fixtureReserves
   if (key === 'u17s') return styles.fixtureU17
   return styles.fixtureFirst
+}
+
+function fixtureChipStyle(team: string) {
+  const key = teamKey(team)
+  if (key === 'reserves') return styles.chipReserves
+  if (key === 'u17s') return styles.chipU17
+  return styles.chipFirst
+}
+
+function eventChipStyle(category: Category) {
+  if (category === 'unavailable') return styles.chipUnavailable
+  if (category === 'clubhouse') return styles.chipClubhouse
+  if (category === 'workingParty') return styles.chipWorkingParty
+  if (category === 'event') return styles.chipEvent
+  if (category === 'meeting') return styles.chipMeeting
+  return styles.chipOther
 }
 
 function fixtureLabel(team: string) {
@@ -115,6 +181,8 @@ export default function ClubDiaryApp() {
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState('')
   const [filter, setFilter] = useState<Filter>('all')
+  const [calendarView, setCalendarView] = useState<CalendarView>('month')
+  const [anchorDate, setAnchorDate] = useState(today)
   const [category, setCategory] = useState<Category>('unavailable')
   const [title, setTitle] = useState('')
   const [personName, setPersonName] = useState('')
@@ -258,8 +326,8 @@ export default function ClubDiaryApp() {
     setCategory('unavailable')
     setTitle('')
     setPersonName(role === 'member' ? memberName : '')
-    setStartDate(today)
-    setEndDate(today)
+    setStartDate(anchorDate)
+    setEndDate(anchorDate)
     setStartTime('')
     setTargetHelpers('8')
     setNotes('')
@@ -358,28 +426,93 @@ export default function ClubDiaryApp() {
       .filter((name, index, all) => all.indexOf(name) === index)
   }
 
-  const items = useMemo(() => {
-    const diaryItems = events.map((event) => ({ kind: 'diary' as const, date: event.startDate, event }))
-    const fixtureItems = fixtures.filter((fixture) => !fixture.played || fixture.date >= today)
-      .map((fixture) => ({ kind: 'fixture' as const, date: fixture.date, fixture }))
-    return [...diaryItems, ...fixtureItems]
-      .filter((item) => item.date >= today)
-      .filter((item) => {
-        if (filter === 'all') return true
-        if (filter === 'fixtures') return item.kind === 'fixture'
-        if (item.kind !== 'diary') return false
-        if (filter === 'availability') return item.event.category === 'unavailable'
-        if (filter === 'clubhouse') return item.event.category === 'clubhouse'
-        return item.event.category === 'workingParty'
-      })
-      .sort((a, b) => a.date.localeCompare(b.date))
-  }, [events, fixtures, filter, today])
+  function eventMatchesFilter(event: DiaryEvent) {
+    if (filter === 'all') return true
+    if (filter === 'fixtures') return false
+    if (filter === 'availability') return event.category === 'unavailable'
+    if (filter === 'clubhouse') return event.category === 'clubhouse'
+    return event.category === 'workingParty'
+  }
 
-  const grouped = useMemo(() => items.reduce<Record<string, typeof items>>((result, item) => {
-    if (!result[item.date]) result[item.date] = []
-    result[item.date].push(item)
-    return result
-  }, {}), [items])
+  function itemsForDate(date: string): CalendarItem[] {
+    const fixtureItems: CalendarItem[] = filter === 'all' || filter === 'fixtures'
+      ? fixtures.filter((fixture) => fixture.date === date).map((fixture) => ({ kind: 'fixture', fixture }))
+      : []
+    const diaryItems: CalendarItem[] = events
+      .filter(eventMatchesFilter)
+      .filter((event) => event.startDate <= date && (event.endDate || event.startDate) >= date)
+      .map((event) => ({ kind: 'diary', event }))
+
+    return [...fixtureItems, ...diaryItems].sort((a, b) => {
+      const aTime = a.kind === 'fixture' ? (a.fixture.kickoff || '') : (a.event.startTime || '')
+      const bTime = b.kind === 'fixture' ? (b.fixture.kickoff || '') : (b.event.startTime || '')
+      return aTime.localeCompare(bTime)
+    })
+  }
+
+  function navigate(direction: -1 | 1) {
+    if (calendarView === 'day') setAnchorDate(addDays(anchorDate, direction))
+    else if (calendarView === 'week') setAnchorDate(addDays(anchorDate, direction * 7))
+    else setAnchorDate(addMonths(anchorDate, direction))
+  }
+
+  function openDay(date: string) {
+    setAnchorDate(date)
+    setCalendarView('day')
+  }
+
+  function renderCalendarChip(item: CalendarItem, key: string) {
+    if (item.kind === 'fixture') {
+      const fixture = item.fixture
+      const title = `${fixture.venue === 'Home' ? 'BTFC' : fixture.opponent} ${resultText(fixture)} ${fixture.venue === 'Home' ? fixture.opponent : 'BTFC'}`
+      return <div className={`${styles.calendarChip} ${fixtureChipStyle(fixture.team)}`} key={key} title={`${fixtureLabel(fixture.team)} · ${title}`}>
+        <strong>{title}</strong><span>{fixture.kickoff && fixture.kickoff !== 'TBC' ? fixture.kickoff : 'Time TBC'}</span>
+      </div>
+    }
+
+    const event = item.event
+    const content = <><strong>{event.title}</strong>{event.startTime && <span>{event.startTime}</span>}</>
+    return event.canEdit
+      ? <button type="button" className={`${styles.calendarChip} ${eventChipStyle(event.category)}`} key={key} onClick={() => startEdit(event)} title={`${labels[event.category]} · ${event.title}`}>{content}</button>
+      : <div className={`${styles.calendarChip} ${eventChipStyle(event.category)}`} key={key} title={`${labels[event.category]} · ${event.title}`}>{content}</div>
+  }
+
+  function renderDetailedItem(item: CalendarItem, date: string, key: string) {
+    const unavailable = unavailableOn(date)
+    if (item.kind === 'fixture') {
+      const fixture = item.fixture
+      return <article className={`${styles.card} ${fixtureStyle(fixture.team)}`} key={key}>
+        <p className={styles.kicker}>{fixtureLabel(fixture.team)}</p>
+        <h3 className={styles.cardTitle}>{fixture.venue === 'Home' ? 'BTFC' : fixture.opponent} {resultText(fixture)} {fixture.venue === 'Home' ? fixture.opponent : 'BTFC'}</h3>
+        <p className={styles.meta}>{fixture.venue} · {fixture.kickoff && fixture.kickoff !== 'TBC' ? fixture.kickoff : 'Time TBC'}{fixture.competition ? ` · ${fixture.competition}` : ''}</p>
+        {unavailable.length > 0 && <div className={styles.warning}>{unavailable.length >= 2 ? '⚠ Staffing check: ' : 'Unavailable: '}{unavailable.join(', ')}</div>}
+      </article>
+    }
+
+    const diaryEvent = item.event
+    const yes = (diaryEvent.rsvps || []).filter((rsvp) => rsvp.response === 'yes')
+    const maybe = (diaryEvent.rsvps || []).filter((rsvp) => rsvp.response === 'maybe')
+    return <article className={`${styles.card} ${styles[diaryEvent.category]}`} key={key}>
+      <div className={styles.cardTop}><div><p className={styles.kicker}>{labels[diaryEvent.category]}</p><h3 className={styles.cardTitle}>{diaryEvent.title}</h3></div>{diaryEvent.canEdit && <div style={{ display: 'flex', gap: 8 }}><button className={styles.secondaryButton} type="button" onClick={() => startEdit(diaryEvent)}>Edit</button><button className={styles.dangerButton} type="button" onClick={() => void removeEvent(diaryEvent)}>Remove</button></div>}</div>
+      <p className={styles.meta}>{diaryEvent.startTime ? `${diaryEvent.startTime} · ` : ''}{diaryEvent.endDate && diaryEvent.endDate !== diaryEvent.startDate ? `Until ${prettyDate(diaryEvent.endDate)}` : ''}{diaryEvent.notes ? `${diaryEvent.endDate && diaryEvent.endDate !== diaryEvent.startDate ? ' · ' : ''}${diaryEvent.notes}` : ''}</p>
+      {diaryEvent.category === 'workingParty' && <div className={styles.rsvpBox}>
+        <div className={styles.rsvpLine}><div><strong>{yes.length} confirmed</strong>{diaryEvent.targetHelpers ? ` / ${diaryEvent.targetHelpers} wanted` : ''}{maybe.length ? ` · ${maybe.length} maybe` : ''}</div>{role === 'admin' && <button className={styles.shareButton} type="button" onClick={() => void shareInvite(diaryEvent)}>Share invite</button>}</div>
+        {yes.length > 0 && <div className={styles.names}>Coming: {yes.map((rsvp) => rsvp.name).join(', ')}</div>}
+      </div>}
+    </article>
+  }
+
+  const weekDates = useMemo(() => {
+    const start = mondayOf(anchorDate)
+    return Array.from({ length: 7 }, (_, index) => addDays(start, index))
+  }, [anchorDate])
+
+  const monthDates = useMemo(() => {
+    const anchor = dateFromIso(anchorDate)
+    const first = isoFromDate(new Date(anchor.getFullYear(), anchor.getMonth(), 1, 12))
+    const gridStart = mondayOf(first)
+    return Array.from({ length: 42 }, (_, index) => addDays(gridStart, index))
+  }, [anchorDate])
 
   if (auth === 'checking') return <div className={styles.page}><div className={styles.loading}>Opening Club Diary…</div></div>
 
@@ -406,6 +539,8 @@ export default function ClubDiaryApp() {
       </form>
     </div></div></div>
   }
+
+  const anchorMonth = dateFromIso(anchorDate).getMonth()
 
   return <div className={styles.page}><div className={styles.shell}>
     <section className={styles.hero}><div className={styles.heroTop}>
@@ -437,44 +572,61 @@ export default function ClubDiaryApp() {
       <div className={styles.formActions}><button className={styles.primaryButton} type="submit" disabled={saving}>{saving ? 'Saving…' : editingId ? 'Save changes' : 'Save'}</button><button className={styles.secondaryButton} type="button" disabled={saving} onClick={() => { setAdding(false); resetForm() }}>Cancel</button></div>
     </form>}
 
+    <div className={styles.calendarControls}>
+      <div className={styles.calendarNav}>
+        <button className={styles.navButton} type="button" onClick={() => navigate(-1)} aria-label="Previous period">‹</button>
+        <button className={styles.todayButton} type="button" onClick={() => setAnchorDate(today)}>Today</button>
+        <button className={styles.navButton} type="button" onClick={() => navigate(1)} aria-label="Next period">›</button>
+        <div className={styles.calendarPeriod}>{periodLabel(calendarView, anchorDate)}</div>
+      </div>
+      <div className={styles.viewButtons} aria-label="Calendar view">
+        {(['day', 'week', 'month'] as CalendarView[]).map((view) => <button key={view} type="button" className={`${styles.viewButton} ${calendarView === view ? styles.viewActive : ''}`} onClick={() => setCalendarView(view)}>{view[0].toUpperCase() + view.slice(1)}</button>)}
+      </div>
+    </div>
+
     <div className={styles.toolbar} aria-label="Diary filters">
       {([['all','Everything'],['fixtures','Fixtures'],['availability','Availability'],['clubhouse','Clubhouse'],['workingParty','Working parties']] as [Filter,string][]).map(([value,label]) => <button key={value} type="button" className={`${styles.filterButton} ${filter === value ? styles.filterActive : ''}`} onClick={() => setFilter(value)}>{label}</button>)}
     </div>
 
     {loading && <div className={styles.loading}>Updating diary and fixtures…</div>}
-    {!loading && Object.keys(grouped).length === 0 && <div className={styles.emptyCard}>Nothing coming up in this view.</div>}
 
-    {!loading && Object.entries(grouped).map(([date, dayItems]) => {
-      const unavailable = unavailableOn(date)
+    {!loading && calendarView === 'day' && (() => {
+      const dayItems = itemsForDate(anchorDate)
+      const unavailable = unavailableOn(anchorDate)
       const homeFixture = dayItems.some((item) => item.kind === 'fixture' && item.fixture.venue === 'Home')
-      return <section className={styles.day} key={date}>
-        <div className={styles.dayHeader}><h2>{prettyDate(date)}</h2>{homeFixture && unavailable.length > 0 && <span>Cover to check</span>}</div>
-        {dayItems.map((item) => {
-          if (item.kind === 'fixture') {
-            const f = item.fixture
-            return <article className={`${styles.card} ${fixtureStyle(f.team)}`} key={`fixture-${f._id}`}>
-              <p className={styles.kicker}>{fixtureLabel(f.team)}</p>
-              <h3 className={styles.cardTitle}>{f.venue === 'Home' ? 'BTFC' : f.opponent} {resultText(f)} {f.venue === 'Home' ? f.opponent : 'BTFC'}</h3>
-              <p className={styles.meta}>{f.venue} · {f.kickoff && f.kickoff !== 'TBC' ? f.kickoff : 'Time TBC'}{f.competition ? ` · ${f.competition}` : ''}</p>
-              {unavailable.length > 0 && <div className={styles.warning}>{unavailable.length >= 2 ? '⚠ Staffing check: ' : 'Unavailable: '}{unavailable.join(', ')}</div>}
-            </article>
-          }
+      return <div className={styles.calendarPanel}><div className={styles.dayView}>
+        <div className={styles.dayViewHeader}><h2>{prettyDate(anchorDate)}</h2>{homeFixture && unavailable.length > 0 && <span className={styles.coverBadge}>Cover to check</span>}</div>
+        {dayItems.length === 0 ? <div className={styles.emptyCard}>Nothing in the diary for this day.</div> : dayItems.map((item, index) => renderDetailedItem(item, anchorDate, `${item.kind}-${index}`))}
+      </div></div>
+    })()}
 
-          const diaryEvent = item.event
-          const yes = (diaryEvent.rsvps || []).filter((rsvp) => rsvp.response === 'yes')
-          const maybe = (diaryEvent.rsvps || []).filter((rsvp) => rsvp.response === 'maybe')
-          return <article className={`${styles.card} ${styles[diaryEvent.category]}`} key={diaryEvent._id}>
-            <div className={styles.cardTop}><div><p className={styles.kicker}>{labels[diaryEvent.category]}</p><h3 className={styles.cardTitle}>{diaryEvent.title}</h3></div>{diaryEvent.canEdit && <div style={{ display: 'flex', gap: 8 }}><button className={styles.secondaryButton} type="button" onClick={() => startEdit(diaryEvent)}>Edit</button><button className={styles.dangerButton} type="button" onClick={() => void removeEvent(diaryEvent)}>Remove</button></div>}</div>
-            <p className={styles.meta}>{diaryEvent.startTime ? `${diaryEvent.startTime} · ` : ''}{diaryEvent.endDate && diaryEvent.endDate !== diaryEvent.startDate ? `Until ${prettyDate(diaryEvent.endDate)}` : ''}{diaryEvent.notes ? `${diaryEvent.endDate && diaryEvent.endDate !== diaryEvent.startDate ? ' · ' : ''}${diaryEvent.notes}` : ''}</p>
-            {diaryEvent.category === 'workingParty' && <div className={styles.rsvpBox}>
-              <div className={styles.rsvpLine}><div><strong>{yes.length} confirmed</strong>{diaryEvent.targetHelpers ? ` / ${diaryEvent.targetHelpers} wanted` : ''}{maybe.length ? ` · ${maybe.length} maybe` : ''}</div>{role === 'admin' && <button className={styles.shareButton} type="button" onClick={() => void shareInvite(diaryEvent)}>Share invite</button>}</div>
-              {yes.length > 0 && <div className={styles.names}>Coming: {yes.map((rsvp) => rsvp.name).join(', ')}</div>}
-            </div>}
-          </article>
-        })}
-      </section>
-    })}
+    {!loading && calendarView === 'week' && <div className={styles.calendarPanel}><div className={styles.calendarScroller}>
+      <div className={styles.weekHeader}>{weekDates.map((date) => <div className={styles.weekHeaderCell} key={`head-${date}`}>{dateFromIso(date).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric' })}</div>)}</div>
+      <div className={styles.weekGrid}>{weekDates.map((date, dayIndex) => {
+        const dayItems = itemsForDate(date)
+        const unavailable = unavailableOn(date)
+        const homeFixture = dayItems.some((item) => item.kind === 'fixture' && item.fixture.venue === 'Home')
+        return <div className={`${styles.weekDay} ${dayIndex >= 5 ? styles.weekend : ''}`} key={date}>
+          <div className={styles.dayNumberRow}><button type="button" className={`${styles.dayNumber} ${date === today ? styles.todayNumber : ''}`} onClick={() => openDay(date)}>{dateFromIso(date).getDate()}</button>{homeFixture && unavailable.length > 0 && <span className={styles.coverBadge}>Cover</span>}</div>
+          {dayItems.map((item, index) => renderCalendarChip(item, `${date}-${item.kind}-${index}`))}
+        </div>
+      })}</div>
+    </div></div>}
 
-    <p className={styles.tip}>Fixtures are automatic and cannot be edited here. On your phone choose “Add to Home Screen” once, then the Club Diary opens like an app.</p>
+    {!loading && calendarView === 'month' && <div className={styles.calendarPanel}><div className={styles.calendarScroller}>
+      <div className={styles.weekHeader}>{dayNames.map((name) => <div className={styles.weekHeaderCell} key={name}>{name}</div>)}</div>
+      <div className={styles.monthGrid}>{monthDates.map((date) => {
+        const dayItems = itemsForDate(date)
+        const inMonth = dateFromIso(date).getMonth() === anchorMonth
+        const visibleItems = dayItems.slice(0, 4)
+        return <div className={`${styles.monthDay} ${!inMonth ? styles.outsideMonth : ''}`} key={date}>
+          <div className={styles.dayNumberRow}><button type="button" className={`${styles.dayNumber} ${date === today ? styles.todayNumber : ''}`} onClick={() => openDay(date)}>{dateFromIso(date).getDate()}</button></div>
+          {visibleItems.map((item, index) => renderCalendarChip(item, `${date}-${item.kind}-${index}`))}
+          {dayItems.length > visibleItems.length && <button type="button" className={styles.moreItems} onClick={() => openDay(date)}>+ {dayItems.length - visibleItems.length} more</button>}
+        </div>
+      })}</div>
+    </div></div>}
+
+    <p className={styles.tip}>Fixtures are automatic and cannot be edited here. Month view opens by default; use Day or Week when you want more detail.</p>
   </div></div>
 }
