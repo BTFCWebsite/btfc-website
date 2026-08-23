@@ -19,18 +19,40 @@ export default function ClubDiaryClubLink() {
     let resizeObserver: ResizeObserver | null = null
     let hero: HTMLElement | null = null
     let factsGrid: HTMLElement | null = null
+    let originalHeroPaddingBottom = ''
 
     const placeHost = (host: HTMLElement) => {
       if (!hero) return
 
-      const heroRect = hero.getBoundingClientRect()
       const mobile = window.innerWidth <= 760
-      const horizontalInset = mobile ? 18 : 32
-
       host.dataset.mobile = mobile ? 'true' : 'false'
+
+      if (mobile) {
+        // The login becomes a full-width card below the facts on mobile.
+        // Extra hero padding reserves real visual space so the card never overlaps the facts.
+        hero.style.paddingBottom = '146px'
+
+        const heroRect = hero.getBoundingClientRect()
+        const factsRect = factsGrid?.getBoundingClientRect()
+        const left = factsRect?.left ?? heroRect.left + 18
+        const top = factsRect?.bottom ? factsRect.bottom + 18 : heroRect.bottom - 120
+        const width = factsRect?.width ?? Math.max(220, heroRect.width - 36)
+
+        host.style.left = `${window.scrollX + left}px`
+        host.style.top = `${window.scrollY + top}px`
+        host.style.setProperty('--club-diary-mobile-width', `${Math.round(width)}px`)
+        host.style.setProperty('--club-diary-mobile-height', '96px')
+        host.style.removeProperty('--club-diary-tile-size')
+        return
+      }
+
+      hero.style.paddingBottom = originalHeroPaddingBottom
+
+      const heroRect = hero.getBoundingClientRect()
+      const horizontalInset = 32
       host.style.left = `${window.scrollX + heroRect.right - horizontalInset}px`
 
-      if (!mobile && factsGrid) {
+      if (factsGrid) {
         const factsRect = factsGrid.getBoundingClientRect()
         const tileSize = Math.max(120, Math.round(factsRect.height))
         host.style.top = `${window.scrollY + factsRect.top}px`
@@ -38,7 +60,7 @@ export default function ClubDiaryClubLink() {
       } else {
         const verticalInset = 16
         host.style.top = `${window.scrollY + heroRect.bottom - verticalInset}px`
-        host.style.setProperty('--club-diary-tile-size', '124px')
+        host.style.setProperty('--club-diary-tile-size', '154px')
       }
     }
 
@@ -52,6 +74,8 @@ export default function ClubDiaryClubLink() {
         timer = setTimeout(mountLogin, 100)
         return
       }
+
+      originalHeroPaddingBottom = hero.style.paddingBottom
 
       let host = document.getElementById('club-diary-club-link') as HTMLElement | null
       if (!host) {
@@ -84,6 +108,7 @@ export default function ClubDiaryClubLink() {
       if (timer) clearTimeout(timer)
       resizeObserver?.disconnect()
       cleanupResize?.()
+      if (hero) hero.style.paddingBottom = originalHeroPaddingBottom
       setMount(null)
       document.getElementById('club-diary-club-link')?.remove()
     }
@@ -124,11 +149,6 @@ export default function ClubDiaryClubLink() {
           backdrop-filter: blur(8px);
           -webkit-backdrop-filter: blur(8px);
           pointer-events: auto;
-        }
-        #club-diary-club-link[data-mobile='true'] a {
-          transform: translate(-100%, -100%);
-          width: 124px;
-          height: 124px;
         }
         #club-diary-club-link a:hover {
           background: rgba(25,69,143,.96);
@@ -172,22 +192,33 @@ export default function ClubDiaryClubLink() {
           white-space: nowrap;
         }
         @media (max-width: 760px) {
-          #club-diary-club-link a {
-            gap: 7px;
-            padding: 10px;
+          #club-diary-club-link[data-mobile='true'] a {
+            transform: none;
+            width: var(--club-diary-mobile-width, 100%);
+            height: var(--club-diary-mobile-height, 96px);
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 14px;
+            padding: 14px 18px;
+            text-align: left;
           }
-          #club-diary-club-link .club-diary-helper-icon {
-            width: 38px;
-            height: 38px;
-            flex-basis: 38px;
-            font-size: 20px;
+          #club-diary-club-link[data-mobile='true'] .club-diary-helper-icon {
+            width: 44px;
+            height: 44px;
+            flex-basis: 44px;
+            font-size: 22px;
           }
-          #club-diary-club-link .club-diary-internal {
-            font-size: 6px;
-            margin-bottom: 4px;
+          #club-diary-club-link[data-mobile='true'] .club-diary-copy {
+            align-items: flex-start;
+            text-align: left;
           }
-          #club-diary-club-link .club-diary-login {
-            font-size: 16px;
+          #club-diary-club-link[data-mobile='true'] .club-diary-internal {
+            font-size: 7px;
+            margin-bottom: 5px;
+          }
+          #club-diary-club-link[data-mobile='true'] .club-diary-login {
+            font-size: 21px;
           }
         }
       `}</style>
