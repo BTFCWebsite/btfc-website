@@ -94,8 +94,8 @@ export default function ClubDiarySecurityTools() {
 
   async function setPin(person: Person) {
     const pin = String(pinValues[person.id] || '')
-    if (!/^\d{6}$/.test(pin)) {
-      setMessage('Personal PIN must be exactly 6 digits.')
+    if (!/^\d{4,6}$/.test(pin)) {
+      setMessage('Personal PIN must be 4 to 6 digits.')
       return
     }
     setMessage('')
@@ -138,7 +138,7 @@ export default function ClubDiarySecurityTools() {
         {loading && <div style={copyStyle}>Updating…</div>}
 
         {!loading && tab === 'pins' && <div style={{ display: 'grid', gap: 9 }}>
-          <div style={noticeStyle}>Set a different 6-digit PIN for each person. PINs are never displayed after saving; an Admin can only reset them.</div>
+          <div style={noticeStyle}>Set a different 4–6 digit PIN for each person. A simple 4-digit PIN is fine. PINs are never displayed after saving; an Admin can only reset them.</div>
           {people.map((person) => <div key={person.id} style={personRowStyle}>
             <div style={{ minWidth: 0 }}>
               <strong style={{ fontFamily: condensed, fontSize: 18, color: '#1F2937' }}>{person.name}</strong>
@@ -152,7 +152,7 @@ export default function ClubDiarySecurityTools() {
               onChange={(event) => setPinValues((current) => ({ ...current, [person.id]: event.target.value.replace(/\D/g, '').slice(0, 6) }))}
               inputMode="numeric"
               autoComplete="off"
-              placeholder="6-digit PIN"
+              placeholder="4–6 digit PIN"
               style={pinInputStyle}
             />
             <button type="button" onClick={() => void setPin(person)} style={primaryButton}>{person.hasPin ? 'Reset PIN' : 'Set PIN'}</button>
