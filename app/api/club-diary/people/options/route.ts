@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic'
 function responseFor(role: DiaryRole, people: Awaited<ReturnType<typeof loadDiaryPeople>>) {
   const eligible = people
     .filter((person) => role === 'member' || person.isAdmin)
-    .map((person) => ({ id: person.id, name: person.name }))
+    .map((person) => ({ id: person.id, name: person.name, hasPin: person.hasPin }))
 
   return NextResponse.json({
     people: eligible,
@@ -22,8 +22,8 @@ function responseFor(role: DiaryRole, people: Awaited<ReturnType<typeof loadDiar
   })
 }
 
-// Login names are intentionally available before PIN entry so both General and
-// Admin login screens can present a name dropdown. The diary itself remains PIN protected.
+// Names are intentionally available before PIN entry so both login screens can
+// present the approved dropdown. No diary data is exposed here.
 export async function GET(request: NextRequest) {
   try {
     const role: DiaryRole = request.nextUrl.searchParams.get('role') === 'admin' ? 'admin' : 'member'
@@ -35,6 +35,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// Retained for compatibility with the earlier two-step login UI.
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => ({}))
