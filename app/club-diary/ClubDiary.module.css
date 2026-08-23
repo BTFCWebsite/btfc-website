@@ -1,0 +1,608 @@
+.page {
+  min-height: 100vh;
+  background: #f2f4f7;
+  color: #162033;
+  padding: 28px 16px 80px;
+}
+
+.shell {
+  width: min(1260px, 100%);
+  margin: 0 auto;
+}
+
+.hero {
+  background: linear-gradient(135deg, #0b2f69 0%, #154f9b 100%);
+  color: white;
+  border-radius: 22px;
+  padding: 22px;
+  box-shadow: 0 12px 34px rgba(10, 35, 78, 0.18);
+}
+
+.heroTop,
+.toolbar,
+.row,
+.cardTop,
+.rsvpLine,
+.calendarControls,
+.calendarNav,
+.viewButtons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.heroTop,
+.cardTop {
+  justify-content: space-between;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(26px, 5vw, 38px);
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  opacity: 0.86;
+  font-size: 14px;
+}
+
+.addButton,
+.primaryButton,
+.secondaryButton,
+.filterButton,
+.shareButton,
+.dangerButton,
+.navButton,
+.todayButton,
+.viewButton {
+  border: 0;
+  border-radius: 12px;
+  min-height: 44px;
+  padding: 10px 14px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.addButton {
+  background: white;
+  color: #0b2f69;
+  white-space: nowrap;
+}
+
+.toolbar {
+  margin: 12px 0;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.filterButton,
+.viewButton,
+.navButton,
+.todayButton {
+  background: white;
+  color: #344054;
+  border: 1px solid #d0d5dd;
+  white-space: nowrap;
+}
+
+.filterActive,
+.viewActive {
+  background: #0b2f69;
+  color: white;
+  border-color: #0b2f69;
+}
+
+.panel,
+.loginCard,
+.emptyCard,
+.calendarPanel {
+  background: white;
+  border: 1px solid #e4e7ec;
+  border-radius: 18px;
+  box-shadow: 0 6px 20px rgba(16, 24, 40, 0.06);
+}
+
+.panel,
+.emptyCard {
+  padding: 18px;
+}
+
+.panel {
+  margin: 16px 0;
+}
+
+.panel h2,
+.loginCard h1 {
+  margin: 0 0 14px;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 13px;
+  font-weight: 800;
+  color: #344054;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid #cfd5df;
+  border-radius: 11px;
+  background: white;
+  color: #172033;
+  font: inherit;
+  font-size: 16px;
+  padding: 10px 12px;
+}
+
+.field textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.formActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.primaryButton {
+  background: #0b2f69;
+  color: white;
+}
+
+.secondaryButton {
+  background: #eef2f6;
+  color: #344054;
+}
+
+.primaryButton:disabled,
+.secondaryButton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.error {
+  margin: 12px 0 0;
+  background: #fff0f0;
+  color: #9f1c1c;
+  border: 1px solid #f4caca;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.notice {
+  margin: 14px 0;
+  background: #fff8df;
+  border: 1px solid #f4dda0;
+  color: #694b00;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.calendarControls {
+  margin: 16px 0 10px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.calendarNav,
+.viewButtons {
+  flex-wrap: wrap;
+}
+
+.calendarPeriod {
+  min-width: 250px;
+  text-align: center;
+  font-weight: 900;
+  font-size: 18px;
+  color: #172033;
+}
+
+.navButton {
+  width: 44px;
+  padding: 8px;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.todayButton,
+.viewButton {
+  min-height: 40px;
+  padding: 8px 13px;
+}
+
+.calendarPanel {
+  overflow: hidden;
+}
+
+.calendarScroller {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.weekHeader,
+.weekGrid,
+.monthGrid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.weekHeader {
+  min-width: 910px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e4e7ec;
+}
+
+.weekHeaderCell {
+  padding: 10px 8px;
+  text-align: center;
+  border-right: 1px solid #e4e7ec;
+  color: #475467;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.weekHeaderCell:last-child {
+  border-right: 0;
+}
+
+.weekGrid {
+  min-width: 910px;
+}
+
+.weekDay {
+  min-height: 360px;
+  padding: 10px;
+  border-right: 1px solid #e4e7ec;
+  background: white;
+}
+
+.weekDay:last-child {
+  border-right: 0;
+}
+
+.weekend {
+  background: #fafbfc;
+}
+
+.dayNumberRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 9px;
+}
+
+.dayNumber {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-weight: 900;
+  color: #344054;
+}
+
+.todayNumber {
+  background: #0b2f69;
+  color: white;
+}
+
+.coverBadge {
+  border-radius: 999px;
+  background: #fff4e5;
+  border: 1px solid #ffd7a1;
+  color: #7a4200;
+  padding: 3px 6px;
+  font-size: 9px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.calendarChip {
+  display: block;
+  width: 100%;
+  margin: 0 0 6px;
+  border: 0;
+  border-left: 4px solid #667085;
+  border-radius: 7px;
+  padding: 7px 8px;
+  text-align: left;
+  color: #172033;
+  background: #f4f6f8;
+  font: inherit;
+  font-size: 11px;
+  line-height: 1.25;
+  cursor: default;
+  overflow: hidden;
+}
+
+button.calendarChip {
+  cursor: pointer;
+}
+
+.calendarChip strong {
+  display: block;
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.calendarChip span {
+  display: block;
+  margin-top: 2px;
+  color: #667085;
+  font-size: 10px;
+}
+
+.chipFirst { border-left-color: #1769aa; background: #edf6fd; }
+.chipReserves { border-left-color: #2d8a4a; background: #eef8f1; }
+.chipU17 { border-left-color: #d39b16; background: #fff8e5; }
+.chipUnavailable { border-left-color: #cf3f3f; background: #fff0f0; }
+.chipClubhouse { border-left-color: #7a55c5; background: #f4f0fb; }
+.chipWorkingParty { border-left-color: #d86f1f; background: #fff3e8; }
+.chipEvent { border-left-color: #008b8b; background: #eaf8f8; }
+.chipMeeting { border-left-color: #4d5c73; background: #f0f2f5; }
+.chipOther { border-left-color: #667085; background: #f4f6f8; }
+
+.monthGrid {
+  min-width: 910px;
+  border-top: 1px solid #e4e7ec;
+  border-left: 1px solid #e4e7ec;
+}
+
+.monthDay {
+  min-height: 132px;
+  padding: 7px;
+  border-right: 1px solid #e4e7ec;
+  border-bottom: 1px solid #e4e7ec;
+  background: white;
+}
+
+.outsideMonth {
+  background: #f8fafc;
+}
+
+.outsideMonth .dayNumber {
+  color: #98a2b3;
+}
+
+.moreItems {
+  margin-top: 4px;
+  color: #475467;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.dayView {
+  padding: 16px;
+}
+
+.dayViewHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.dayViewHeader h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.day {
+  margin-top: 22px;
+}
+
+.dayHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+  padding: 0 4px;
+}
+
+.dayHeader h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.dayHeader span {
+  color: #667085;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.card {
+  position: relative;
+  background: white;
+  border: 1px solid #e4e7ec;
+  border-left: 7px solid #667085;
+  border-radius: 15px;
+  padding: 14px 14px 14px 13px;
+  margin-bottom: 9px;
+  box-shadow: 0 4px 14px rgba(16, 24, 40, 0.05);
+}
+
+.fixtureFirst { border-left-color: #1769aa; }
+.fixtureReserves { border-left-color: #2d8a4a; }
+.fixtureU17 { border-left-color: #d39b16; }
+.unavailable { border-left-color: #cf3f3f; }
+.clubhouse { border-left-color: #7a55c5; }
+.workingParty { border-left-color: #d86f1f; }
+.event { border-left-color: #008b8b; }
+.meeting { border-left-color: #4d5c73; }
+.other { border-left-color: #667085; }
+
+.kicker {
+  margin: 0 0 4px;
+  color: #667085;
+  font-size: 11px;
+  line-height: 1.2;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 900;
+}
+
+.meta {
+  margin: 7px 0 0;
+  color: #475467;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.warning {
+  margin-top: 10px;
+  border-radius: 10px;
+  background: #fff4e5;
+  border: 1px solid #ffd7a1;
+  color: #7a4200;
+  padding: 9px 10px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.rsvpBox {
+  margin-top: 12px;
+  border-radius: 12px;
+  background: #f7f8fa;
+  padding: 11px;
+}
+
+.rsvpLine {
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.names {
+  margin-top: 7px;
+  color: #475467;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.shareButton {
+  background: #172f59;
+  color: white;
+  min-height: 38px;
+  padding: 7px 10px;
+}
+
+.dangerButton {
+  background: transparent;
+  color: #9f1c1c;
+  min-height: 34px;
+  padding: 4px 7px;
+  font-size: 12px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: #eef2f6;
+  color: #475467;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.tip {
+  margin-top: 20px;
+  color: #667085;
+  text-align: center;
+  font-size: 13px;
+}
+
+.loginWrap {
+  min-height: 65vh;
+  display: grid;
+  place-items: center;
+}
+
+.loginCard {
+  width: min(420px, 100%);
+  text-align: center;
+  padding: 18px;
+}
+
+.loginCard p {
+  color: #667085;
+}
+
+.pinInput {
+  width: 100%;
+  min-height: 54px;
+  border-radius: 12px;
+  border: 1px solid #cfd5df;
+  font-size: 24px;
+  text-align: center;
+  letter-spacing: 0.15em;
+  margin: 6px 0 10px;
+}
+
+.loading {
+  text-align: center;
+  padding: 70px 20px;
+  color: #667085;
+  font-weight: 800;
+}
+
+@media (max-width: 760px) {
+  .page { padding: 14px 10px 70px; }
+  .shell { width: 100%; }
+  .hero { border-radius: 16px; padding: 17px 15px; }
+  .heroTop { align-items: flex-start; }
+  .subtitle { max-width: 250px; }
+  .formGrid { grid-template-columns: 1fr; }
+  .full { grid-column: auto; }
+  .panel { padding: 14px; }
+  .card { padding-right: 11px; }
+  .calendarControls { align-items: stretch; }
+  .calendarNav { width: 100%; }
+  .calendarPeriod { flex: 1; min-width: 150px; font-size: 15px; }
+  .viewButtons { width: 100%; }
+  .viewButton { flex: 1; }
+  .weekHeader,
+  .weekGrid,
+  .monthGrid { min-width: 760px; }
+  .weekDay { min-height: 300px; padding: 7px; }
+  .monthDay { min-height: 112px; padding: 5px; }
+  .calendarChip { padding: 6px; }
+}
