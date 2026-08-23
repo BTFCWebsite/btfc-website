@@ -93,7 +93,7 @@ export default function ClubDiaryPreGate() {
         setError(data?.error || 'Unable to open the diary.')
         return
       }
-      setAuth('loggedIn')
+      window.location.reload()
     } finally {
       setWorking(false)
     }
