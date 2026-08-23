@@ -17,6 +17,8 @@ export default function ClubDiaryPreGate() {
   const [people, setPeople] = useState<Person[]>([])
   const [personId, setPersonId] = useState('')
   const [pin, setPin] = useState('')
+  const [newPersonalPin, setNewPersonalPin] = useState('')
+  const [confirmPersonalPin, setConfirmPersonalPin] = useState('')
   const [needsSetup, setNeedsSetup] = useState(false)
   const [setupName, setSetupName] = useState('')
   const [loadingNames, setLoadingNames] = useState(false)
@@ -69,6 +71,8 @@ export default function ClubDiaryPreGate() {
   function changeMode(nextMode: Role) {
     setMode(nextMode)
     setPin('')
+    setNewPersonalPin('')
+    setConfirmPersonalPin('')
     setSetupName('')
     setError('')
   }
@@ -84,6 +88,7 @@ export default function ClubDiaryPreGate() {
         body: JSON.stringify({
           role: mode,
           pin,
+          newPersonalPin: needsPersonalPinSetup ? newPersonalPin : undefined,
           personId: needsSetup ? undefined : personId,
           name: needsSetup ? setupName : undefined,
         }),
@@ -114,9 +119,11 @@ export default function ClubDiaryPreGate() {
 
   const selectedNeedsPin = Boolean(selectedPerson && !selectedPerson.hasPin)
   const canUseSetupPin = selectedNeedsPin && mode === 'admin'
+  const needsPersonalPinSetup = Boolean((needsSetup && mode === 'admin') || canUseSetupPin)
   const personalPinRequired = Boolean(selectedPerson?.hasPin)
   const personalPinValid = !personalPinRequired || /^\d{4,6}$/.test(pin)
-  const loginDisabled = working || loadingNames || (!needsSetup && (!personId || (selectedNeedsPin && !canUseSetupPin))) || !personalPinValid
+  const newPinValid = !needsPersonalPinSetup || (/^\d{4,6}$/.test(newPersonalPin) && newPersonalPin === confirmPersonalPin)
+  const loginDisabled = working || loadingNames || (!needsSetup && (!personId || (selectedNeedsPin && !canUseSetupPin))) || !personalPinValid || !newPinValid
 
   return <div style={pageStyle}>
     <form style={cardStyle} onSubmit={login}>
@@ -129,19 +136,19 @@ export default function ClubDiaryPreGate() {
       </div>
 
       {needsSetup && mode === 'admin' ? <>
-        <div style={noticeStyle}>First-time setup: create the first administrator. After opening the diary, set personal PINs for each person.</div>
+        <div style={noticeStyle}>First-time setup: create the first administrator and choose your personal PIN.</div>
         <label style={labelStyle} htmlFor="setupName">Your name</label>
         <input id="setupName" value={setupName} onChange={(event) => setSetupName(event.target.value)} autoComplete="name" required style={inputStyle} />
       </> : <>
         <label style={labelStyle} htmlFor="personSelect">Your name</label>
-        <select id="personSelect" value={personId} onChange={(event) => { setPersonId(event.target.value); setPin(''); setError('') }} required style={inputStyle} disabled={loadingNames || people.length === 0}>
+        <select id="personSelect" value={personId} onChange={(event) => { setPersonId(event.target.value); setPin(''); setNewPersonalPin(''); setConfirmPersonalPin(''); setError('') }} required style={inputStyle} disabled={loadingNames || people.length === 0}>
           {loadingNames && <option value="">Loading names…</option>}
           {!loadingNames && people.length === 0 && <option value="">No eligible names</option>}
           {people.map((person) => <option key={person.id} value={person.id}>{person.name}</option>)}
         </select>
         {!loadingNames && people.length === 0 && <div style={noticeStyle}>{mode === 'admin' ? 'No active administrators are available.' : 'No people have been added yet. Ask a diary administrator.'}</div>}
         {selectedNeedsPin && mode === 'member' && <div style={noticeStyle}>A diary administrator needs to set a personal PIN for {selectedPerson?.name} before this account can be used.</div>}
-        {canUseSetupPin && <div style={noticeStyle}>This Admin does not have a personal PIN yet. Use the existing Admin setup PIN once, then set a personal PIN from the security controls.</div>}
+        {canUseSetupPin && <div style={noticeStyle}>This Admin does not have a personal PIN yet. Enter the Admin setup PIN below, then choose your own 4–6 digit personal PIN. This setup PIN is only needed this once.</div>}
       </>}
 
       <label style={labelStyle} htmlFor="diaryPin">
@@ -158,8 +165,34 @@ export default function ClubDiaryPreGate() {
         placeholder={needsSetup || canUseSetupPin ? '' : '4–6 digits'}
       />
 
+      {needsPersonalPinSetup && <>
+        <label style={labelStyle} htmlFor="newPersonalPin">Choose your new personal PIN</label>
+        <input
+          id="newPersonalPin"
+          value={newPersonalPin}
+          onChange={(event) => setNewPersonalPin(event.target.value.replace(/\D/g, '').slice(0, 6))}
+          inputMode="numeric"
+          autoComplete="new-password"
+          required
+          style={inputStyle}
+          placeholder="4–6 digits"
+        />
+        <label style={labelStyle} htmlFor="confirmPersonalPin">Confirm your new personal PIN</label>
+        <input
+          id="confirmPersonalPin"
+          value={confirmPersonalPin}
+          onChange={(event) => setConfirmPersonalPin(event.target.value.replace(/\D/g, '').slice(0, 6))}
+          inputMode="numeric"
+          autoComplete="new-password"
+          required
+          style={inputStyle}
+          placeholder="Repeat 4–6 digits"
+        />
+        {confirmPersonalPin && newPersonalPin !== confirmPersonalPin && <div style={errorStyle}>The two personal PINs do not match.</div>}
+      </>}
+
       <button type="submit" disabled={loginDisabled} style={primaryStyle}>
-        {working ? 'Opening…' : needsSetup && mode === 'admin' ? 'Create administrator & open diary' : 'Open Diary'}
+        {working ? 'Opening…' : needsPersonalPinSetup ? 'Set Personal PIN & Open Diary' : 'Open Diary'}
       </button>
 
       {error && <div style={errorStyle}>{error}</div>}
