@@ -18,14 +18,28 @@ export default function ClubDiaryClubLink() {
     let timer: ReturnType<typeof setTimeout> | null = null
     let resizeObserver: ResizeObserver | null = null
     let hero: HTMLElement | null = null
+    let factsGrid: HTMLElement | null = null
 
     const placeHost = (host: HTMLElement) => {
       if (!hero) return
-      const rect = hero.getBoundingClientRect()
-      const horizontalInset = window.innerWidth <= 760 ? 18 : 32
-      const verticalInset = window.innerWidth <= 760 ? 16 : 22
-      host.style.left = `${window.scrollX + rect.right - horizontalInset}px`
-      host.style.top = `${window.scrollY + rect.bottom - verticalInset}px`
+
+      const heroRect = hero.getBoundingClientRect()
+      const mobile = window.innerWidth <= 760
+      const horizontalInset = mobile ? 18 : 32
+
+      host.dataset.mobile = mobile ? 'true' : 'false'
+      host.style.left = `${window.scrollX + heroRect.right - horizontalInset}px`
+
+      if (!mobile && factsGrid) {
+        const factsRect = factsGrid.getBoundingClientRect()
+        const tileSize = Math.max(120, Math.round(factsRect.height))
+        host.style.top = `${window.scrollY + factsRect.top}px`
+        host.style.setProperty('--club-diary-tile-size', `${tileSize}px`)
+      } else {
+        const verticalInset = 16
+        host.style.top = `${window.scrollY + heroRect.bottom - verticalInset}px`
+        host.style.setProperty('--club-diary-tile-size', '124px')
+      }
     }
 
     const mountLogin = () => {
@@ -33,6 +47,7 @@ export default function ClubDiaryClubLink() {
 
       const section = document.querySelector('main > section') as HTMLElement | null
       hero = section?.firstElementChild as HTMLElement | null
+      factsGrid = hero?.children?.[1] as HTMLElement | null
       if (!hero) {
         timer = setTimeout(mountLogin, 100)
         return
@@ -54,6 +69,7 @@ export default function ClubDiaryClubLink() {
       if (typeof ResizeObserver !== 'undefined') {
         resizeObserver = new ResizeObserver(reposition)
         resizeObserver.observe(hero)
+        if (factsGrid) resizeObserver.observe(factsGrid)
       }
 
       timer = setTimeout(reposition, 500)
@@ -88,10 +104,10 @@ export default function ClubDiaryClubLink() {
           pointer-events: none;
         }
         #club-diary-club-link a {
-          transform: translate(-100%, -100%);
+          transform: translateX(-100%);
           display: flex;
-          width: 154px;
-          height: 154px;
+          width: var(--club-diary-tile-size, 154px);
+          height: var(--club-diary-tile-size, 154px);
           box-sizing: border-box;
           flex-direction: column;
           align-items: center;
@@ -108,6 +124,11 @@ export default function ClubDiaryClubLink() {
           backdrop-filter: blur(8px);
           -webkit-backdrop-filter: blur(8px);
           pointer-events: auto;
+        }
+        #club-diary-club-link[data-mobile='true'] a {
+          transform: translate(-100%, -100%);
+          width: 124px;
+          height: 124px;
         }
         #club-diary-club-link a:hover {
           background: rgba(25,69,143,.96);
@@ -152,8 +173,6 @@ export default function ClubDiaryClubLink() {
         }
         @media (max-width: 760px) {
           #club-diary-club-link a {
-            width: 124px;
-            height: 124px;
             gap: 7px;
             padding: 10px;
           }
