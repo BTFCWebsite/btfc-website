@@ -3,8 +3,16 @@ import { createClient } from 'next-sanity'
 import type { NextRequest } from 'next/server'
 
 export const CLUB_DIARY_COOKIE = 'btfc-club-diary'
+export type DiaryRole = 'member' | 'admin'
+export type DiarySession = { role: DiaryRole; name?: string }
 
-function requiredEnv(name: 'CLUB_DIARY_PIN' | 'CLUB_DIARY_DATA_KEY' | 'SANITY_API_WRITE_TOKEN') {
+type RequiredEnv =
+  | 'CLUB_DIARY_MEMBER_PIN'
+  | 'CLUB_DIARY_ADMIN_PIN'
+  | 'CLUB_DIARY_DATA_KEY'
+  | 'SANITY_API_WRITE_TOKEN'
+
+function requiredEnv(name: RequiredEnv) {
   const value = process.env[name]
   if (!value) throw new Error(`${name} is not configured`)
   return value
@@ -12,6 +20,12 @@ function requiredEnv(name: 'CLUB_DIARY_PIN' | 'CLUB_DIARY_DATA_KEY' | 'SANITY_AP
 
 function dataKey() {
   return createHash('sha256').update(requiredEnv('CLUB_DIARY_DATA_KEY')).digest()
+}
+
+function sessionSigningKey() {
+  return createHmac('sha256', dataKey())
+    .update(`sessions:${requiredEnv('CLUB_DIARY_MEMBER_PIN')}:${requiredEnv('CLUB_DIARY_ADMIN_PIN')}`)
+    .digest()
 }
 
 export function getDiaryClient() {
@@ -48,29 +62,57 @@ export function decryptDiaryPayload<T>(value: string): T {
   return JSON.parse(decrypted.toString('utf8')) as T
 }
 
-function sessionToken() {
-  return createHmac('sha256', dataKey())
-    .update(`btfc-club-diary:${requiredEnv('CLUB_DIARY_PIN')}`)
-    .digest('base64url')
-}
-
 function safeEqual(a: string, b: string) {
   const left = Buffer.from(a)
   const right = Buffer.from(b)
   return left.length === right.length && timingSafeEqual(left, right)
 }
 
-export function pinIsValid(pin: string) {
-  return safeEqual(String(pin || ''), requiredEnv('CLUB_DIARY_PIN'))
+export function authenticateDiaryUser(pin: string, name: string, requestedRole: DiaryRole): DiarySession | null {
+  const suppliedPin = String(pin || '')
+  if (requestedRole === 'admin') {
+    return safeEqual(suppliedPin, requiredEnv('CLUB_DIARY_ADMIN_PIN')) ? { role: 'admin' } : null
+  }
+
+  const cleanName = cleanText(name, 100)
+  if (!cleanName) return null
+  return safeEqual(suppliedPin, requiredEnv('CLUB_DIARY_MEMBER_PIN'))
+    ? { role: 'member', name: cleanName }
+    : null
 }
 
-export function diarySessionValue() {
-  return sessionToken()
+export function diarySessionValue(session: DiarySession = { role: 'admin' }) {
+  const payload = Buffer.from(JSON.stringify(session), 'utf8').toString('base64url')
+  const signature = createHmac('sha256', sessionSigningKey()).update(payload).digest('base64url')
+  return `${payload}.${signature}`
+}
+
+export function getDiarySession(request: NextRequest): DiarySession | null {
+  try {
+    const supplied = request.cookies.get(CLUB_DIARY_COOKIE)?.value || ''
+    const [payload, signature] = supplied.split('.')
+    if (!payload || !signature) return null
+    const expected = createHmac('sha256', sessionSigningKey()).update(payload).digest('base64url')
+    if (!safeEqual(signature, expected)) return null
+
+    const parsed = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as DiarySession
+    if (parsed?.role === 'admin') return { role: 'admin' }
+    if (parsed?.role === 'member' && cleanText(parsed.name, 100)) {
+      return { role: 'member', name: cleanText(parsed.name, 100) }
+    }
+    return null
+  } catch {
+    return null
+  }
 }
 
 export function isDiaryAuthorised(request: NextRequest) {
-  const supplied = request.cookies.get(CLUB_DIARY_COOKIE)?.value || ''
-  return safeEqual(supplied, sessionToken())
+  return getDiarySession(request) !== null
+}
+
+// Kept for compatibility while the feature branch transitions to two access levels.
+export function pinIsValid(pin: string) {
+  return safeEqual(String(pin || ''), requiredEnv('CLUB_DIARY_ADMIN_PIN'))
 }
 
 export function newShareToken() {
