@@ -1,115 +1,137 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from 'next-sanity'
+import {
+  cleanText,
+  decryptDiaryPayload,
+  encryptDiaryPayload,
+  getDiaryClient,
+  normaliseName,
+  shareTokenHash,
+} from '../../../lib/clubDiary.server'
 
+export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-const client = createClient({
-  projectId: 'vm0n9zl5',
-  dataset: 'production',
-  apiVersion: '2024-01-01',
-  useCdn: false,
-  token: undefined,
-})
-
-function token() {
-  return String(
-    process.env.SANITY_WRITE_TOKEN ||
-    process.env.SANITY_API_WRITE_TOKEN ||
-    process.env.SANITY_API_TOKEN ||
-    ''
-  ).trim()
+type ResponseValue = 'yes' | 'maybe' | 'no'
+type StoredEvent = {
+  title: string
+  category: string
+  startDate: string
+  endDate?: string
+  startTime?: string
+  notes?: string
+  targetHelpers?: number
+  inviteCode?: string
+}
+type StoredRsvp = {
+  name: string
+  response: ResponseValue
+  respondedAt: string
 }
 
-function writer() {
-  const auth = token()
-  if (!auth) return null
-  return createClient({
-    projectId: 'vm0n9zl5',
-    dataset: 'production',
-    apiVersion: '2024-01-01',
-    useCdn: false,
-    token: auth,
-  })
-}
-
-function clean(value: unknown, max = 200) {
-  return String(value || '').replace(/\s+/g, ' ').trim().slice(0, max)
-}
-
-function nameKey(value: string) {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
+function noStore(data: unknown, status = 200) {
+  return NextResponse.json(data, { status, headers: { 'Cache-Control': 'no-store, max-age=0' } })
 }
 
 async function findEvent(code: string) {
-  if (!/^[a-f0-9]{20}$/.test(code)) return null
-  return client.fetch(
-    `*[_type == "clubDiaryEvent" && category == "workingParty" && inviteCode == $code][0] {
-      _id, title, startDate, endDate, startTime, notes, targetHelpers
-    }`,
-    { code },
+  if (!code) return null
+  const client = getDiaryClient()
+  const hash = shareTokenHash(code)
+  const doc = await client.fetch<{ _id: string; payload: string } | null>(
+    `*[_type == "clubDiaryEvent" && shareTokenHash == $hash][0] { _id, payload }`,
+    { hash },
     { cache: 'no-store' }
   )
+  if (!doc) return null
+
+  const event = decryptDiaryPayload<StoredEvent>(doc.payload)
+  if (event.category !== 'workingParty' || event.inviteCode !== code) return null
+  return { id: doc._id, ...event }
+}
+
+async function loadResponses(eventId: string) {
+  const client = getDiaryClient()
+  const docs = await client.fetch<Array<{ _id: string; payload: string }>>(
+    `*[_type == "clubDiaryRsvp" && eventId == $eventId] { _id, payload }`,
+    { eventId },
+    { cache: 'no-store' }
+  )
+
+  const latest = new Map<string, StoredRsvp>()
+  for (const doc of docs || []) {
+    try {
+      const response = decryptDiaryPayload<StoredRsvp>(doc.payload)
+      const key = normaliseName(response.name)
+      const current = latest.get(key)
+      if (!current || response.respondedAt > current.respondedAt) latest.set(key, response)
+    } catch (error) {
+      console.error('Unable to decrypt club diary RSVP', doc._id, error)
+    }
+  }
+  return Array.from(latest.values())
+}
+
+function countsFor(responses: StoredRsvp[]) {
+  return responses.reduce((counts, response) => {
+    counts[response.response] += 1
+    return counts
+  }, { yes: 0, maybe: 0, no: 0 })
 }
 
 export async function GET(request: NextRequest) {
-  const code = clean(request.nextUrl.searchParams.get('code'), 20)
-  const event = await findEvent(code)
-  if (!event) return NextResponse.json({ error: 'This invitation cannot be found.' }, { status: 404 })
+  try {
+    const code = cleanText(request.nextUrl.searchParams.get('code'), 200)
+    const event = await findEvent(code)
+    if (!event) return noStore({ error: 'This invitation cannot be found.' }, 404)
 
-  const rsvps = await client.fetch(
-    `*[_type == "clubDiaryRsvp" && eventId == $eventId] | order(_createdAt asc) {
-      name, response
-    }`,
-    { eventId: event._id },
-    { cache: 'no-store' }
-  )
-
-  const counts = (rsvps || []).reduce((result: Record<string, number>, rsvp: any) => {
-    const response = String(rsvp?.response || '')
-    if (response in result) result[response] += 1
-    return result
-  }, { yes: 0, maybe: 0, no: 0 })
-
-  return NextResponse.json({ event, counts }, { headers: { 'Cache-Control': 'no-store, max-age=0' } })
+    const responses = await loadResponses(event.id)
+    return noStore({
+      event: {
+        title: event.title,
+        startDate: event.startDate,
+        endDate: event.endDate,
+        startTime: event.startTime,
+        notes: event.notes,
+        targetHelpers: event.targetHelpers,
+      },
+      counts: countsFor(responses),
+    })
+  } catch (error) {
+    console.error('Unable to load working party invitation:', error)
+    return noStore({ error: 'This invitation is temporarily unavailable.' }, 500)
+  }
 }
 
 export async function POST(request: NextRequest) {
-  const write = writer()
-  if (!write) {
-    return NextResponse.json({ error: 'RSVPs have not been configured yet.' }, { status: 503 })
-  }
+  try {
+    const body = await request.json().catch(() => ({}))
+    const code = cleanText(body?.code, 200)
+    const name = cleanText(body?.name, 100)
+    const response = cleanText(body?.response, 10) as ResponseValue
 
-  const body = await request.json().catch(() => ({}))
-  const code = clean(body?.code, 20)
-  const name = clean(body?.name, 100)
-  const response = clean(body?.response, 10)
+    if (!name) return noStore({ error: 'Please enter your name.' }, 400)
+    if (!['yes', 'maybe', 'no'].includes(response)) {
+      return noStore({ error: 'Choose Going, Maybe or Can’t make it.' }, 400)
+    }
 
-  if (!name) return NextResponse.json({ error: 'Please enter your name.' }, { status: 400 })
-  if (!['yes', 'maybe', 'no'].includes(response)) {
-    return NextResponse.json({ error: 'Choose Yes, Maybe or No.' }, { status: 400 })
-  }
+    const event = await findEvent(code)
+    if (!event) return noStore({ error: 'This invitation cannot be found.' }, 404)
 
-  const event = await findEvent(code)
-  if (!event) return NextResponse.json({ error: 'This invitation cannot be found.' }, { status: 404 })
-
-  const key = nameKey(name)
-  const existing = await write.fetch(
-    `*[_type == "clubDiaryRsvp" && eventId == $eventId && nameKey == $nameKey][0]._id`,
-    { eventId: event._id, nameKey: key },
-    { cache: 'no-store' }
-  )
-
-  if (existing) {
-    await write.patch(existing).set({ name, response }).commit()
-  } else {
-    await write.create({
-      _type: 'clubDiaryRsvp',
-      eventId: event._id,
+    const stored: StoredRsvp = {
       name,
-      nameKey: key,
       response,
-    })
-  }
+      respondedAt: new Date().toISOString(),
+    }
 
-  return NextResponse.json({ ok: true, response })
+    await getDiaryClient().create({
+      _type: 'clubDiaryRsvp',
+      eventId: event.id,
+      payload: encryptDiaryPayload(stored),
+    })
+
+    const responses = await loadResponses(event.id)
+    return noStore({ ok: true, response, counts: countsFor(responses) }, 201)
+  } catch (error) {
+    console.error('Unable to save working party response:', error)
+    return noStore({ error: 'Unable to save your response.' }, 500)
+  }
 }
