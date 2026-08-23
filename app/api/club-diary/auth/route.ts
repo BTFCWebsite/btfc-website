@@ -5,15 +5,16 @@ import {
   cleanText,
   diarySessionValue,
   getDiaryClient,
-  memberPinIsValid,
   type DiaryRole,
   type DiarySession,
 } from '../../../lib/clubDiary.server'
 import {
   createDiaryPerson,
+  diaryPersonPinIsValid,
   getVerifiedDiarySession,
   loadDiaryPeople,
 } from '../../../lib/clubDiaryPeople.server'
+import { writeDiaryAudit } from '../../../lib/clubDiaryAudit.server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -54,21 +55,12 @@ export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({}))
   const requestedRole: DiaryRole = body?.role === 'admin' ? 'admin' : 'member'
   const pin = String(body?.pin || '')
-  const pinValid = requestedRole === 'admin' ? adminPinIsValid(pin) : memberPinIsValid(pin)
-
-  if (!pinValid) {
-    return NextResponse.json(
-      { error: requestedRole === 'admin' ? 'Incorrect admin PIN.' : 'Incorrect general access PIN.' },
-      { status: 401 }
-    )
-  }
-
   const people = await loadDiaryPeople(true)
   let session: DiarySession | null = null
 
   if (people.length === 0) {
-    if (requestedRole !== 'admin') {
-      return NextResponse.json({ error: 'An administrator needs to set up the people list first.' }, { status: 409 })
+    if (requestedRole !== 'admin' || !adminPinIsValid(pin)) {
+      return NextResponse.json({ error: 'Use the Admin setup PIN to create the first administrator.' }, { status: 401 })
     }
 
     const bootstrapName = cleanText(body?.name, 100)
@@ -89,8 +81,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'That person does not have administrator access.' }, { status: 403 })
     }
 
+    let pinValid = false
+    if (person.hasPin) {
+      pinValid = await diaryPersonPinIsValid(person.id, pin)
+    } else if (requestedRole === 'admin' && person.isAdmin) {
+      // Migration/bootstrap only: once this person has a personal PIN, the shared Admin PIN stops working for them.
+      pinValid = adminPinIsValid(pin)
+    }
+
+    if (!pinValid) {
+      return NextResponse.json({
+        error: person.hasPin
+          ? 'Incorrect personal PIN.'
+          : 'A diary administrator needs to set your personal PIN first.',
+      }, { status: 401 })
+    }
+
     session = { role: requestedRole, personId: person.id, name: person.name }
   }
+
+  await writeDiaryAudit(session, 'login', 'session', session.personId, `Logged in with ${session.role === 'admin' ? 'Admin' : 'General'} access`)
 
   const response = NextResponse.json({
     ok: true,
@@ -111,7 +121,10 @@ export async function POST(request: NextRequest) {
   return response
 }
 
-export async function DELETE() {
+export async function DELETE(request: NextRequest) {
+  const session = await getVerifiedDiarySession(request).catch(() => null)
+  if (session) await writeDiaryAudit(session, 'logout', 'session', session.personId, 'Logged out')
+
   const response = NextResponse.json({ ok: true })
   response.cookies.set({
     name: CLUB_DIARY_COOKIE,
