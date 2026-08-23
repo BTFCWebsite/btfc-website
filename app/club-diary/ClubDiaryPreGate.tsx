@@ -1,10 +1,10 @@
 'use client'
 
-import { FormEvent, useEffect, useState } from 'react'
+import { FormEvent, useEffect, useMemo, useState } from 'react'
 import ClubDiaryGate from './ClubDiaryGate'
 
 type Role = 'member' | 'admin'
-type Person = { id: string; name: string }
+type Person = { id: string; name: string; hasPin: boolean }
 
 type AuthState = 'checking' | 'loggedOut' | 'loggedIn' | 'setup'
 
@@ -22,6 +22,8 @@ export default function ClubDiaryPreGate() {
   const [loadingNames, setLoadingNames] = useState(false)
   const [working, setWorking] = useState(false)
   const [error, setError] = useState('')
+
+  const selectedPerson = useMemo(() => people.find((person) => person.id === personId) || null, [people, personId])
 
   useEffect(() => { void checkAuth() }, [])
   useEffect(() => {
@@ -110,6 +112,10 @@ export default function ClubDiaryPreGate() {
 
   if (auth === 'loggedIn') return <ClubDiaryGate />
 
+  const selectedNeedsPin = Boolean(selectedPerson && !selectedPerson.hasPin)
+  const canUseSetupPin = selectedNeedsPin && mode === 'admin'
+  const loginDisabled = working || loadingNames || (!needsSetup && (!personId || (selectedNeedsPin && !canUseSetupPin)))
+
   return <div style={pageStyle}>
     <form style={cardStyle} onSubmit={login}>
       <h1 style={titleStyle}>BTFC Club Diary</h1>
@@ -121,23 +127,36 @@ export default function ClubDiaryPreGate() {
       </div>
 
       {needsSetup && mode === 'admin' ? <>
-        <div style={noticeStyle}>First-time setup: create the first administrator. After login you can add everyone else from <strong>People &amp; access</strong>.</div>
+        <div style={noticeStyle}>First-time setup: create the first administrator. After opening the diary, set personal PINs for each person.</div>
         <label style={labelStyle} htmlFor="setupName">Your name</label>
         <input id="setupName" value={setupName} onChange={(event) => setSetupName(event.target.value)} autoComplete="name" required style={inputStyle} />
       </> : <>
         <label style={labelStyle} htmlFor="personSelect">Your name</label>
-        <select id="personSelect" value={personId} onChange={(event) => setPersonId(event.target.value)} required style={inputStyle} disabled={loadingNames || people.length === 0}>
+        <select id="personSelect" value={personId} onChange={(event) => { setPersonId(event.target.value); setPin(''); setError('') }} required style={inputStyle} disabled={loadingNames || people.length === 0}>
           {loadingNames && <option value="">Loading names…</option>}
           {!loadingNames && people.length === 0 && <option value="">No eligible names</option>}
           {people.map((person) => <option key={person.id} value={person.id}>{person.name}</option>)}
         </select>
         {!loadingNames && people.length === 0 && <div style={noticeStyle}>{mode === 'admin' ? 'No active administrators are available.' : 'No people have been added yet. Ask a diary administrator.'}</div>}
+        {selectedNeedsPin && mode === 'member' && <div style={noticeStyle}>A diary administrator needs to set a personal PIN for {selectedPerson?.name} before this account can be used.</div>}
+        {canUseSetupPin && <div style={noticeStyle}>This Admin does not have a personal PIN yet. Use the existing Admin setup PIN once, then set a personal PIN from the security controls.</div>}
       </>}
 
-      <label style={labelStyle} htmlFor="diaryPin">{mode === 'admin' ? 'Admin PIN' : 'General access PIN'}</label>
-      <input id="diaryPin" value={pin} onChange={(event) => setPin(event.target.value)} inputMode="numeric" autoComplete="off" required style={inputStyle} />
+      <label style={labelStyle} htmlFor="diaryPin">
+        {needsSetup || canUseSetupPin ? 'Admin setup PIN' : 'Your personal 6-digit PIN'}
+      </label>
+      <input
+        id="diaryPin"
+        value={pin}
+        onChange={(event) => setPin(event.target.value.replace(/\D/g, '').slice(0, needsSetup || canUseSetupPin ? 12 : 6))}
+        inputMode="numeric"
+        autoComplete="off"
+        required
+        style={inputStyle}
+        placeholder={needsSetup || canUseSetupPin ? '' : '6 digits'}
+      />
 
-      <button type="submit" disabled={working || loadingNames || (!needsSetup && !personId)} style={primaryStyle}>
+      <button type="submit" disabled={loginDisabled} style={primaryStyle}>
         {working ? 'Opening…' : needsSetup && mode === 'admin' ? 'Create administrator & open diary' : 'Open Diary'}
       </button>
 
