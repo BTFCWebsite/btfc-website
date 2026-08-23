@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import ClubDiaryGate from './ClubDiaryGate'
+import ClubDiaryPreGate from './ClubDiaryPreGate'
 
 export const metadata: Metadata = {
   title: 'Club Diary | Brimscombe & Thrupp FC',
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 }
 
 export default function ClubDiaryPage() {
-  return <ClubDiaryGate />
+  return <ClubDiaryPreGate />
 }
