@@ -192,7 +192,7 @@ export default function ClubDiaryClubLink() {
         }
       `}</style>
       <a href="/club-diary" aria-label="Internal Club Diary login for club officials and volunteers">
-        <span className="club-diary-helper-icon" aria-hidden="true">👥</span>
+        <span className="club-diary-helper-icon" aria-hidden="true">📅</span>
         <span className="club-diary-copy">
           <span className="club-diary-internal">Internal · Club Officials &amp; Volunteers Only</span>
           <span className="club-diary-login">Club Login →</span>
