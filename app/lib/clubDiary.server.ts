@@ -3,8 +3,9 @@ import { createClient } from 'next-sanity'
 import type { NextRequest } from 'next/server'
 
 export const CLUB_DIARY_COOKIE = 'btfc-club-diary'
+export const CLUB_DIARY_SELECTED_PERSON_COOKIE = 'btfc-club-diary-selected-person'
 export type DiaryRole = 'member' | 'admin'
-export type DiarySession = { role: DiaryRole; name?: string }
+export type DiarySession = { role: DiaryRole; personId?: string; name?: string }
 
 type RequiredEnv =
   | 'CLUB_DIARY_MEMBER_PIN'
@@ -24,7 +25,7 @@ function dataKey() {
 
 function sessionSigningKey() {
   return createHmac('sha256', dataKey())
-    .update(`sessions:${requiredEnv('CLUB_DIARY_MEMBER_PIN')}:${requiredEnv('CLUB_DIARY_ADMIN_PIN')}`)
+    .update(`sessions:v2-people:${requiredEnv('CLUB_DIARY_MEMBER_PIN')}:${requiredEnv('CLUB_DIARY_ADMIN_PIN')}`)
     .digest()
 }
 
@@ -68,15 +69,24 @@ function safeEqual(a: string, b: string) {
   return left.length === right.length && timingSafeEqual(left, right)
 }
 
+export function memberPinIsValid(pin: string) {
+  return safeEqual(String(pin || ''), requiredEnv('CLUB_DIARY_MEMBER_PIN'))
+}
+
+export function adminPinIsValid(pin: string) {
+  return safeEqual(String(pin || ''), requiredEnv('CLUB_DIARY_ADMIN_PIN'))
+}
+
+// Compatibility helper retained for existing callers while the people directory is introduced.
 export function authenticateDiaryUser(pin: string, name: string, requestedRole: DiaryRole): DiarySession | null {
   const suppliedPin = String(pin || '')
   if (requestedRole === 'admin') {
-    return safeEqual(suppliedPin, requiredEnv('CLUB_DIARY_ADMIN_PIN')) ? { role: 'admin' } : null
+    return adminPinIsValid(suppliedPin) ? { role: 'admin' } : null
   }
 
   const cleanName = cleanText(name, 100)
   if (!cleanName) return null
-  return safeEqual(suppliedPin, requiredEnv('CLUB_DIARY_MEMBER_PIN'))
+  return memberPinIsValid(suppliedPin)
     ? { role: 'member', name: cleanName }
     : null
 }
@@ -96,11 +106,13 @@ export function getDiarySession(request: NextRequest): DiarySession | null {
     if (!safeEqual(signature, expected)) return null
 
     const parsed = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as DiarySession
-    if (parsed?.role === 'admin') return { role: 'admin' }
-    if (parsed?.role === 'member' && cleanText(parsed.name, 100)) {
-      return { role: 'member', name: cleanText(parsed.name, 100) }
-    }
-    return null
+    if (parsed?.role !== 'admin' && parsed?.role !== 'member') return null
+
+    const personId = cleanText(parsed.personId, 200) || undefined
+    const name = cleanText(parsed.name, 100) || undefined
+
+    if (parsed.role === 'member' && !name) return null
+    return { role: parsed.role, personId, name }
   } catch {
     return null
   }
@@ -110,9 +122,9 @@ export function isDiaryAuthorised(request: NextRequest) {
   return getDiarySession(request) !== null
 }
 
-// Kept for compatibility while the feature branch transitions to two access levels.
+// Kept for compatibility with earlier feature-branch code.
 export function pinIsValid(pin: string) {
-  return safeEqual(String(pin || ''), requiredEnv('CLUB_DIARY_ADMIN_PIN'))
+  return adminPinIsValid(pin)
 }
 
 export function newShareToken() {
