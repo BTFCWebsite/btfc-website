@@ -64,7 +64,7 @@ export default function ClubDiaryClubLink() {
             textTransform: 'uppercase',
             marginBottom: 5,
           }}>
-            🔒 Committee &amp; Volunteers
+            🔒 Private Club Area
           </div>
           <div style={{
             fontFamily: "'Barlow Condensed', sans-serif",
@@ -74,7 +74,7 @@ export default function ClubDiaryClubLink() {
             lineHeight: 1.05,
             marginBottom: 5,
           }}>
-            Club Diary
+            Committee &amp; Volunteer Login
           </div>
           <div style={{
             fontFamily: "'Montserrat', sans-serif",
@@ -82,7 +82,7 @@ export default function ClubDiaryClubLink() {
             color: '#6B7280',
             lineHeight: 1.55,
           }}>
-            Fixtures, staff availability, clubhouse bookings, working parties and club events.
+            Private access to the Club Diary for authorised club volunteers only.
           </div>
         </div>
 
@@ -100,7 +100,7 @@ export default function ClubDiaryClubLink() {
           fontSize: 16,
           whiteSpace: 'nowrap',
         }}>
-          Open Club Diary →
+          Club Login →
         </span>
       </a>
     </div>,
