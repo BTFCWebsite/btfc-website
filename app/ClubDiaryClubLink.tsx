@@ -81,6 +81,7 @@ export default function ClubDiaryClubLink() {
         #club-diary-club-link {
           position: absolute;
           z-index: 100;
+          width: 0;
           height: 0;
           margin: 0;
           padding: 0;
@@ -88,20 +89,24 @@ export default function ClubDiaryClubLink() {
         }
         #club-diary-club-link a {
           transform: translate(-100%, -100%);
-          display: inline-flex;
+          display: flex;
+          width: 154px;
+          height: 154px;
+          box-sizing: border-box;
+          flex-direction: column;
           align-items: center;
-          gap: 11px;
-          min-height: 58px;
-          padding: 7px 15px 8px 10px;
+          justify-content: center;
+          gap: 10px;
+          padding: 14px;
           border: 1px solid rgba(255,255,255,.34);
           border-radius: 8px;
           background: rgba(18,53,116,.92);
           color: #fff;
           text-decoration: none;
+          text-align: center;
           box-shadow: 0 5px 16px rgba(0,0,0,.16);
           backdrop-filter: blur(8px);
           -webkit-backdrop-filter: blur(8px);
-          white-space: nowrap;
           pointer-events: auto;
         }
         #club-diary-club-link a:hover {
@@ -110,55 +115,60 @@ export default function ClubDiaryClubLink() {
         #club-diary-club-link .club-diary-helper-icon {
           display: grid;
           place-items: center;
-          width: 38px;
-          height: 38px;
-          flex: 0 0 38px;
+          width: 46px;
+          height: 46px;
+          flex: 0 0 46px;
           border-radius: 50%;
           background: rgba(255,255,255,.14);
-          font-size: 21px;
+          font-size: 25px;
           line-height: 1;
         }
         #club-diary-club-link .club-diary-copy {
           display: flex;
           flex-direction: column;
-          align-items: flex-start;
+          align-items: center;
           justify-content: center;
+          min-width: 0;
         }
         #club-diary-club-link .club-diary-internal {
           font-family: 'Montserrat', sans-serif;
-          font-size: 8px;
-          line-height: 1.2;
+          font-size: 7px;
+          line-height: 1.35;
           font-weight: 800;
-          letter-spacing: .09em;
+          letter-spacing: .07em;
           text-transform: uppercase;
           color: rgba(255,255,255,.72);
-          margin-bottom: 4px;
+          margin-bottom: 6px;
+          white-space: normal;
         }
         #club-diary-club-link .club-diary-login {
           font-family: 'Barlow Condensed', sans-serif;
-          font-size: 17px;
+          font-size: 19px;
           line-height: 1.05;
           font-weight: 800;
           letter-spacing: .02em;
           color: #fff;
+          white-space: nowrap;
         }
         @media (max-width: 760px) {
           #club-diary-club-link a {
-            min-height: 52px;
-            gap: 8px;
-            padding: 6px 11px 7px 8px;
+            width: 124px;
+            height: 124px;
+            gap: 7px;
+            padding: 10px;
           }
           #club-diary-club-link .club-diary-helper-icon {
-            width: 34px;
-            height: 34px;
-            flex-basis: 34px;
-            font-size: 18px;
+            width: 38px;
+            height: 38px;
+            flex-basis: 38px;
+            font-size: 20px;
           }
           #club-diary-club-link .club-diary-internal {
-            font-size: 7px;
+            font-size: 6px;
+            margin-bottom: 4px;
           }
           #club-diary-club-link .club-diary-login {
-            font-size: 15px;
+            font-size: 16px;
           }
         }
       `}</style>
