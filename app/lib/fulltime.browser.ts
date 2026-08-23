@@ -317,6 +317,20 @@ function createTableWidgetLoad(widgetCode: string, timeoutMs: number): Promise<F
   })
 }
 
+async function loadMatchesFromApi(widgetCode: string, team: string) {
+  const params = new URLSearchParams({
+    kind: 'matches',
+    widget: widgetCode,
+    team,
+  })
+  const response = await fetch(`/api/full-time?${params.toString()}`, { cache: 'default' })
+  if (!response.ok) throw new Error(`Full-Time matches API failed (${response.status})`)
+  const payload = await response.json()
+  const matches = Array.isArray(payload?.matches) ? payload.matches : []
+  if (!matches.length) throw new Error('Full-Time matches API returned no fixtures')
+  return matches as FullTimeFixture[]
+}
+
 async function loadTableFromApi(widgetCode: string) {
   const config = TABLE_API[widgetCode]
   if (!config) return null
@@ -339,7 +353,15 @@ export function loadFullTimeWidgetMatches(widgetCode: string, team: string, time
   const existing = inflightFixtureLoads.get(key)
   if (existing) return existing
 
-  const load = createFixtureLoad(widgetCode, team, timeoutMs)
+  const load = (async () => {
+    try {
+      return await loadMatchesFromApi(widgetCode, team)
+    } catch {
+      // Fall back to the official browser widget only if the faster same-origin API fails.
+      return createFixtureLoad(widgetCode, team, Math.min(timeoutMs, 5000))
+    }
+  })()
+
   inflightFixtureLoads.set(key, load)
   load.finally(() => {
     if (inflightFixtureLoads.get(key) === load) inflightFixtureLoads.delete(key)
