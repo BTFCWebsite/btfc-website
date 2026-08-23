@@ -4,12 +4,13 @@ import {
   decryptDiaryPayload,
   encryptDiaryPayload,
   getDiaryClient,
-  isDiaryAuthorised,
+  getDiarySession,
   newShareToken,
   normaliseName,
   shareTokenHash,
   validDate,
   validTime,
+  type DiarySession,
 } from '../../lib/clubDiary.server'
 
 export const runtime = 'nodejs'
@@ -30,6 +31,7 @@ type StoredEvent = {
   targetHelpers?: number
   inviteCode?: string
   createdAt: string
+  updatedAt?: string
 }
 
 type StoredRsvp = {
@@ -37,6 +39,8 @@ type StoredRsvp = {
   response: ResponseValue
   respondedAt: string
 }
+
+type EventDoc = { _id: string; payload: string }
 
 function noStore(data: unknown, status = 200) {
   return NextResponse.json(data, { status, headers: { 'Cache-Control': 'no-store, max-age=0' } })
@@ -48,10 +52,75 @@ function targetNumber(value: unknown) {
   return Math.max(0, Math.min(99, Math.round(parsed)))
 }
 
-async function loadEvents() {
+function canManageEvent(session: DiarySession, event: StoredEvent) {
+  if (session.role === 'admin') return true
+  return event.category === 'unavailable' &&
+    Boolean(session.name) &&
+    normaliseName(event.personName) === normaliseName(session.name)
+}
+
+async function loadEventDocument(id: string) {
+  if (!id) return null
+  return getDiaryClient().fetch<EventDoc | null>(
+    `*[_type == "clubDiaryEvent" && _id == $id][0] { _id, payload }`,
+    { id },
+    { cache: 'no-store' }
+  )
+}
+
+function eventFromBody(body: any, session: DiarySession, existing?: StoredEvent): { event?: StoredEvent; error?: string } {
+  const requestedCategory = cleanText(body?.category, 30)
+  const category: Category | null = session.role === 'member'
+    ? 'unavailable'
+    : CATEGORIES.includes(requestedCategory as Category) ? requestedCategory as Category : null
+
+  const startDate = validDate(body?.startDate)
+  const requestedEndDate = validDate(body?.endDate)
+  const endDate = requestedEndDate && startDate && requestedEndDate >= startDate ? requestedEndDate : startDate
+  const startTime = validTime(body?.startTime) || undefined
+  const personName = session.role === 'member'
+    ? cleanText(session.name, 100)
+    : cleanText(body?.personName, 100)
+  const notes = cleanText(body?.notes, 1200) || undefined
+  let title = cleanText(body?.title, 160)
+
+  if (!category) return { error: 'Choose a valid diary type.' }
+  if (!startDate) return { error: 'Check the start date.' }
+  if (category === 'unavailable' && !personName) return { error: 'Add the name of the person who is unavailable.' }
+
+  if (session.role === 'member') title = `${personName} unavailable`
+  if (!title) {
+    if (category === 'unavailable') title = `${personName} unavailable`
+    else if (category === 'workingParty') title = 'Club Working Party'
+    else return { error: 'Add a title.' }
+  }
+
+  const inviteCode = category === 'workingParty'
+    ? (existing?.category === 'workingParty' && existing.inviteCode ? existing.inviteCode : newShareToken())
+    : undefined
+  const now = new Date().toISOString()
+
+  return {
+    event: {
+      title,
+      category,
+      startDate,
+      endDate,
+      startTime: category === 'unavailable' ? undefined : startTime,
+      notes,
+      personName: category === 'unavailable' ? personName : undefined,
+      targetHelpers: category === 'workingParty' ? targetNumber(body?.targetHelpers) : undefined,
+      inviteCode,
+      createdAt: existing?.createdAt || now,
+      updatedAt: existing ? now : undefined,
+    },
+  }
+}
+
+async function loadEvents(session: DiarySession) {
   const client = getDiaryClient()
   const [eventDocs, rsvpDocs] = await Promise.all([
-    client.fetch<Array<{ _id: string; payload: string }>>(
+    client.fetch<Array<EventDoc>>(
       `*[_type == "clubDiaryEvent"] { _id, payload }`, {}, { cache: 'no-store' }
     ),
     client.fetch<Array<{ _id: string; eventId: string; payload: string }>>(
@@ -92,6 +161,7 @@ async function loadEvents() {
         personName: event.personName,
         targetHelpers: event.targetHelpers,
         inviteCode: event.inviteCode,
+        canEdit: canManageEvent(session, event),
         rsvps: Array.from(latest.values())
           .sort((a, b) => a.name.localeCompare(b.name))
           .map(({ name, response }) => ({ name, response })),
@@ -109,8 +179,14 @@ async function loadEvents() {
 
 export async function GET(request: NextRequest) {
   try {
-    if (!isDiaryAuthorised(request)) return noStore({ error: 'PIN required.' }, 401)
-    return noStore({ events: await loadEvents(), writeConfigured: true })
+    const session = getDiarySession(request)
+    if (!session) return noStore({ error: 'PIN required.' }, 401)
+    return noStore({
+      events: await loadEvents(session),
+      writeConfigured: true,
+      role: session.role,
+      name: session.name || '',
+    })
   } catch (error) {
     console.error('Unable to load club diary:', error)
     return noStore({ error: 'Club Diary is not configured yet.', writeConfigured: false }, 503)
@@ -119,7 +195,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    if (!isDiaryAuthorised(request)) return noStore({ error: 'PIN required.' }, 401)
+    const session = getDiarySession(request)
+    if (!session) return noStore({ error: 'PIN required.' }, 401)
 
     const body = await request.json().catch(() => ({}))
     const action = cleanText(body?.action, 30)
@@ -128,6 +205,11 @@ export async function POST(request: NextRequest) {
     if (action === 'deleteEvent') {
       const id = cleanText(body?.id, 200)
       if (!id) return noStore({ error: 'Event id is required.' }, 400)
+
+      const doc = await loadEventDocument(id)
+      if (!doc) return noStore({ error: 'Diary entry not found.' }, 404)
+      const event = decryptDiaryPayload<StoredEvent>(doc.payload)
+      if (!canManageEvent(session, event)) return noStore({ error: 'You cannot alter this diary entry.' }, 403)
 
       const rsvps = await client.fetch<Array<{ _id: string }>>(
         `*[_type == "clubDiaryRsvp" && eventId == $id] { _id }`, { id }, { cache: 'no-store' }
@@ -138,51 +220,51 @@ export async function POST(request: NextRequest) {
       return noStore({ ok: true })
     }
 
+    if (action === 'updateEvent') {
+      const id = cleanText(body?.id, 200)
+      if (!id) return noStore({ error: 'Event id is required.' }, 400)
+
+      const doc = await loadEventDocument(id)
+      if (!doc) return noStore({ error: 'Diary entry not found.' }, 404)
+      const existing = decryptDiaryPayload<StoredEvent>(doc.payload)
+      if (!canManageEvent(session, existing)) return noStore({ error: 'You cannot alter this diary entry.' }, 403)
+
+      const parsed = eventFromBody(body, session, existing)
+      if (!parsed.event) return noStore({ error: parsed.error || 'Check this diary entry.' }, 400)
+      const updated = parsed.event
+
+      let patch = client.patch(id).set({ payload: encryptDiaryPayload(updated) })
+      if (updated.inviteCode) patch = patch.set({ shareTokenHash: shareTokenHash(updated.inviteCode) })
+      else patch = patch.unset(['shareTokenHash'])
+      await patch.commit()
+
+      if (existing.category === 'workingParty' && updated.category !== 'workingParty') {
+        const rsvps = await client.fetch<Array<{ _id: string }>>(
+          `*[_type == "clubDiaryRsvp" && eventId == $id] { _id }`, { id }, { cache: 'no-store' }
+        )
+        if (rsvps?.length) {
+          let transaction = client.transaction()
+          for (const rsvp of rsvps) transaction = transaction.delete(rsvp._id)
+          await transaction.commit()
+        }
+      }
+
+      return noStore({ event: { _id: id, ...updated, canEdit: true } })
+    }
+
     if (action !== 'createEvent') return noStore({ error: 'Unknown diary action.' }, 400)
 
-    const requestedCategory = cleanText(body?.category, 30)
-    const category = CATEGORIES.includes(requestedCategory as Category) ? requestedCategory as Category : null
-    const startDate = validDate(body?.startDate)
-    const requestedEndDate = validDate(body?.endDate)
-    const endDate = requestedEndDate && requestedEndDate >= startDate ? requestedEndDate : startDate
-    const startTime = validTime(body?.startTime) || undefined
-    const personName = cleanText(body?.personName, 100)
-    const notes = cleanText(body?.notes, 1200) || undefined
-    let title = cleanText(body?.title, 160)
-
-    if (!category) return noStore({ error: 'Choose a valid diary type.' }, 400)
-    if (!startDate) return noStore({ error: 'Check the start date.' }, 400)
-    if (category === 'unavailable' && !personName) {
-      return noStore({ error: 'Add the name of the person who is unavailable.' }, 400)
-    }
-
-    if (!title) {
-      if (category === 'unavailable') title = `${personName} unavailable`
-      else if (category === 'workingParty') title = 'Club Working Party'
-      else return noStore({ error: 'Add a title.' }, 400)
-    }
-
-    const inviteCode = category === 'workingParty' ? newShareToken() : undefined
-    const stored: StoredEvent = {
-      title,
-      category,
-      startDate,
-      endDate,
-      startTime,
-      notes,
-      personName: personName || undefined,
-      targetHelpers: category === 'workingParty' ? targetNumber(body?.targetHelpers) : undefined,
-      inviteCode,
-      createdAt: new Date().toISOString(),
-    }
+    const parsed = eventFromBody(body, session)
+    if (!parsed.event) return noStore({ error: parsed.error || 'Check this diary entry.' }, 400)
+    const stored = parsed.event
 
     const created = await client.create({
       _type: 'clubDiaryEvent',
       payload: encryptDiaryPayload(stored),
-      ...(inviteCode ? { shareTokenHash: shareTokenHash(inviteCode) } : {}),
+      ...(stored.inviteCode ? { shareTokenHash: shareTokenHash(stored.inviteCode) } : {}),
     })
 
-    return noStore({ event: { _id: created._id, ...stored, rsvps: [] } }, 201)
+    return noStore({ event: { _id: created._id, ...stored, canEdit: true, rsvps: [] } }, 201)
   } catch (error) {
     console.error('Unable to save club diary entry:', error)
     return noStore({ error: 'Unable to save this diary entry.' }, 500)
