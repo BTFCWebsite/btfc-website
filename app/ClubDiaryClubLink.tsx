@@ -17,71 +17,58 @@ export default function ClubDiaryClubLink() {
     let cancelled = false
     let timer: ReturnType<typeof setTimeout> | null = null
     let resizeObserver: ResizeObserver | null = null
-    let resizeHandler: (() => void) | null = null
+    let hero: HTMLElement | null = null
+
+    const placeHost = (host: HTMLElement) => {
+      if (!hero) return
+      const rect = hero.getBoundingClientRect()
+      const inset = window.innerWidth <= 760 ? 18 : 32
+      host.style.left = `${window.scrollX + rect.left + inset}px`
+      host.style.top = `${window.scrollY + rect.bottom}px`
+    }
 
     const mountLogin = () => {
       if (cancelled) return
 
       const section = document.querySelector('main > section') as HTMLElement | null
-      const hero = section?.firstElementChild as HTMLElement | null
-      if (!section || !hero) {
+      hero = section?.firstElementChild as HTMLElement | null
+      if (!hero) {
         timer = setTimeout(mountLogin, 100)
         return
       }
-
-      const previousSectionPosition = section.style.position
-      const previousHeroPaddingBottom = hero.style.paddingBottom
-      section.style.position = 'relative'
-      hero.style.paddingBottom = window.innerWidth <= 760 ? '88px' : '96px'
 
       let host = document.getElementById('club-diary-club-link') as HTMLElement | null
       if (!host) {
         host = document.createElement('div')
         host.id = 'club-diary-club-link'
-        hero.insertAdjacentElement('afterend', host)
+        document.body.appendChild(host)
       }
 
-      host.dataset.previousSectionPosition = previousSectionPosition
-      host.dataset.previousHeroPaddingBottom = previousHeroPaddingBottom
+      placeHost(host)
+      setMount(host)
 
-      const placeHost = () => {
-        if (!host || !hero) return
-        hero.style.paddingBottom = window.innerWidth <= 760 ? '88px' : '96px'
-        host.style.top = `${hero.offsetTop + hero.offsetHeight}px`
-        host.style.left = window.innerWidth <= 760 ? '18px' : '32px'
-      }
-
-      placeHost()
-      resizeHandler = placeHost
-      window.addEventListener('resize', resizeHandler)
+      const reposition = () => host && placeHost(host)
+      window.addEventListener('resize', reposition)
 
       if (typeof ResizeObserver !== 'undefined') {
-        resizeObserver = new ResizeObserver(placeHost)
+        resizeObserver = new ResizeObserver(reposition)
         resizeObserver.observe(hero)
       }
 
-      setMount(host)
+      timer = setTimeout(reposition, 500)
+
+      return () => window.removeEventListener('resize', reposition)
     }
 
-    mountLogin()
+    const cleanupResize = mountLogin()
 
     return () => {
       cancelled = true
       if (timer) clearTimeout(timer)
-      if (resizeHandler) window.removeEventListener('resize', resizeHandler)
       resizeObserver?.disconnect()
+      cleanupResize?.()
       setMount(null)
-
-      const host = document.getElementById('club-diary-club-link') as HTMLElement | null
-      const section = document.querySelector('main > section') as HTMLElement | null
-      const hero = section?.firstElementChild as HTMLElement | null
-      if (section && host?.dataset.previousSectionPosition !== undefined) {
-        section.style.position = host.dataset.previousSectionPosition
-      }
-      if (hero && host?.dataset.previousHeroPaddingBottom !== undefined) {
-        hero.style.paddingBottom = host.dataset.previousHeroPaddingBottom
-      }
-      host?.remove()
+      document.getElementById('club-diary-club-link')?.remove()
     }
   }, [pathname])
 
@@ -92,13 +79,14 @@ export default function ClubDiaryClubLink() {
       <style>{`
         #club-diary-club-link {
           position: absolute;
-          z-index: 20;
+          z-index: 100;
           height: 0;
           margin: 0;
           padding: 0;
+          pointer-events: none;
         }
         #club-diary-club-link a {
-          transform: translateY(calc(-100% - 18px));
+          transform: translateY(-28%);
           display: inline-flex;
           align-items: center;
           gap: 11px;
@@ -106,16 +94,15 @@ export default function ClubDiaryClubLink() {
           padding: 7px 15px 8px 10px;
           border: 1px solid rgba(255,255,255,.34);
           border-radius: 8px;
-          background: rgba(255,255,255,.10);
+          background: #123574;
           color: #fff;
           text-decoration: none;
-          box-shadow: 0 4px 14px rgba(0,0,0,.12);
-          backdrop-filter: blur(8px);
-          -webkit-backdrop-filter: blur(8px);
+          box-shadow: 0 5px 16px rgba(0,0,0,.18);
           white-space: nowrap;
+          pointer-events: auto;
         }
         #club-diary-club-link a:hover {
-          background: rgba(255,255,255,.18);
+          background: #19458f;
         }
         #club-diary-club-link .club-diary-helper-icon {
           display: grid;
@@ -124,7 +111,7 @@ export default function ClubDiaryClubLink() {
           height: 38px;
           flex: 0 0 38px;
           border-radius: 50%;
-          background: rgba(255,255,255,.15);
+          background: rgba(255,255,255,.14);
           font-size: 21px;
           line-height: 1;
         }
@@ -141,7 +128,7 @@ export default function ClubDiaryClubLink() {
           font-weight: 800;
           letter-spacing: .09em;
           text-transform: uppercase;
-          color: rgba(255,255,255,.68);
+          color: rgba(255,255,255,.72);
           margin-bottom: 4px;
         }
         #club-diary-club-link .club-diary-login {
@@ -154,7 +141,7 @@ export default function ClubDiaryClubLink() {
         }
         @media (max-width: 760px) {
           #club-diary-club-link a {
-            transform: translateY(calc(-100% - 14px));
+            transform: translateY(-24%);
             min-height: 52px;
             gap: 8px;
             padding: 6px 11px 7px 8px;
@@ -174,7 +161,7 @@ export default function ClubDiaryClubLink() {
         }
       `}</style>
       <a href="/club-diary" aria-label="Internal Club Diary login for club officials and volunteers">
-        <span className="club-diary-helper-icon" aria-hidden="true">🙋</span>
+        <span className="club-diary-helper-icon" aria-hidden="true">👥</span>
         <span className="club-diary-copy">
           <span className="club-diary-internal">Internal · Club Officials &amp; Volunteers Only</span>
           <span className="club-diary-login">Club Login →</span>
