@@ -25,7 +25,7 @@ function dataKey() {
 
 function sessionSigningKey() {
   return createHmac('sha256', dataKey())
-    .update(`sessions:v2-people:${requiredEnv('CLUB_DIARY_MEMBER_PIN')}:${requiredEnv('CLUB_DIARY_ADMIN_PIN')}`)
+    .update(`sessions:v3-personal-pins:${requiredEnv('CLUB_DIARY_MEMBER_PIN')}:${requiredEnv('CLUB_DIARY_ADMIN_PIN')}`)
     .digest()
 }
 
@@ -75,6 +75,21 @@ export function memberPinIsValid(pin: string) {
 
 export function adminPinIsValid(pin: string) {
   return safeEqual(String(pin || ''), requiredEnv('CLUB_DIARY_ADMIN_PIN'))
+}
+
+export function validPersonalPin(pin: unknown) {
+  return /^\d{6}$/.test(String(pin || ''))
+}
+
+export function diaryPersonPinHash(personId: string, pin: string) {
+  return createHmac('sha256', dataKey())
+    .update(`person-pin:${cleanText(personId, 200)}:${String(pin || '')}`)
+    .digest('base64url')
+}
+
+export function diaryPersonPinMatches(personId: string, pin: string, expectedHash: string) {
+  if (!validPersonalPin(pin) || !expectedHash) return false
+  return safeEqual(diaryPersonPinHash(personId, pin), expectedHash)
 }
 
 // Compatibility helper retained for existing callers while the people directory is introduced.
