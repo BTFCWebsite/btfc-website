@@ -4,7 +4,6 @@ import {
   decryptDiaryPayload,
   encryptDiaryPayload,
   getDiaryClient,
-  getDiarySession,
   newShareToken,
   normaliseName,
   shareTokenHash,
@@ -12,6 +11,8 @@ import {
   validTime,
   type DiarySession,
 } from '../../lib/clubDiary.server'
+import { getVerifiedDiarySession } from '../../lib/clubDiaryPeople.server'
+import { writeDiaryAudit } from '../../lib/clubDiaryAudit.server'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -57,6 +58,14 @@ function canManageEvent(session: DiarySession, event: StoredEvent) {
   return event.category === 'unavailable' &&
     Boolean(session.name) &&
     normaliseName(event.personName) === normaliseName(session.name)
+}
+
+function eventAuditText(event: StoredEvent) {
+  const who = event.category === 'unavailable' ? (event.personName || event.title) : event.title
+  const dates = event.endDate && event.endDate !== event.startDate
+    ? `${event.startDate} to ${event.endDate}`
+    : event.startDate
+  return `${who} · ${dates}`
 }
 
 async function loadEventDocument(id: string) {
@@ -179,8 +188,8 @@ async function loadEvents(session: DiarySession) {
 
 export async function GET(request: NextRequest) {
   try {
-    const session = getDiarySession(request)
-    if (!session) return noStore({ error: 'PIN required.' }, 401)
+    const session = await getVerifiedDiarySession(request)
+    if (!session) return noStore({ error: 'Login required.' }, 401)
     return noStore({
       events: await loadEvents(session),
       writeConfigured: true,
@@ -195,8 +204,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = getDiarySession(request)
-    if (!session) return noStore({ error: 'PIN required.' }, 401)
+    const session = await getVerifiedDiarySession(request)
+    if (!session) return noStore({ error: 'Login required.' }, 401)
 
     const body = await request.json().catch(() => ({}))
     const action = cleanText(body?.action, 30)
@@ -217,6 +226,7 @@ export async function POST(request: NextRequest) {
       let transaction = client.transaction().delete(id)
       for (const rsvp of rsvps || []) transaction = transaction.delete(rsvp._id)
       await transaction.commit()
+      await writeDiaryAudit(session, 'event.delete', 'event', id, `Deleted ${eventAuditText(event)}`)
       return noStore({ ok: true })
     }
 
@@ -249,6 +259,7 @@ export async function POST(request: NextRequest) {
         }
       }
 
+      await writeDiaryAudit(session, 'event.update', 'event', id, `Updated ${eventAuditText(updated)}`)
       return noStore({ event: { _id: id, ...updated, canEdit: true } })
     }
 
@@ -264,6 +275,7 @@ export async function POST(request: NextRequest) {
       ...(stored.inviteCode ? { shareTokenHash: shareTokenHash(stored.inviteCode) } : {}),
     })
 
+    await writeDiaryAudit(session, 'event.create', 'event', created._id, `Added ${eventAuditText(stored)}`)
     return noStore({ event: { _id: created._id, ...stored, canEdit: true, rsvps: [] } }, 201)
   } catch (error) {
     console.error('Unable to save club diary entry:', error)
