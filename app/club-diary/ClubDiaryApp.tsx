@@ -8,6 +8,7 @@ import styles from './ClubDiary.module.css'
 type Category = 'unavailable' | 'clubhouse' | 'workingParty' | 'event' | 'meeting' | 'other'
 type Filter = 'all' | 'fixtures' | 'availability' | 'clubhouse' | 'workingParty'
 type TeamKey = 'first' | 'reserves' | 'u17s'
+type DiaryRole = 'member' | 'admin'
 
 type Rsvp = { name: string; response: 'yes' | 'maybe' | 'no' }
 type DiaryEvent = {
@@ -21,6 +22,7 @@ type DiaryEvent = {
   personName?: string
   targetHelpers?: number
   inviteCode?: string
+  canEdit?: boolean
   rsvps?: Rsvp[]
 }
 type Fixture = {
@@ -98,6 +100,10 @@ function resultText(fixture: Fixture) {
 export default function ClubDiaryApp() {
   const today = useMemo(() => todayIso(), [])
   const [auth, setAuth] = useState<'checking' | 'login' | 'ready' | 'setup'>('checking')
+  const [role, setRole] = useState<DiaryRole | null>(null)
+  const [memberName, setMemberName] = useState('')
+  const [loginMode, setLoginMode] = useState<DiaryRole>('member')
+  const [loginName, setLoginName] = useState('')
   const [pin, setPin] = useState('')
   const [authError, setAuthError] = useState('')
   const [events, setEvents] = useState<DiaryEvent[]>([])
@@ -105,6 +111,7 @@ export default function ClubDiaryApp() {
   const [loading, setLoading] = useState(false)
   const [writeConfigured, setWriteConfigured] = useState(true)
   const [adding, setAdding] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState('')
   const [filter, setFilter] = useState<Filter>('all')
@@ -124,8 +131,17 @@ export default function ClubDiaryApp() {
     try {
       const response = await fetch('/api/club-diary/auth', { cache: 'no-store' })
       const data = await response.json().catch(() => ({}))
-      if (response.status === 503 || data?.configured === false) setAuth('setup')
-      else setAuth(data?.authorised ? 'ready' : 'login')
+      if (response.status === 503 || data?.configured === false) {
+        setAuth('setup')
+        return
+      }
+      if (data?.authorised) {
+        setRole(data?.role === 'admin' ? 'admin' : 'member')
+        setMemberName(String(data?.name || ''))
+        setAuth('ready')
+      } else {
+        setAuth('login')
+      }
     } catch {
       setAuth('login')
     }
@@ -137,7 +153,7 @@ export default function ClubDiaryApp() {
     const response = await fetch('/api/club-diary/auth', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pin }),
+      body: JSON.stringify({ pin, name: loginName, role: loginMode }),
     })
     const data = await response.json().catch(() => ({}))
     if (!response.ok) {
@@ -145,7 +161,19 @@ export default function ClubDiaryApp() {
       return
     }
     setPin('')
+    setRole(data?.role === 'admin' ? 'admin' : 'member')
+    setMemberName(String(data?.name || ''))
     setAuth('ready')
+  }
+
+  async function switchAccess() {
+    await fetch('/api/club-diary/auth', { method: 'DELETE' }).catch(() => null)
+    setRole(null)
+    setMemberName('')
+    setPin('')
+    setLoginName('')
+    setAuthError('')
+    setAuth('login')
   }
 
   async function loadFixtureData() {
@@ -217,6 +245,8 @@ export default function ClubDiaryApp() {
       if (response.ok) {
         setEvents(Array.isArray(data?.events) ? data.events : [])
         setWriteConfigured(data?.writeConfigured !== false)
+        setRole(data?.role === 'admin' ? 'admin' : 'member')
+        setMemberName(String(data?.name || ''))
       }
     } finally {
       setLoading(false)
@@ -224,15 +254,37 @@ export default function ClubDiaryApp() {
   }
 
   function resetForm() {
+    setEditingId(null)
     setCategory('unavailable')
     setTitle('')
-    setPersonName('')
+    setPersonName(role === 'member' ? memberName : '')
     setStartDate(today)
     setEndDate(today)
     setStartTime('')
     setTargetHelpers('8')
     setNotes('')
     setFormError('')
+  }
+
+  function startAdd() {
+    resetForm()
+    setAdding(true)
+  }
+
+  function startEdit(event: DiaryEvent) {
+    if (!event.canEdit) return
+    setEditingId(event._id)
+    setCategory(event.category)
+    setTitle(event.category === 'unavailable' ? '' : event.title)
+    setPersonName(event.personName || (role === 'member' ? memberName : ''))
+    setStartDate(event.startDate)
+    setEndDate(event.endDate || event.startDate)
+    setStartTime(event.startTime || '')
+    setTargetHelpers(String(event.targetHelpers || 8))
+    setNotes(event.notes || '')
+    setFormError('')
+    setAdding(true)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   async function saveEvent(event: FormEvent) {
@@ -244,8 +296,16 @@ export default function ClubDiaryApp() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'createEvent', category, title, personName,
-          startDate, endDate, startTime, targetHelpers, notes,
+          action: editingId ? 'updateEvent' : 'createEvent',
+          id: editingId,
+          category,
+          title,
+          personName,
+          startDate,
+          endDate,
+          startTime,
+          targetHelpers,
+          notes,
         }),
       })
       const data = await response.json().catch(() => ({}))
@@ -261,18 +321,23 @@ export default function ClubDiaryApp() {
     }
   }
 
-  async function removeEvent(id: string) {
-    if (!window.confirm('Remove this diary entry?')) return
+  async function removeEvent(event: DiaryEvent) {
+    if (!event.canEdit || !window.confirm('Remove this diary entry?')) return
     const response = await fetch('/api/club-diary', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'deleteEvent', id }),
+      body: JSON.stringify({ action: 'deleteEvent', id: event._id }),
     })
-    if (response.ok) await refreshAll()
+    const data = await response.json().catch(() => ({}))
+    if (!response.ok) {
+      window.alert(data?.error || 'Unable to remove this diary entry.')
+      return
+    }
+    await refreshAll()
   }
 
   async function shareInvite(event: DiaryEvent) {
-    if (!event.inviteCode) return
+    if (role !== 'admin' || !event.inviteCode) return
     const url = `${window.location.origin}/club-diary/rsvp/${event.inviteCode}`
     const text = `${event.title} - ${prettyDate(event.startDate)}. Please let us know if you can help.`
     if (navigator.share) {
@@ -321,7 +386,7 @@ export default function ClubDiaryApp() {
   if (auth === 'setup') {
     return <div className={styles.page}><div className={styles.shell}><div className={styles.loginWrap}><div className={styles.loginCard}>
       <h1>BTFC Club Diary</h1>
-      <p>The diary is installed. The private club PIN still needs to be set in Vercel before it can be opened.</p>
+      <p>The diary is installed. The general PIN, admin PIN and secure server settings still need to be added in Vercel before it can be opened.</p>
     </div></div></div></div>
   }
 
@@ -329,8 +394,13 @@ export default function ClubDiaryApp() {
     return <div className={styles.page}><div className={styles.shell}><div className={styles.loginWrap}>
       <form className={styles.loginCard} onSubmit={login}>
         <h1>BTFC Club Diary</h1>
-        <p>Enter the club PIN. You should only need to do this once on this phone.</p>
-        <input className={styles.pinInput} value={pin} onChange={(e) => setPin(e.target.value)} inputMode="numeric" autoComplete="off" aria-label="Club PIN" required />
+        <p>{loginMode === 'member' ? 'Add and manage your own availability.' : 'Manage the full club diary.'}</p>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 18 }}>
+          <button type="button" className={`${styles.filterButton} ${loginMode === 'member' ? styles.filterActive : ''}`} onClick={() => { setLoginMode('member'); setAuthError('') }}>General access</button>
+          <button type="button" className={`${styles.filterButton} ${loginMode === 'admin' ? styles.filterActive : ''}`} onClick={() => { setLoginMode('admin'); setAuthError('') }}>Admin</button>
+        </div>
+        {loginMode === 'member' && <div className={styles.field}><label htmlFor="loginName">Your name</label><input id="loginName" value={loginName} onChange={(e) => setLoginName(e.target.value)} autoComplete="name" required /></div>}
+        <div className={styles.field}><label htmlFor="clubPin">{loginMode === 'admin' ? 'Admin PIN' : 'General access PIN'}</label><input id="clubPin" className={styles.pinInput} value={pin} onChange={(e) => setPin(e.target.value)} inputMode="numeric" autoComplete="off" required /></div>
         <button className={styles.primaryButton} type="submit" style={{ width: '100%' }}>Open Diary</button>
         {authError && <div className={styles.error}>{authError}</div>}
       </form>
@@ -339,20 +409,23 @@ export default function ClubDiaryApp() {
 
   return <div className={styles.page}><div className={styles.shell}>
     <section className={styles.hero}><div className={styles.heroTop}>
-      <div><h1 className={styles.title}>Club Diary</h1><p className={styles.subtitle}>Fixtures, availability, clubhouse bookings and club jobs in one place.</p></div>
-      <button className={styles.addButton} type="button" disabled={!writeConfigured} onClick={() => { resetForm(); setAdding(true) }}>+ Add</button>
+      <div><h1 className={styles.title}>Club Diary</h1><p className={styles.subtitle}>{role === 'admin' ? 'Admin access · fixtures are read-only.' : `${memberName} · personal availability access.`}</p></div>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+        <button className={styles.secondaryButton} type="button" onClick={() => void switchAccess()}>Switch access</button>
+        <button className={styles.addButton} type="button" disabled={!writeConfigured} onClick={startAdd}>{role === 'admin' ? '+ Add' : '+ Add availability'}</button>
+      </div>
     </div></section>
 
     {!writeConfigured && <div className={styles.notice}>The diary can be viewed, but editing and RSVPs need the Sanity write token added in Vercel.</div>}
 
     {adding && <form className={styles.panel} onSubmit={saveEvent}>
-      <h2>Add to Club Diary</h2>
+      <h2>{editingId ? 'Edit diary entry' : role === 'admin' ? 'Add to Club Diary' : 'Add my availability'}</h2>
       <div className={styles.formGrid}>
-        <div className={`${styles.field} ${styles.full}`}><label htmlFor="category">What are you adding?</label>
+        {role === 'admin' ? <div className={`${styles.field} ${styles.full}`}><label htmlFor="category">What are you adding?</label>
           <select id="category" value={category} onChange={(e) => setCategory(e.target.value as Category)}>{Object.entries(labels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>
-        </div>
+        </div> : <div className={`${styles.field} ${styles.full}`}><label>Entry type</label><input value="My holiday / unavailable" readOnly /></div>}
         {category === 'unavailable'
-          ? <div className={`${styles.field} ${styles.full}`}><label htmlFor="person">Who is unavailable?</label><input id="person" value={personName} onChange={(e) => setPersonName(e.target.value)} placeholder="e.g. Paul Day" required /></div>
+          ? <div className={`${styles.field} ${styles.full}`}><label htmlFor="person">Who is unavailable?</label><input id="person" value={role === 'member' ? memberName : personName} onChange={(e) => setPersonName(e.target.value)} readOnly={role === 'member'} placeholder="e.g. Paul Day" required /></div>
           : <div className={`${styles.field} ${styles.full}`}><label htmlFor="title">What is it?</label><input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={category === 'workingParty' ? 'Club Working Party' : 'e.g. 50th Birthday Party'} /></div>}
         <div className={styles.field}><label htmlFor="start">{category === 'unavailable' ? 'From' : 'Date'}</label><input id="start" type="date" value={startDate} onChange={(e) => { setStartDate(e.target.value); if (endDate < e.target.value) setEndDate(e.target.value) }} required /></div>
         <div className={styles.field}><label htmlFor="end">{category === 'unavailable' ? 'Until' : 'End date (if needed)'}</label><input id="end" type="date" value={endDate} min={startDate} onChange={(e) => setEndDate(e.target.value)} /></div>
@@ -361,7 +434,7 @@ export default function ClubDiaryApp() {
         <div className={`${styles.field} ${styles.full}`}><label htmlFor="notes">Notes (optional)</label><textarea id="notes" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Anything people need to know" /></div>
       </div>
       {formError && <div className={styles.error}>{formError}</div>}
-      <div className={styles.formActions}><button className={styles.primaryButton} type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save'}</button><button className={styles.secondaryButton} type="button" disabled={saving} onClick={() => setAdding(false)}>Cancel</button></div>
+      <div className={styles.formActions}><button className={styles.primaryButton} type="submit" disabled={saving}>{saving ? 'Saving…' : editingId ? 'Save changes' : 'Save'}</button><button className={styles.secondaryButton} type="button" disabled={saving} onClick={() => { setAdding(false); resetForm() }}>Cancel</button></div>
     </form>}
 
     <div className={styles.toolbar} aria-label="Diary filters">
@@ -387,14 +460,14 @@ export default function ClubDiaryApp() {
             </article>
           }
 
-          const event = item.event
-          const yes = (event.rsvps || []).filter((rsvp) => rsvp.response === 'yes')
-          const maybe = (event.rsvps || []).filter((rsvp) => rsvp.response === 'maybe')
-          return <article className={`${styles.card} ${styles[event.category]}`} key={event._id}>
-            <div className={styles.cardTop}><div><p className={styles.kicker}>{labels[event.category]}</p><h3 className={styles.cardTitle}>{event.title}</h3></div><button className={styles.dangerButton} type="button" onClick={() => void removeEvent(event._id)}>Remove</button></div>
-            <p className={styles.meta}>{event.startTime ? `${event.startTime} · ` : ''}{event.endDate && event.endDate !== event.startDate ? `Until ${prettyDate(event.endDate)}` : ''}{event.notes ? `${event.endDate && event.endDate !== event.startDate ? ' · ' : ''}${event.notes}` : ''}</p>
-            {event.category === 'workingParty' && <div className={styles.rsvpBox}>
-              <div className={styles.rsvpLine}><div><strong>{yes.length} confirmed</strong>{event.targetHelpers ? ` / ${event.targetHelpers} wanted` : ''}{maybe.length ? ` · ${maybe.length} maybe` : ''}</div><button className={styles.shareButton} type="button" onClick={() => void shareInvite(event)}>Share invite</button></div>
+          const diaryEvent = item.event
+          const yes = (diaryEvent.rsvps || []).filter((rsvp) => rsvp.response === 'yes')
+          const maybe = (diaryEvent.rsvps || []).filter((rsvp) => rsvp.response === 'maybe')
+          return <article className={`${styles.card} ${styles[diaryEvent.category]}`} key={diaryEvent._id}>
+            <div className={styles.cardTop}><div><p className={styles.kicker}>{labels[diaryEvent.category]}</p><h3 className={styles.cardTitle}>{diaryEvent.title}</h3></div>{diaryEvent.canEdit && <div style={{ display: 'flex', gap: 8 }}><button className={styles.secondaryButton} type="button" onClick={() => startEdit(diaryEvent)}>Edit</button><button className={styles.dangerButton} type="button" onClick={() => void removeEvent(diaryEvent)}>Remove</button></div>}</div>
+            <p className={styles.meta}>{diaryEvent.startTime ? `${diaryEvent.startTime} · ` : ''}{diaryEvent.endDate && diaryEvent.endDate !== diaryEvent.startDate ? `Until ${prettyDate(diaryEvent.endDate)}` : ''}{diaryEvent.notes ? `${diaryEvent.endDate && diaryEvent.endDate !== diaryEvent.startDate ? ' · ' : ''}${diaryEvent.notes}` : ''}</p>
+            {diaryEvent.category === 'workingParty' && <div className={styles.rsvpBox}>
+              <div className={styles.rsvpLine}><div><strong>{yes.length} confirmed</strong>{diaryEvent.targetHelpers ? ` / ${diaryEvent.targetHelpers} wanted` : ''}{maybe.length ? ` · ${maybe.length} maybe` : ''}</div>{role === 'admin' && <button className={styles.shareButton} type="button" onClick={() => void shareInvite(diaryEvent)}>Share invite</button>}</div>
               {yes.length > 0 && <div className={styles.names}>Coming: {yes.map((rsvp) => rsvp.name).join(', ')}</div>}
             </div>}
           </article>
@@ -402,6 +475,6 @@ export default function ClubDiaryApp() {
       </section>
     })}
 
-    <p className={styles.tip}>Tip: on your phone choose “Add to Home Screen” once, then the Club Diary opens like an app.</p>
+    <p className={styles.tip}>Fixtures are automatic and cannot be edited here. On your phone choose “Add to Home Screen” once, then the Club Diary opens like an app.</p>
   </div></div>
 }
