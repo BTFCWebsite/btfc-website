@@ -22,9 +22,10 @@ export default function ClubDiaryClubLink() {
     const placeHost = (host: HTMLElement) => {
       if (!hero) return
       const rect = hero.getBoundingClientRect()
-      const inset = window.innerWidth <= 760 ? 18 : 32
-      host.style.left = `${window.scrollX + rect.left + inset}px`
-      host.style.top = `${window.scrollY + rect.bottom}px`
+      const horizontalInset = window.innerWidth <= 760 ? 18 : 32
+      const verticalInset = window.innerWidth <= 760 ? 16 : 22
+      host.style.left = `${window.scrollX + rect.right - horizontalInset}px`
+      host.style.top = `${window.scrollY + rect.bottom - verticalInset}px`
     }
 
     const mountLogin = () => {
@@ -86,7 +87,7 @@ export default function ClubDiaryClubLink() {
           pointer-events: none;
         }
         #club-diary-club-link a {
-          transform: translateY(-28%);
+          transform: translate(-100%, -100%);
           display: inline-flex;
           align-items: center;
           gap: 11px;
@@ -94,15 +95,17 @@ export default function ClubDiaryClubLink() {
           padding: 7px 15px 8px 10px;
           border: 1px solid rgba(255,255,255,.34);
           border-radius: 8px;
-          background: #123574;
+          background: rgba(18,53,116,.92);
           color: #fff;
           text-decoration: none;
-          box-shadow: 0 5px 16px rgba(0,0,0,.18);
+          box-shadow: 0 5px 16px rgba(0,0,0,.16);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
           white-space: nowrap;
           pointer-events: auto;
         }
         #club-diary-club-link a:hover {
-          background: #19458f;
+          background: rgba(25,69,143,.96);
         }
         #club-diary-club-link .club-diary-helper-icon {
           display: grid;
@@ -141,7 +144,6 @@ export default function ClubDiaryClubLink() {
         }
         @media (max-width: 760px) {
           #club-diary-club-link a {
-            transform: translateY(-24%);
             min-height: 52px;
             gap: 8px;
             padding: 6px 11px 7px 8px;
