@@ -16,6 +16,8 @@ import {
 export type DiaryPerson = {
   id: string
   name: string
+  email: string
+  mobile: string
   isAdmin: boolean
   active: boolean
   hasPin: boolean
@@ -24,6 +26,8 @@ export type DiaryPerson = {
 
 type StoredPerson = {
   name: string
+  email?: string
+  mobile?: string
   isAdmin: boolean
   active: boolean
   pinHash?: string
@@ -31,6 +35,20 @@ type StoredPerson = {
 }
 
 type PersonDoc = { _id: string; payload: string }
+
+function cleanEmail(value: unknown) {
+  return cleanText(value, 160).toLocaleLowerCase('en-GB')
+}
+
+function cleanMobile(value: unknown) {
+  return cleanText(value, 40)
+}
+
+function assertEmail(email: string) {
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new Error('Enter a valid email address.')
+  }
+}
 
 export async function loadDiaryPeople(includeInactive = true): Promise<DiaryPerson[]> {
   const docs = await getDiaryClient().fetch<PersonDoc[]>(
@@ -45,6 +63,8 @@ export async function loadDiaryPeople(includeInactive = true): Promise<DiaryPers
       const person: DiaryPerson = {
         id: doc._id,
         name: cleanText(stored.name, 100),
+        email: cleanEmail(stored.email),
+        mobile: cleanMobile(stored.mobile),
         isAdmin: Boolean(stored.isAdmin),
         active: stored.active !== false,
         hasPin: Boolean(stored.pinHash),
@@ -87,20 +107,28 @@ export async function diaryPersonPinIsValid(id: string, pin: string) {
   }
 }
 
-export async function createDiaryPerson(name: string, isAdmin: boolean, pin?: string) {
+export async function createDiaryPerson(name: string, isAdmin: boolean, pin?: string, email?: string, mobile?: string) {
   const cleanName = cleanText(name, 100)
+  const cleanEmailValue = cleanEmail(email)
+  const cleanMobileValue = cleanMobile(mobile)
   if (!cleanName) throw new Error('Add a name.')
+  assertEmail(cleanEmailValue)
   if (pin !== undefined && pin !== '' && !validPersonalPin(pin)) throw new Error('Personal PIN must be 4 to 6 digits.')
 
   const people = await loadDiaryPeople(true)
   if (people.some((person) => normaliseName(person.name) === normaliseName(cleanName))) {
     throw new Error('That person is already on the list.')
   }
+  if (cleanEmailValue && people.some((person) => person.email && person.email === cleanEmailValue)) {
+    throw new Error('That email address is already used by another person.')
+  }
 
   const hasActiveAdmin = people.some((person) => person.active && person.isAdmin)
   const id = `clubDiaryPerson.${randomBytes(12).toString('hex')}`
   const stored: StoredPerson = {
     name: cleanName,
+    email: cleanEmailValue,
+    mobile: cleanMobileValue,
     isAdmin: hasActiveAdmin ? Boolean(isAdmin) : true,
     active: true,
     ...(pin ? { pinHash: diaryPersonPinHash(id, pin) } : {}),
@@ -116,6 +144,8 @@ export async function createDiaryPerson(name: string, isAdmin: boolean, pin?: st
   return {
     id,
     name: stored.name,
+    email: stored.email || '',
+    mobile: stored.mobile || '',
     isAdmin: stored.isAdmin,
     active: stored.active,
     hasPin: Boolean(stored.pinHash),
@@ -123,15 +153,21 @@ export async function createDiaryPerson(name: string, isAdmin: boolean, pin?: st
   } satisfies DiaryPerson
 }
 
-export async function updateDiaryPerson(id: string, values: { name?: string; isAdmin?: boolean; active?: boolean }) {
+export async function updateDiaryPerson(id: string, values: { name?: string; email?: string; mobile?: string; isAdmin?: boolean; active?: boolean }) {
   const people = await loadDiaryPeople(true)
   const person = people.find((item) => item.id === id)
   if (!person) throw new Error('Person not found.')
 
   const requestedName = values.name === undefined ? person.name : cleanText(values.name, 100)
+  const requestedEmail = values.email === undefined ? person.email : cleanEmail(values.email)
+  const requestedMobile = values.mobile === undefined ? person.mobile : cleanMobile(values.mobile)
   if (!requestedName) throw new Error('Add a name.')
+  assertEmail(requestedEmail)
   if (people.some((item) => item.id !== id && normaliseName(item.name) === normaliseName(requestedName))) {
     throw new Error('That person is already on the list.')
+  }
+  if (requestedEmail && people.some((item) => item.id !== id && item.email && item.email === requestedEmail)) {
+    throw new Error('That email address is already used by another person.')
   }
 
   const doc = await loadDiaryPersonDocument(id)
@@ -141,6 +177,8 @@ export async function updateDiaryPerson(id: string, values: { name?: string; isA
   const updated: DiaryPerson = {
     ...person,
     name: requestedName,
+    email: requestedEmail,
+    mobile: requestedMobile,
     isAdmin: typeof values.isAdmin === 'boolean' ? values.isAdmin : person.isAdmin,
     active: typeof values.active === 'boolean' ? values.active : person.active,
   }
@@ -152,6 +190,8 @@ export async function updateDiaryPerson(id: string, values: { name?: string; isA
 
   const stored: StoredPerson = {
     name: updated.name,
+    email: updated.email,
+    mobile: updated.mobile,
     isAdmin: updated.isAdmin,
     active: updated.active,
     ...(existing.pinHash ? { pinHash: existing.pinHash } : {}),
@@ -177,6 +217,8 @@ export async function setDiaryPersonPin(id: string, pin: string) {
   return {
     id: doc._id,
     name: cleanText(updated.name, 100),
+    email: cleanEmail(updated.email),
+    mobile: cleanMobile(updated.mobile),
     isAdmin: Boolean(updated.isAdmin),
     active: updated.active !== false,
     hasPin: true,
