@@ -50,6 +50,26 @@ function assertEmail(email: string) {
   }
 }
 
+function personFromDocument(doc: PersonDoc): DiaryPerson | null {
+  try {
+    const stored = decryptDiaryPayload<StoredPerson>(doc.payload)
+    const person: DiaryPerson = {
+      id: doc._id,
+      name: cleanText(stored.name, 100),
+      email: cleanEmail(stored.email),
+      mobile: cleanMobile(stored.mobile),
+      isAdmin: Boolean(stored.isAdmin),
+      active: stored.active !== false,
+      hasPin: Boolean(stored.pinHash),
+      createdAt: cleanText(stored.createdAt, 50) || new Date(0).toISOString(),
+    }
+    return person.name ? person : null
+  } catch (error) {
+    console.error('Unable to decrypt Club Diary person', doc._id, error)
+    return null
+  }
+}
+
 export async function loadDiaryPeople(includeInactive = true): Promise<DiaryPerson[]> {
   const docs = await getDiaryClient().fetch<PersonDoc[]>(
     `*[_type == "clubDiaryPerson"] { _id, payload }`,
@@ -57,26 +77,13 @@ export async function loadDiaryPeople(includeInactive = true): Promise<DiaryPers
     { cache: 'no-store' }
   )
 
-  return (docs || []).flatMap((doc) => {
-    try {
-      const stored = decryptDiaryPayload<StoredPerson>(doc.payload)
-      const person: DiaryPerson = {
-        id: doc._id,
-        name: cleanText(stored.name, 100),
-        email: cleanEmail(stored.email),
-        mobile: cleanMobile(stored.mobile),
-        isAdmin: Boolean(stored.isAdmin),
-        active: stored.active !== false,
-        hasPin: Boolean(stored.pinHash),
-        createdAt: cleanText(stored.createdAt, 50) || new Date(0).toISOString(),
-      }
-      if (!person.name || (!includeInactive && !person.active)) return []
+  return (docs || [])
+    .flatMap((doc) => {
+      const person = personFromDocument(doc)
+      if (!person || (!includeInactive && !person.active)) return []
       return [person]
-    } catch (error) {
-      console.error('Unable to decrypt Club Diary person', doc._id, error)
-      return []
-    }
-  }).sort((a, b) => a.name.localeCompare(b.name, 'en-GB'))
+    })
+    .sort((a, b) => a.name.localeCompare(b.name, 'en-GB'))
 }
 
 async function loadDiaryPersonDocument(id: string) {
@@ -90,10 +97,8 @@ async function loadDiaryPersonDocument(id: string) {
 }
 
 export async function findDiaryPerson(id: string) {
-  const cleanId = cleanText(id, 200)
-  if (!cleanId) return null
-  const people = await loadDiaryPeople(true)
-  return people.find((person) => person.id === cleanId) || null
+  const doc = await loadDiaryPersonDocument(id)
+  return doc ? personFromDocument(doc) : null
 }
 
 export async function diaryPersonPinIsValid(id: string, pin: string) {
@@ -230,15 +235,18 @@ export async function getVerifiedDiarySession(request: NextRequest): Promise<Dia
   const session = getDiarySession(request)
   if (!session) return null
 
-  const people = await loadDiaryPeople(true)
-
   // Bootstrap admin session used only while the first approved person is being created.
   if (!session.personId) {
-    if (session.role === 'admin' && people.length === 0) return session
-    return null
+    if (session.role !== 'admin') return null
+    const personCount = await getDiaryClient().fetch<number>(
+      `count(*[_type == "clubDiaryPerson"])`,
+      {},
+      { cache: 'no-store' }
+    )
+    return personCount === 0 ? session : null
   }
 
-  const person = people.find((item) => item.id === session.personId)
+  const person = await findDiaryPerson(session.personId)
   if (!person || !person.active) return null
   if (session.role === 'admin' && !person.isAdmin) return null
 
