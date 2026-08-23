@@ -78,7 +78,7 @@ export function adminPinIsValid(pin: string) {
 }
 
 export function validPersonalPin(pin: unknown) {
-  return /^\d{6}$/.test(String(pin || ''))
+  return /^\d{4,6}$/.test(String(pin || ''))
 }
 
 export function diaryPersonPinHash(personId: string, pin: string) {
