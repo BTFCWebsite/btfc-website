@@ -2,6 +2,19 @@
 
 import { useEffect } from 'react'
 
+function mobileBarColour(chip: HTMLElement) {
+  const classes = chip.className
+  if (classes.includes('chipFirst')) return '#2E75B6'
+  if (classes.includes('chipReserves')) return '#3A9152'
+  if (classes.includes('chipU17')) return '#D89B19'
+  if (classes.includes('chipUnavailable')) return '#D85858'
+  if (classes.includes('chipClubhouse')) return '#7A5BC8'
+  if (classes.includes('chipWorkingParty')) return '#D9722C'
+  if (classes.includes('chipEvent')) return '#148A8A'
+  if (classes.includes('chipMeeting')) return '#56647A'
+  return '#7A8494'
+}
+
 export default function ClubDiaryMonthDetails() {
   useEffect(() => {
     const media = window.matchMedia('(max-width: 760px)')
@@ -94,6 +107,8 @@ export default function ClubDiaryMonthDetails() {
             chip.style.overflow = 'hidden'
             chip.style.cursor = 'pointer'
             chip.style.touchAction = 'manipulation'
+            chip.style.backgroundColor = mobileBarColour(chip)
+            chip.style.boxShadow = 'inset 0 0 0 1px rgba(0,0,0,.08)'
             if (title) title.style.display = 'none'
             for (const span of spans) span.style.display = 'none'
           } else {
@@ -109,6 +124,8 @@ export default function ClubDiaryMonthDetails() {
             chip.style.overflow = ''
             chip.style.cursor = 'pointer'
             chip.style.touchAction = ''
+            chip.style.backgroundColor = ''
+            chip.style.boxShadow = ''
 
             if (title) {
               title.style.display = '-webkit-box'
