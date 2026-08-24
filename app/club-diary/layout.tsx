@@ -58,11 +58,6 @@ export default function ClubDiaryLayout({ children }: { children: ReactNode }) {
         }
 
         [class*="ClubDiary_toolbar__"] {
-          position: static !important;
-          top: auto !important;
-          left: auto !important;
-          right: auto !important;
-          transform: none !important;
           width: 100% !important;
           margin-left: 0 !important;
           margin-right: 0 !important;
