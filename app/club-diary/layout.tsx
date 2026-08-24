@@ -63,6 +63,15 @@ export default function ClubDiaryLayout({ children }: { children: ReactNode }) {
         color: #98a2b3 !important;
       }
 
+      @media (min-width: 761px) {
+        [class*="ClubDiary_monthDay__"] {
+          height: 158px !important;
+          min-height: 158px !important;
+          max-height: 158px !important;
+          overflow: hidden !important;
+        }
+      }
+
       @media (max-width: 760px) {
         html,
         body {
