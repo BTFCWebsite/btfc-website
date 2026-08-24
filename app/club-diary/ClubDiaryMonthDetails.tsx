@@ -32,9 +32,87 @@ export default function ClubDiaryMonthDetails() {
       const calendarScroller = monthGrid?.parentElement as HTMLElement | null
       const calendarPanel = calendarScroller?.parentElement as HTMLElement | null
       const weekHeader = calendarScroller?.querySelector<HTMLElement>('[class*="weekHeader"]') || null
+      const shell = calendarPanel?.closest<HTMLElement>('[class*="shell"]') || null
+      const page = shell?.closest<HTMLElement>('[class*="page"]') || null
+      const calendarControls = document.querySelector<HTMLElement>('[class*="calendarControls"]')
+      const calendarNav = document.querySelector<HTMLElement>('[class*="calendarNav"]')
+      const calendarPeriod = document.querySelector<HTMLElement>('[class*="calendarPeriod"]')
+      const viewButtons = document.querySelector<HTMLElement>('[class*="viewButtons"]')
+      const toolbar = document.querySelector<HTMLElement>('[class*="toolbar"]')
 
       document.documentElement.style.overflowX = media.matches ? 'hidden' : ''
       document.body.style.overflowX = media.matches ? 'hidden' : ''
+
+      if (page) {
+        page.style.width = media.matches ? '100%' : ''
+        page.style.maxWidth = media.matches ? '100vw' : ''
+        page.style.boxSizing = media.matches ? 'border-box' : ''
+        page.style.overflowX = media.matches ? 'hidden' : ''
+      }
+
+      if (shell) {
+        shell.style.width = media.matches ? '100%' : ''
+        shell.style.maxWidth = media.matches ? '100%' : ''
+        shell.style.minWidth = media.matches ? '0' : ''
+        shell.style.boxSizing = media.matches ? 'border-box' : ''
+        shell.style.overflowX = media.matches ? 'hidden' : ''
+      }
+
+      if (calendarControls) {
+        calendarControls.style.width = media.matches ? '100%' : ''
+        calendarControls.style.maxWidth = media.matches ? '100%' : ''
+        calendarControls.style.minWidth = media.matches ? '0' : ''
+        calendarControls.style.boxSizing = media.matches ? 'border-box' : ''
+        calendarControls.style.display = media.matches ? 'grid' : ''
+        calendarControls.style.gridTemplateColumns = media.matches ? 'minmax(0, 1fr)' : ''
+        calendarControls.style.gap = media.matches ? '10px' : ''
+      }
+
+      if (calendarNav) {
+        calendarNav.style.width = media.matches ? '100%' : ''
+        calendarNav.style.maxWidth = media.matches ? '100%' : ''
+        calendarNav.style.minWidth = media.matches ? '0' : ''
+        calendarNav.style.boxSizing = media.matches ? 'border-box' : ''
+        calendarNav.style.display = media.matches ? 'grid' : ''
+        calendarNav.style.gridTemplateColumns = media.matches ? '44px auto 44px minmax(0, 1fr)' : ''
+        calendarNav.style.gap = media.matches ? '8px' : ''
+      }
+
+      if (calendarPeriod) {
+        calendarPeriod.style.minWidth = media.matches ? '0' : ''
+        calendarPeriod.style.width = media.matches ? 'auto' : ''
+        calendarPeriod.style.maxWidth = media.matches ? '100%' : ''
+        calendarPeriod.style.overflow = media.matches ? 'hidden' : ''
+        calendarPeriod.style.whiteSpace = media.matches ? 'nowrap' : ''
+        calendarPeriod.style.textOverflow = media.matches ? 'ellipsis' : ''
+        calendarPeriod.style.textAlign = media.matches ? 'right' : ''
+        calendarPeriod.style.alignSelf = media.matches ? 'center' : ''
+      }
+
+      if (viewButtons) {
+        viewButtons.style.width = media.matches ? '100%' : ''
+        viewButtons.style.maxWidth = media.matches ? '100%' : ''
+        viewButtons.style.minWidth = media.matches ? '0' : ''
+        viewButtons.style.boxSizing = media.matches ? 'border-box' : ''
+        viewButtons.style.display = media.matches ? 'grid' : ''
+        viewButtons.style.gridTemplateColumns = media.matches ? 'repeat(3, minmax(0, 1fr))' : ''
+        viewButtons.style.gap = media.matches ? '8px' : ''
+        for (const button of Array.from(viewButtons.children) as HTMLElement[]) {
+          button.style.width = media.matches ? '100%' : ''
+          button.style.minWidth = media.matches ? '0' : ''
+          button.style.maxWidth = media.matches ? '100%' : ''
+          button.style.boxSizing = media.matches ? 'border-box' : ''
+          button.style.paddingLeft = media.matches ? '4px' : ''
+          button.style.paddingRight = media.matches ? '4px' : ''
+        }
+      }
+
+      if (toolbar) {
+        toolbar.style.width = media.matches ? '100%' : ''
+        toolbar.style.maxWidth = media.matches ? '100%' : ''
+        toolbar.style.minWidth = media.matches ? '0' : ''
+        toolbar.style.boxSizing = media.matches ? 'border-box' : ''
+      }
 
       if (monthGrid) {
         monthGrid.style.minWidth = media.matches ? '0' : ''
@@ -51,6 +129,8 @@ export default function ClubDiaryMonthDetails() {
         weekHeader.style.gridTemplateColumns = media.matches ? 'repeat(7, minmax(0, 1fr))' : ''
         for (const headerCell of Array.from(weekHeader.children) as HTMLElement[]) {
           headerCell.style.minWidth = media.matches ? '0' : ''
+          headerCell.style.maxWidth = media.matches ? '100%' : ''
+          headerCell.style.boxSizing = media.matches ? 'border-box' : ''
           headerCell.style.padding = media.matches ? '7px 0' : ''
           headerCell.style.fontSize = media.matches ? '9px' : ''
           headerCell.style.overflow = media.matches ? 'hidden' : ''
@@ -59,6 +139,7 @@ export default function ClubDiaryMonthDetails() {
       if (calendarScroller) {
         calendarScroller.style.width = media.matches ? '100%' : ''
         calendarScroller.style.maxWidth = media.matches ? '100%' : ''
+        calendarScroller.style.minWidth = media.matches ? '0' : ''
         calendarScroller.style.boxSizing = media.matches ? 'border-box' : ''
         calendarScroller.style.overflowX = media.matches ? 'hidden' : ''
         if (media.matches && calendarScroller.scrollLeft !== 0) calendarScroller.scrollLeft = 0
@@ -66,6 +147,7 @@ export default function ClubDiaryMonthDetails() {
       if (calendarPanel) {
         calendarPanel.style.width = media.matches ? '100%' : ''
         calendarPanel.style.maxWidth = media.matches ? '100%' : ''
+        calendarPanel.style.minWidth = media.matches ? '0' : ''
         calendarPanel.style.boxSizing = media.matches ? 'border-box' : ''
       }
       if (media.matches && window.scrollX !== 0) {
@@ -201,12 +283,14 @@ export default function ClubDiaryMonthDetails() {
     const observer = new MutationObserver(() => enhance())
     observer.observe(document.body, { childList: true, subtree: true })
     media.addEventListener('change', enhance)
+    window.addEventListener('resize', enhance)
 
     return () => {
       document.documentElement.style.overflowX = ''
       document.body.style.overflowX = ''
       observer.disconnect()
       media.removeEventListener('change', enhance)
+      window.removeEventListener('resize', enhance)
     }
   }, [])
 
