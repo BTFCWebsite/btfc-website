@@ -20,6 +20,21 @@ export default function ClubDiaryHeroControls() {
   const [addDisabled, setAddDisabled] = useState(false)
   const [compact, setCompact] = useState(false)
 
+  async function checkAuth() {
+    const response = await fetch('/api/club-diary/auth', { cache: 'no-store' }).catch(() => null)
+    if (!response?.ok) {
+      setRole(null)
+      return false
+    }
+    const data = await response.json().catch(() => ({}))
+    if (!data?.authorised) {
+      setRole(null)
+      return false
+    }
+    setRole(data?.role === 'admin' ? 'admin' : 'member')
+    return true
+  }
+
   useEffect(() => {
     const media = window.matchMedia('(max-width: 900px)')
     const update = () => setCompact(media.matches)
@@ -29,23 +44,22 @@ export default function ClubDiaryHeroControls() {
   }, [])
 
   useEffect(() => {
+    void checkAuth()
+    const onFocus = () => void checkAuth()
+    window.addEventListener('focus', onFocus)
+    return () => window.removeEventListener('focus', onFocus)
+  }, [])
+
+  useEffect(() => {
+    if (role) return
+    const timer = window.setInterval(() => { void checkAuth() }, 800)
+    return () => window.clearInterval(timer)
+  }, [role])
+
+  useEffect(() => {
     let cancelled = false
     let observer: MutationObserver | null = null
     let timer: ReturnType<typeof setTimeout> | null = null
-
-    const checkAuth = async () => {
-      const response = await fetch('/api/club-diary/auth', { cache: 'no-store' }).catch(() => null)
-      if (!response?.ok || cancelled) {
-        setRole(null)
-        return
-      }
-      const data = await response.json().catch(() => ({}))
-      if (cancelled || !data?.authorised) {
-        setRole(null)
-        return
-      }
-      setRole(data?.role === 'admin' ? 'admin' : 'member')
-    }
 
     const arrange = () => {
       if (cancelled) return
@@ -88,7 +102,6 @@ export default function ClubDiaryHeroControls() {
       setTarget((current) => current === host ? current : host)
     }
 
-    void checkAuth()
     arrange()
 
     observer = new MutationObserver(() => {
@@ -146,6 +159,34 @@ export default function ClubDiaryHeroControls() {
     window.location.replace('/club-diary')
   }
 
+  async function openSecurity() {
+    const clickLauncher = () => {
+      const button = Array.from(document.querySelectorAll<HTMLButtonElement>('button')).find((item) => {
+        const label = item.textContent?.trim()
+        return (label === '🔐 Security & Activity' || label === 'Security & Activity') && !item.closest('[data-btfc-hero-controls]')
+      })
+      if (!button) return false
+      button.click()
+      return true
+    }
+
+    if (originals.security && document.body.contains(originals.security)) {
+      originals.security.click()
+      return
+    }
+    if (clickLauncher()) return
+
+    // The security component may have checked auth before the user logged in.
+    // Trigger its existing focus re-check, then open it as soon as it renders.
+    window.dispatchEvent(new Event('focus'))
+    for (let attempt = 0; attempt < 20; attempt += 1) {
+      await new Promise((resolve) => window.setTimeout(resolve, 100))
+      if (clickLauncher()) return
+    }
+
+    window.alert('Unable to open Security & Activity. Please refresh the Club Diary and try again.')
+  }
+
   if (!target || !role) return null
 
   const secondary = compact ? compactSecondaryButtonStyle : secondaryButtonStyle
@@ -154,7 +195,7 @@ export default function ClubDiaryHeroControls() {
   return createPortal(
     <>
       {role === 'admin' && <button type="button" onClick={() => originals.people?.click()} style={secondary}>People &amp; access</button>}
-      {role === 'admin' && <button type="button" onClick={() => originals.security?.click()} style={secondary}>Security &amp; Activity</button>}
+      {role === 'admin' && <button type="button" onClick={() => void openSecurity()} style={secondary}>Security &amp; Activity</button>}
       <button type="button" onClick={() => void logout()} style={secondary}>Log out</button>
       <button type="button" disabled={addDisabled} onClick={() => originals.add?.click()} style={{ ...primary, opacity: addDisabled ? .55 : 1, cursor: addDisabled ? 'not-allowed' : 'pointer' }}>
         {role === 'admin' ? '+ Add' : '+ Add availability'}
