@@ -54,6 +54,19 @@ export default function ClubDiaryStickyHero() {
       toolbar.style.boxShadow = ''
     }
 
+    const ensureStickyAncestors = () => {
+      if (!mobile.matches) return
+      const shell = hero?.closest<HTMLElement>('[class*="shell"]') || null
+      const page = shell?.closest<HTMLElement>('[class*="page"]') || null
+      // overflow-x:hidden creates a scroll container on Safari and prevents
+      // sticky descendants from sticking to the viewport. clip prevents side
+      // overflow without becoming a scrolling ancestor.
+      document.documentElement.style.overflowX = 'clip'
+      document.body.style.overflowX = 'clip'
+      if (page) page.style.overflowX = 'clip'
+      if (shell) shell.style.overflowX = 'clip'
+    }
+
     const visibleSiteHeaderBottom = () => {
       if (mobile.matches) return 0
       const siteHeader = Array.from(document.querySelectorAll<HTMLElement>('header')).find((header) => !header.contains(hero)) || null
@@ -80,8 +93,6 @@ export default function ClubDiaryStickyHero() {
       toolbar.style.paddingBottom = '7px'
 
       if (mobile.matches) {
-        // Mobile filters deliberately remain in normal flow so they can never
-        // cover the month grid.
         toolbar.style.position = 'relative'
         toolbar.style.top = ''
         toolbar.style.zIndex = ''
@@ -110,6 +121,7 @@ export default function ClubDiaryStickyHero() {
       resetHero()
       resetControls()
       resetToolbar()
+      ensureStickyAncestors()
 
       hero.style.zIndex = '250'
       hero.style.boxSizing = 'border-box'
@@ -122,9 +134,8 @@ export default function ClubDiaryStickyHero() {
       calendarControls.style.boxSizing = 'border-box'
 
       if (mobile.matches) {
-        // Sticky keeps both elements in normal document flow. There is no
-        // artificial spacer, so the filters/calendar sit directly underneath
-        // the controls while the hero and controls remain visible on scroll.
+        // Both sticky elements remain in normal flow, so no manual spacer is
+        // needed and the category row/calendar cannot slide underneath them.
         hero.style.position = 'sticky'
         hero.style.top = '0px'
         hero.style.left = ''
@@ -161,6 +172,7 @@ export default function ClubDiaryStickyHero() {
 
     const refreshPositions = () => {
       if (!hero || !calendarControls) return
+      ensureStickyAncestors()
       if (mobile.matches) {
         calendarControls.style.top = `${Math.ceil(hero.getBoundingClientRect().height)}px`
       } else if (hero.style.position === 'fixed') {
@@ -186,6 +198,8 @@ export default function ClubDiaryStickyHero() {
     observer = new MutationObserver(() => {
       if (!hero || !document.body.contains(hero) || !calendarControls || !document.body.contains(calendarControls)) {
         queueApply()
+      } else {
+        ensureStickyAncestors()
       }
     })
     observer.observe(document.body, { childList: true, subtree: true })
