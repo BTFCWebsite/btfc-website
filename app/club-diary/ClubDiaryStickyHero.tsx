@@ -6,10 +6,22 @@ export default function ClubDiaryStickyHero() {
   useEffect(() => {
     const mobile = window.matchMedia('(max-width: 900px)')
     let hero: HTMLElement | null = null
+    let calendarControls: HTMLElement | null = null
     let spacer: HTMLDivElement | null = null
     let observer: MutationObserver | null = null
     let resizeObserver: ResizeObserver | null = null
     let timer: ReturnType<typeof setTimeout> | null = null
+
+    const clearCalendarControls = () => {
+      if (!calendarControls) return
+      calendarControls.style.position = ''
+      calendarControls.style.top = ''
+      calendarControls.style.zIndex = ''
+      calendarControls.style.background = ''
+      calendarControls.style.paddingTop = ''
+      calendarControls.style.paddingBottom = ''
+      calendarControls.style.boxShadow = ''
+    }
 
     const clearFixed = () => {
       if (!hero) return
@@ -34,12 +46,32 @@ export default function ClubDiaryStickyHero() {
       return Math.max(0, Math.min(rect.bottom, window.innerHeight))
     }
 
+    const findCalendarControls = () => {
+      calendarControls = document.querySelector<HTMLElement>('[class*="calendarControls"]')
+      if (!calendarControls) return
+      calendarControls.style.position = 'sticky'
+      calendarControls.style.zIndex = '240'
+      calendarControls.style.background = '#f2f4f7'
+      calendarControls.style.paddingTop = '8px'
+      calendarControls.style.paddingBottom = '7px'
+      calendarControls.style.boxShadow = '0 8px 14px rgba(16,24,40,.04)'
+    }
+
+    const positionCalendarControls = () => {
+      if (!calendarControls || !document.body.contains(calendarControls)) findCalendarControls()
+      if (!calendarControls || !hero || hero.style.position !== 'fixed') return
+      calendarControls.style.top = `${Math.ceil(hero.getBoundingClientRect().bottom + 4)}px`
+    }
+
     const findHero = () => {
       const nextHero = Array.from(document.querySelectorAll('section')).find((section) =>
         section.querySelector('h1')?.textContent?.trim() === 'Club Diary'
       ) as HTMLElement | null
 
-      if (nextHero === hero) return
+      if (nextHero === hero) {
+        if (!calendarControls || !document.body.contains(calendarControls)) findCalendarControls()
+        return
+      }
 
       resizeObserver?.disconnect()
       resizeObserver = null
@@ -54,10 +86,12 @@ export default function ClubDiaryStickyHero() {
       spacer.style.height = '0px'
       spacer.style.width = '100%'
       hero.parentElement?.insertBefore(spacer, hero)
+      findCalendarControls()
 
       resizeObserver = new ResizeObserver(() => {
         if (hero && spacer && hero.style.position === 'fixed') {
           spacer.style.height = `${hero.getBoundingClientRect().height}px`
+          positionCalendarControls()
         }
       })
       resizeObserver.observe(hero)
@@ -66,6 +100,7 @@ export default function ClubDiaryStickyHero() {
     const positionFixedHero = () => {
       if (!hero || hero.style.position !== 'fixed') return
       hero.style.top = `${visibleSiteHeaderBottom()}px`
+      positionCalendarControls()
     }
 
     const apply = () => {
@@ -84,9 +119,6 @@ export default function ClubDiaryStickyHero() {
       hero.style.boxSizing = 'border-box'
 
       if (mobile.matches) {
-        // The diary page has 10px horizontal padding on mobile. Pin the hero
-        // directly to the viewport rather than inheriting any accidental
-        // over-width from the page contents.
         hero.style.left = '10px'
         hero.style.width = 'calc(100vw - 20px)'
         hero.style.maxWidth = 'calc(100vw - 20px)'
@@ -99,6 +131,8 @@ export default function ClubDiaryStickyHero() {
       }
 
       if (spacer) spacer.style.height = `${height}px`
+      findCalendarControls()
+      positionCalendarControls()
     }
 
     const queueApply = () => {
@@ -116,6 +150,11 @@ export default function ClubDiaryStickyHero() {
       if (!hero || !document.body.contains(hero)) {
         findHero()
         queueApply()
+        return
+      }
+      if (!calendarControls || !document.body.contains(calendarControls)) {
+        findCalendarControls()
+        positionCalendarControls()
       }
     })
     observer.observe(document.body, { childList: true, subtree: true })
@@ -127,6 +166,7 @@ export default function ClubDiaryStickyHero() {
       mobile.removeEventListener('change', queueApply)
       window.removeEventListener('resize', queueApply)
       window.removeEventListener('scroll', positionFixedHero)
+      clearCalendarControls()
       clearFixed()
       spacer?.remove()
     }
