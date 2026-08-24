@@ -11,28 +11,63 @@ export default function ClubDiaryMonthDetails() {
       const firstCell = monthDays[0]
       const monthGrid = firstCell?.parentElement as HTMLElement | null
       const calendarScroller = monthGrid?.parentElement as HTMLElement | null
+      const calendarPanel = calendarScroller?.parentElement as HTMLElement | null
       const weekHeader = calendarScroller?.querySelector<HTMLElement>('[class*="weekHeader"]') || null
 
-      if (monthGrid) monthGrid.style.minWidth = media.matches ? '0' : ''
+      document.documentElement.style.overflowX = media.matches ? 'hidden' : ''
+      document.body.style.overflowX = media.matches ? 'hidden' : ''
+
+      if (monthGrid) {
+        monthGrid.style.minWidth = media.matches ? '0' : ''
+        monthGrid.style.width = media.matches ? '100%' : ''
+        monthGrid.style.maxWidth = media.matches ? '100%' : ''
+        monthGrid.style.boxSizing = media.matches ? 'border-box' : ''
+        monthGrid.style.gridTemplateColumns = media.matches ? 'repeat(7, minmax(0, 1fr))' : ''
+      }
       if (weekHeader) {
         weekHeader.style.minWidth = media.matches ? '0' : ''
+        weekHeader.style.width = media.matches ? '100%' : ''
+        weekHeader.style.maxWidth = media.matches ? '100%' : ''
+        weekHeader.style.boxSizing = media.matches ? 'border-box' : ''
+        weekHeader.style.gridTemplateColumns = media.matches ? 'repeat(7, minmax(0, 1fr))' : ''
         for (const headerCell of Array.from(weekHeader.children) as HTMLElement[]) {
+          headerCell.style.minWidth = media.matches ? '0' : ''
           headerCell.style.padding = media.matches ? '7px 0' : ''
           headerCell.style.fontSize = media.matches ? '9px' : ''
+          headerCell.style.overflow = media.matches ? 'hidden' : ''
         }
       }
-      if (calendarScroller) calendarScroller.style.overflowX = media.matches ? 'visible' : ''
+      if (calendarScroller) {
+        calendarScroller.style.width = media.matches ? '100%' : ''
+        calendarScroller.style.maxWidth = media.matches ? '100%' : ''
+        calendarScroller.style.boxSizing = media.matches ? 'border-box' : ''
+        calendarScroller.style.overflowX = media.matches ? 'hidden' : ''
+        if (media.matches && calendarScroller.scrollLeft !== 0) calendarScroller.scrollLeft = 0
+      }
+      if (calendarPanel) {
+        calendarPanel.style.width = media.matches ? '100%' : ''
+        calendarPanel.style.maxWidth = media.matches ? '100%' : ''
+        calendarPanel.style.boxSizing = media.matches ? 'border-box' : ''
+      }
+      if (media.matches && window.scrollX !== 0) {
+        window.scrollTo({ left: 0, top: window.scrollY, behavior: 'auto' })
+      }
 
       for (const cell of monthDays) {
+        cell.style.minWidth = media.matches ? '0' : ''
+        cell.style.maxWidth = media.matches ? '100%' : ''
+        cell.style.boxSizing = media.matches ? 'border-box' : ''
         cell.style.minHeight = media.matches ? '66px' : ''
         cell.style.padding = media.matches ? '4px' : ''
         cell.style.cursor = media.matches ? 'pointer' : ''
+        cell.style.overflow = media.matches ? 'hidden' : ''
 
         const dayNumber = cell.querySelector<HTMLElement>('[class*="dayNumber"]')
         if (dayNumber) {
           dayNumber.style.width = media.matches ? '24px' : ''
           dayNumber.style.height = media.matches ? '24px' : ''
           dayNumber.style.fontSize = media.matches ? '12px' : ''
+          dayNumber.style.minWidth = media.matches ? '0' : ''
         }
 
         const chips = Array.from(cell.querySelectorAll<HTMLElement>('[class*="calendarChip"]'))
@@ -41,6 +76,9 @@ export default function ClubDiaryMonthDetails() {
           const spans = Array.from(chip.querySelectorAll<HTMLElement>('span'))
 
           if (media.matches) {
+            chip.style.width = '100%'
+            chip.style.maxWidth = '100%'
+            chip.style.boxSizing = 'border-box'
             chip.style.height = '6px'
             chip.style.minHeight = '6px'
             chip.style.margin = '0 0 3px'
@@ -52,6 +90,9 @@ export default function ClubDiaryMonthDetails() {
             if (title) title.style.display = 'none'
             for (const span of spans) span.style.display = 'none'
           } else {
+            chip.style.width = ''
+            chip.style.maxWidth = ''
+            chip.style.boxSizing = ''
             chip.style.height = ''
             chip.style.minHeight = ''
             chip.style.margin = ''
@@ -95,6 +136,8 @@ export default function ClubDiaryMonthDetails() {
 
         const more = cell.querySelector<HTMLElement>('[class*="moreItems"]')
         if (more) {
+          more.style.maxWidth = media.matches ? '100%' : ''
+          more.style.overflow = media.matches ? 'hidden' : ''
           more.style.fontSize = media.matches ? '8px' : ''
           more.style.padding = media.matches ? '0' : ''
           more.style.minHeight = media.matches ? '0' : ''
@@ -153,6 +196,8 @@ export default function ClubDiaryMonthDetails() {
     document.addEventListener('keydown', handleKeyDown, true)
 
     return () => {
+      document.documentElement.style.overflowX = ''
+      document.body.style.overflowX = ''
       observer.disconnect()
       media.removeEventListener('change', enhance)
       document.removeEventListener('click', handleClick, true)
