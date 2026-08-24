@@ -18,6 +18,15 @@ export default function ClubDiaryHeroControls() {
   const [target, setTarget] = useState<HTMLElement | null>(null)
   const [originals, setOriginals] = useState<Originals>({ add: null, people: null, security: null })
   const [addDisabled, setAddDisabled] = useState(false)
+  const [compact, setCompact] = useState(false)
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 900px)')
+    const update = () => setCompact(media.matches)
+    update()
+    media.addEventListener('change', update)
+    return () => media.removeEventListener('change', update)
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -68,14 +77,6 @@ export default function ClubDiaryHeroControls() {
       if (!host) {
         host = document.createElement('div')
         host.dataset.btfcHeroControls = 'true'
-        Object.assign(host.style, {
-          display: 'flex',
-          gap: '8px',
-          flexWrap: 'wrap',
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          marginLeft: 'auto',
-        })
         heroTop.appendChild(host)
       }
 
@@ -103,6 +104,43 @@ export default function ClubDiaryHeroControls() {
     }
   }, [])
 
+  useEffect(() => {
+    if (!target) return
+    const heroTop = target.parentElement as HTMLElement | null
+
+    if (compact) {
+      Object.assign(target.style, {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+        gap: '6px',
+        width: '100%',
+        marginLeft: '0',
+        alignItems: 'stretch',
+      })
+      if (heroTop) {
+        heroTop.style.flexDirection = 'column'
+        heroTop.style.alignItems = 'stretch'
+        heroTop.style.gap = '10px'
+      }
+    } else {
+      Object.assign(target.style, {
+        display: 'flex',
+        gridTemplateColumns: '',
+        gap: '8px',
+        width: '',
+        flexWrap: 'wrap',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        marginLeft: 'auto',
+      })
+      if (heroTop) {
+        heroTop.style.flexDirection = ''
+        heroTop.style.alignItems = ''
+        heroTop.style.gap = ''
+      }
+    }
+  }, [target, compact])
+
   async function logout() {
     await fetch('/api/club-diary/auth', { method: 'DELETE' }).catch(() => null)
     window.location.replace('/club-diary')
@@ -110,12 +148,15 @@ export default function ClubDiaryHeroControls() {
 
   if (!target || !role) return null
 
+  const secondary = compact ? compactSecondaryButtonStyle : secondaryButtonStyle
+  const primary = compact ? compactPrimaryButtonStyle : primaryButtonStyle
+
   return createPortal(
     <>
-      {role === 'admin' && <button type="button" onClick={() => originals.people?.click()} style={secondaryButtonStyle}>People &amp; access</button>}
-      {role === 'admin' && <button type="button" onClick={() => originals.security?.click()} style={secondaryButtonStyle}>Security &amp; Activity</button>}
-      <button type="button" onClick={() => void logout()} style={secondaryButtonStyle}>Log out</button>
-      <button type="button" disabled={addDisabled} onClick={() => originals.add?.click()} style={{ ...primaryButtonStyle, opacity: addDisabled ? .55 : 1, cursor: addDisabled ? 'not-allowed' : 'pointer' }}>
+      {role === 'admin' && <button type="button" onClick={() => originals.people?.click()} style={secondary}>People &amp; access</button>}
+      {role === 'admin' && <button type="button" onClick={() => originals.security?.click()} style={secondary}>Security &amp; Activity</button>}
+      <button type="button" onClick={() => void logout()} style={secondary}>Log out</button>
+      <button type="button" disabled={addDisabled} onClick={() => originals.add?.click()} style={{ ...primary, opacity: addDisabled ? .55 : 1, cursor: addDisabled ? 'not-allowed' : 'pointer' }}>
         {role === 'admin' ? '+ Add' : '+ Add availability'}
       </button>
     </>,
@@ -148,4 +189,24 @@ const primaryButtonStyle = {
   fontSize: 11,
   fontWeight: 900,
   whiteSpace: 'nowrap',
+} as const
+
+const compactSecondaryButtonStyle = {
+  ...secondaryButtonStyle,
+  width: '100%',
+  minHeight: 34,
+  borderRadius: 8,
+  padding: '6px 7px',
+  fontSize: 9,
+  lineHeight: 1.15,
+} as const
+
+const compactPrimaryButtonStyle = {
+  ...primaryButtonStyle,
+  width: '100%',
+  minHeight: 34,
+  borderRadius: 8,
+  padding: '6px 7px',
+  fontSize: 9,
+  lineHeight: 1.15,
 } as const
