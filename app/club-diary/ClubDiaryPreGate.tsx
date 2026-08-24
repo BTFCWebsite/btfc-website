@@ -6,13 +6,15 @@ import ClubDiaryGate from './ClubDiaryGate'
 type Role = 'member' | 'admin'
 type Person = { id: string; name: string; hasPin: boolean }
 
-type AuthState = 'checking' | 'loggedOut' | 'loggedIn' | 'setup'
+type AuthState = 'loggedOut' | 'loggedIn' | 'setup'
 
 const font = "'Montserrat', sans-serif"
 const condensed = "'Barlow Condensed', sans-serif"
 
 export default function ClubDiaryPreGate() {
-  const [auth, setAuth] = useState<AuthState>('checking')
+  // Start on the usable login UI while the existing session is checked in the background.
+  // This avoids the large intermediate "Opening Club Diary" screen on every visit.
+  const [auth, setAuth] = useState<AuthState>('loggedOut')
   const [mode, setMode] = useState<Role>('member')
   const [people, setPeople] = useState<Person[]>([])
   const [personId, setPersonId] = useState('')
@@ -40,9 +42,9 @@ export default function ClubDiaryPreGate() {
         setAuth('setup')
         return
       }
-      setAuth(data?.authorised ? 'loggedIn' : 'loggedOut')
+      if (data?.authorised) setAuth('loggedIn')
     } catch {
-      setAuth('loggedOut')
+      // Stay on the login screen if the session check cannot be completed.
     }
   }
 
@@ -77,6 +79,14 @@ export default function ClubDiaryPreGate() {
     setError('')
   }
 
+  const selectedNeedsPin = Boolean(selectedPerson && !selectedPerson.hasPin)
+  const canUseSetupPin = selectedNeedsPin && mode === 'admin'
+  const needsPersonalPinSetup = Boolean((needsSetup && mode === 'admin') || canUseSetupPin)
+  const personalPinRequired = Boolean(selectedPerson?.hasPin)
+  const personalPinValid = !personalPinRequired || /^\d{4,6}$/.test(pin)
+  const newPinValid = !needsPersonalPinSetup || (/^\d{4,6}$/.test(newPersonalPin) && newPersonalPin === confirmPersonalPin)
+  const loginDisabled = working || loadingNames || (!needsSetup && (!personId || (selectedNeedsPin && !canUseSetupPin))) || !personalPinValid || !newPinValid
+
   async function login(event: FormEvent) {
     event.preventDefault()
     setError('')
@@ -104,10 +114,6 @@ export default function ClubDiaryPreGate() {
     }
   }
 
-  if (auth === 'checking') {
-    return <div style={pageStyle}><div style={cardStyle}>Opening Club Diary…</div></div>
-  }
-
   if (auth === 'setup') {
     return <div style={pageStyle}><div style={cardStyle}>
       <h1 style={titleStyle}>BTFC Club Diary</h1>
@@ -117,22 +123,14 @@ export default function ClubDiaryPreGate() {
 
   if (auth === 'loggedIn') return <ClubDiaryGate />
 
-  const selectedNeedsPin = Boolean(selectedPerson && !selectedPerson.hasPin)
-  const canUseSetupPin = selectedNeedsPin && mode === 'admin'
-  const needsPersonalPinSetup = Boolean((needsSetup && mode === 'admin') || canUseSetupPin)
-  const personalPinRequired = Boolean(selectedPerson?.hasPin)
-  const personalPinValid = !personalPinRequired || /^\d{4,6}$/.test(pin)
-  const newPinValid = !needsPersonalPinSetup || (/^\d{4,6}$/.test(newPersonalPin) && newPersonalPin === confirmPersonalPin)
-  const loginDisabled = working || loadingNames || (!needsSetup && (!personId || (selectedNeedsPin && !canUseSetupPin))) || !personalPinValid || !newPinValid
-
   return <div style={pageStyle}>
     <form style={cardStyle} onSubmit={login}>
       <h1 style={titleStyle}>BTFC Club Diary</h1>
       <p style={copyStyle}>Private club diary for authorised officials and volunteers.</p>
 
       <div style={{ display: 'flex', gap: 8, margin: '20px 0' }}>
-        <button type="button" onClick={() => changeMode('member')} style={tabStyle(mode === 'member')}>General access</button>
-        <button type="button" onClick={() => changeMode('admin')} style={tabStyle(mode === 'admin')}>Admin</button>
+        <button type="button" onClick={() => changeMode('member')} style={tabStyle(mode === 'member')}>Standard login</button>
+        <button type="button" onClick={() => changeMode('admin')} style={tabStyle(mode === 'admin')}>Admin login</button>
       </div>
 
       {needsSetup && mode === 'admin' ? <>
@@ -146,7 +144,7 @@ export default function ClubDiaryPreGate() {
           {!loadingNames && people.length === 0 && <option value="">No eligible names</option>}
           {people.map((person) => <option key={person.id} value={person.id}>{person.name}</option>)}
         </select>
-        {!loadingNames && people.length === 0 && <div style={noticeStyle}>{mode === 'admin' ? 'No active administrators are available.' : 'No people have been added yet. Ask a diary administrator.'}</div>}
+        {!loadingNames && people.length === 0 && <div style={noticeStyle}>{mode === 'admin' ? 'No active administrators are available.' : 'No standard users have been added yet. Ask a diary administrator.'}</div>}
         {selectedNeedsPin && mode === 'member' && <div style={noticeStyle}>A diary administrator needs to set a personal PIN for {selectedPerson?.name} before this account can be used.</div>}
         {canUseSetupPin && <div style={noticeStyle}>This Admin does not have a personal PIN yet. Enter the Admin setup PIN below, then choose your own 4–6 digit personal PIN. This setup PIN is only needed this once.</div>}
       </>}
