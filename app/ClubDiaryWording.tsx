@@ -14,12 +14,32 @@ export default function ClubDiaryWording() {
       let node: Node | null = walker.nextNode()
 
       while (node) {
-        const value = node.nodeValue?.trim()
-        if (value === 'Clubhouse' || value === 'Clubhouse booking') {
-          node.nodeValue = node.nodeValue?.replace(value, 'Clubhouse Events') || 'Clubhouse Events'
+        const value = node.nodeValue || ''
+        const trimmed = value.trim()
+        const parent = node.parentElement
+
+        if (trimmed === 'Clubhouse' || trimmed === 'Clubhouse booking') {
+          node.nodeValue = value.replace(trimmed, 'Clubhouse Events')
+        } else if (/General access/i.test(value)) {
+          node.nodeValue = value
+            .replace(/General access/g, 'Standard login')
+            .replace(/general access/g, 'standard login')
         }
+
+        if (parent?.tagName === 'BUTTON' && trimmed === 'Admin') {
+          node.nodeValue = value.replace('Admin', 'Admin login')
+        }
+
         node = walker.nextNode()
       }
+
+      document.querySelectorAll('button').forEach((button) => {
+        if (button.textContent?.trim() === 'Switch access') {
+          ;(button as HTMLElement).style.display = 'none'
+          button.setAttribute('aria-hidden', 'true')
+          button.setAttribute('tabindex', '-1')
+        }
+      })
     }
 
     updateLabels()
