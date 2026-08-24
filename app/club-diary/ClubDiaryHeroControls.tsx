@@ -65,10 +65,11 @@ export default function ClubDiaryHeroControls() {
       if (cancelled) return
 
       const buttons = Array.from(document.querySelectorAll('button')) as HTMLButtonElement[]
-      const add = buttons.find((button) => /^\+ Add(?: availability)?$/.test(button.textContent?.trim() || '')) || null
-      const people = buttons.find((button) => button.textContent?.trim() === 'People & access') || null
-      const security = buttons.find((button) => button.textContent?.trim() === '🔐 Security & Activity' || button.textContent?.trim() === 'Security & Activity') || null
-      const logout = buttons.find((button) => button.textContent?.trim() === 'Log out' && !button.closest('[data-btfc-hero-controls]')) || null
+      const outsideHeroControls = (button: HTMLButtonElement) => !button.closest('[data-btfc-hero-controls]')
+      const add = buttons.find((button) => outsideHeroControls(button) && /^\+ Add(?: availability)?$/.test(button.textContent?.trim() || '')) || null
+      const people = buttons.find((button) => outsideHeroControls(button) && button.textContent?.trim() === 'People & access') || null
+      const security = buttons.find((button) => outsideHeroControls(button) && (button.textContent?.trim() === '🔐 Security & Activity' || button.textContent?.trim() === 'Security & Activity')) || null
+      const logout = buttons.find((button) => outsideHeroControls(button) && button.textContent?.trim() === 'Log out') || null
 
       if (!add || !logout) return
 
@@ -176,8 +177,6 @@ export default function ClubDiaryHeroControls() {
     }
     if (clickLauncher()) return
 
-    // The security component may have checked auth before the user logged in.
-    // Trigger its existing focus re-check, then open it as soon as it renders.
     window.dispatchEvent(new Event('focus'))
     for (let attempt = 0; attempt < 20; attempt += 1) {
       await new Promise((resolve) => window.setTimeout(resolve, 100))
