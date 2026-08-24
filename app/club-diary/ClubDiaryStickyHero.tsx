@@ -133,26 +133,24 @@ export default function ClubDiaryStickyHero() {
       hero.style.zIndex = '250'
       hero.style.boxSizing = 'border-box'
       hero.style.boxShadow = '0 12px 30px rgba(10,35,78,.30)'
+      hero.style.position = 'sticky'
+      hero.style.left = ''
+      hero.style.width = ''
+      hero.style.maxWidth = ''
+      hero.style.borderRadius = '18px'
 
       calendarControls.style.zIndex = '240'
       calendarControls.style.background = '#f2f4f7'
       calendarControls.style.paddingTop = '8px'
       calendarControls.style.paddingBottom = '7px'
       calendarControls.style.boxSizing = 'border-box'
-
-      const rect = hero.getBoundingClientRect()
-      hero.style.position = 'fixed'
-      hero.style.left = `${rect.left}px`
-      hero.style.width = `${rect.width}px`
-      hero.style.maxWidth = `${rect.width}px`
-      hero.style.borderRadius = '18px'
-
       calendarControls.style.position = 'sticky'
       calendarControls.style.left = ''
       calendarControls.style.width = ''
       calendarControls.style.maxWidth = ''
       calendarControls.style.margin = ''
       calendarControls.style.boxShadow = '0 5px 10px rgba(16,24,40,.035)'
+
       positionDesktop()
       styleToolbar()
     }
@@ -162,7 +160,7 @@ export default function ClubDiaryStickyHero() {
       ensureStickyAncestors()
       if (mobile.matches) {
         styleToolbar()
-      } else if (hero.style.position === 'fixed') {
+      } else if (hero.style.position === 'sticky') {
         positionDesktop()
       }
     }
