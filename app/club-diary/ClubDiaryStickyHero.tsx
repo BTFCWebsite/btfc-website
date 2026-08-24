@@ -17,6 +17,8 @@ export default function ClubDiaryStickyHero() {
       hero.style.top = ''
       hero.style.left = ''
       hero.style.width = ''
+      hero.style.maxWidth = ''
+      hero.style.boxSizing = ''
       hero.style.zIndex = ''
       hero.style.boxShadow = ''
       hero.style.borderRadius = ''
@@ -63,16 +65,13 @@ export default function ClubDiaryStickyHero() {
 
     const positionFixedHero = () => {
       if (!hero || hero.style.position !== 'fixed') return
-      const top = visibleSiteHeaderBottom()
-      hero.style.top = `${top}px`
+      hero.style.top = `${visibleSiteHeaderBottom()}px`
     }
 
     const apply = () => {
       if (!hero || !document.body.contains(hero)) findHero()
       if (!hero) return
 
-      // Measure in the normal page flow so the fixed hero keeps exactly the
-      // same width/alignment as the Club Diary content on every screen size.
       clearFixed()
       const rect = hero.getBoundingClientRect()
       const height = rect.height
@@ -80,11 +79,25 @@ export default function ClubDiaryStickyHero() {
 
       hero.style.position = 'fixed'
       hero.style.top = `${top}px`
-      hero.style.left = `${rect.left}px`
-      hero.style.width = `${rect.width}px`
       hero.style.zIndex = '250'
       hero.style.boxShadow = '0 12px 30px rgba(10,35,78,.30)'
-      hero.style.borderRadius = mobile.matches ? '0 0 16px 16px' : '18px'
+      hero.style.boxSizing = 'border-box'
+
+      if (mobile.matches) {
+        // The diary page has 10px horizontal padding on mobile. Pin the hero
+        // directly to the viewport rather than inheriting any accidental
+        // over-width from the page contents.
+        hero.style.left = '10px'
+        hero.style.width = 'calc(100vw - 20px)'
+        hero.style.maxWidth = 'calc(100vw - 20px)'
+        hero.style.borderRadius = '0 0 16px 16px'
+      } else {
+        hero.style.left = `${rect.left}px`
+        hero.style.width = `${rect.width}px`
+        hero.style.maxWidth = `${rect.width}px`
+        hero.style.borderRadius = '18px'
+      }
+
       if (spacer) spacer.style.height = `${height}px`
     }
 
