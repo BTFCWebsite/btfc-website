@@ -63,12 +63,63 @@ export default function ClubDiaryLayout({ children }: { children: ReactNode }) {
         color: #98a2b3 !important;
       }
 
+      /* Month tiles are deliberately summary-only. The whole tile opens the
+         individual detail, so an extra "View details" line is unnecessary. */
+      [data-month-details] {
+        display: none !important;
+      }
+
       @media (min-width: 761px) {
         [class*="ClubDiary_monthDay__"] {
           height: 158px !important;
           min-height: 158px !important;
           max-height: 158px !important;
           overflow: hidden !important;
+        }
+
+        [class*="ClubDiary_monthDay__"] [class*="ClubDiary_dayNumberRow__"] {
+          margin-bottom: 5px !important;
+        }
+
+        [class*="ClubDiary_monthDay__"] [class*="ClubDiary_calendarChip__"] {
+          min-height: 24px !important;
+          height: 24px !important;
+          margin: 0 0 3px !important;
+          padding: 3px 6px !important;
+          display: flex !important;
+          align-items: center !important;
+          overflow: hidden !important;
+        }
+
+        [class*="ClubDiary_monthDay__"] [class*="ClubDiary_calendarChip__"] strong {
+          display: block !important;
+          min-width: 0 !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+          white-space: nowrap !important;
+          font-size: 10.5px !important;
+          line-height: 1.1 !important;
+        }
+
+        [class*="ClubDiary_monthDay__"] [class*="ClubDiary_calendarChip__"] > span {
+          display: none !important;
+        }
+
+        [class*="ClubDiary_monthDay__"] [class*="ClubDiary_moreItems__"] {
+          display: inline-flex !important;
+          align-items: center !important;
+          min-height: 18px !important;
+          margin: 0 !important;
+          padding: 1px 4px !important;
+          border: 0 !important;
+          border-radius: 5px !important;
+          background: #eef2f6 !important;
+          color: #344054 !important;
+          font: inherit !important;
+          font-size: 9.5px !important;
+          line-height: 1 !important;
+          font-weight: 900 !important;
+          cursor: pointer !important;
         }
       }
 
