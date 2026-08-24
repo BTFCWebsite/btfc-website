@@ -3,6 +3,38 @@ import type { ReactNode } from 'react'
 export default function ClubDiaryLayout({ children }: { children: ReactNode }) {
   return <>
     <style dangerouslySetInnerHTML={{ __html: `
+      .clubDiaryBackRow {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px 16px 0;
+        background: #f2f4f7;
+      }
+
+      .clubDiaryBackLink {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        min-height: 40px;
+        padding: 8px 13px;
+        border: 1px solid #d0d5dd;
+        border-radius: 10px;
+        background: #fff;
+        color: #0b2f69;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 13px;
+        font-weight: 800;
+        line-height: 1;
+        text-decoration: none;
+        box-shadow: 0 2px 7px rgba(16, 24, 40, .05);
+      }
+
+      .clubDiaryBackLink:hover,
+      .clubDiaryBackLink:focus-visible {
+        background: #f8fafc;
+        outline: 2px solid #0b5fa5;
+        outline-offset: 2px;
+      }
+
       [class*="ClubDiary_dayNumber__"] {
         display: inline-block !important;
         width: auto !important;
@@ -36,6 +68,16 @@ export default function ClubDiaryLayout({ children }: { children: ReactNode }) {
         body {
           max-width: 100%;
           overflow-x: clip;
+        }
+
+        .clubDiaryBackRow {
+          padding: 8px 10px 0;
+        }
+
+        .clubDiaryBackLink {
+          min-height: 38px;
+          padding: 7px 11px;
+          font-size: 12px;
         }
 
         [class*="ClubDiary_page__"] {
@@ -94,6 +136,9 @@ export default function ClubDiaryLayout({ children }: { children: ReactNode }) {
         }
       }
     ` }} />
+    <div className="clubDiaryBackRow">
+      <a className="clubDiaryBackLink" href="/" aria-label="Back to Brimscombe and Thrupp FC home page">← Back to home</a>
+    </div>
     {children}
   </>
 }
