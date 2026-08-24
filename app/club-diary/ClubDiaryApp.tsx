@@ -483,14 +483,12 @@ export default function ClubDiaryApp() {
   }
 
   function renderDetailedItem(item: CalendarItem, date: string, key: string) {
-    const unavailable = unavailableOn(date)
     if (item.kind === 'fixture') {
       const fixture = item.fixture
       return <article className={`${styles.card} ${fixtureStyle(fixture.team)}`} key={key}>
         <p className={styles.kicker}>{fixtureLabel(fixture.team)}</p>
         <h3 className={styles.cardTitle}>{fixture.venue === 'Home' ? 'BTFC' : fixture.opponent} {resultText(fixture)} {fixture.venue === 'Home' ? fixture.opponent : 'BTFC'}</h3>
         <p className={styles.meta}>{fixture.venue} · {fixture.kickoff && fixture.kickoff !== 'TBC' ? fixture.kickoff : 'Time TBC'}{fixture.competition ? ` · ${fixture.competition}` : ''}</p>
-        {unavailable.length > 0 && <div className={styles.warning}>{unavailable.length >= 2 ? '⚠ Staffing check: ' : 'Unavailable: '}{unavailable.join(', ')}</div>}
       </article>
     }
     const diaryEvent = item.event
