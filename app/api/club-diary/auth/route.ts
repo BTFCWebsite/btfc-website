@@ -85,7 +85,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Choose your name from the list.' }, { status: 400 })
     }
     if (requestedRole === 'admin' && !person.isAdmin) {
-      return NextResponse.json({ error: 'That person does not have administrator access.' }, { status: 403 })
+      return NextResponse.json({ error: 'That person has a Standard login, not an Admin login.' }, { status: 403 })
+    }
+    if (requestedRole === 'member' && person.isAdmin) {
+      return NextResponse.json({ error: 'That person has an Admin login. Use Admin login instead.' }, { status: 403 })
     }
 
     if (person.hasPin) {
@@ -111,7 +114,7 @@ export async function POST(request: NextRequest) {
     if (!session) session = { role: requestedRole, personId: person.id, name: person.name }
   }
 
-  await writeDiaryAudit(session, 'login', 'session', session.personId, `Logged in with ${session.role === 'admin' ? 'Admin' : 'General'} access`)
+  await writeDiaryAudit(session, 'login', 'session', session.personId, `Logged in with ${session.role === 'admin' ? 'Admin' : 'Standard'} access`)
 
   const response = NextResponse.json({
     ok: true,
