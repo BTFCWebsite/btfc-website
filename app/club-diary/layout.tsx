@@ -3,30 +3,6 @@ import type { ReactNode } from 'react'
 export default function ClubDiaryLayout({ children }: { children: ReactNode }) {
   return <>
     <style dangerouslySetInnerHTML={{ __html: `
-      [class*="ClubDiary_calendarControls__"] {
-        position: sticky;
-        top: 82px;
-        z-index: 45;
-        margin: 12px -6px 0 !important;
-        padding: 8px 6px;
-        background: rgba(242, 244, 247, 0.96);
-        border-bottom: 1px solid rgba(208, 213, 221, 0.9);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-      }
-
-      [class*="ClubDiary_toolbar__"] {
-        position: sticky;
-        top: 145px;
-        z-index: 44;
-        margin: 0 -6px 10px !important;
-        padding: 7px 6px 8px !important;
-        background: rgba(242, 244, 247, 0.96);
-        box-shadow: 0 8px 14px rgba(16, 24, 40, 0.05);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-      }
-
       [class*="ClubDiary_dayNumber__"] {
         display: inline-block !important;
         width: auto !important;
@@ -56,16 +32,70 @@ export default function ClubDiaryLayout({ children }: { children: ReactNode }) {
       }
 
       @media (max-width: 760px) {
-        [class*="ClubDiary_calendarControls__"] {
-          top: 76px;
-          margin-left: -4px !important;
-          margin-right: -4px !important;
+        html,
+        body {
+          max-width: 100%;
+          overflow-x: clip;
+        }
+
+        [class*="ClubDiary_page__"] {
+          width: 100% !important;
+          max-width: 100vw !important;
+          box-sizing: border-box !important;
+          overflow-x: clip !important;
+        }
+
+        [class*="ClubDiary_shell__"],
+        [class*="ClubDiary_calendarControls__"],
+        [class*="ClubDiary_calendarNav__"],
+        [class*="ClubDiary_viewButtons__"],
+        [class*="ClubDiary_toolbar__"],
+        [class*="ClubDiary_calendarPanel__"],
+        [class*="ClubDiary_calendarScroller__"] {
+          min-width: 0 !important;
+          max-width: 100% !important;
+          box-sizing: border-box !important;
         }
 
         [class*="ClubDiary_toolbar__"] {
-          top: 181px;
-          margin-left: -4px !important;
-          margin-right: -4px !important;
+          position: static !important;
+          top: auto !important;
+          left: auto !important;
+          right: auto !important;
+          transform: none !important;
+          width: 100% !important;
+          margin-left: 0 !important;
+          margin-right: 0 !important;
+        }
+
+        [class*="ClubDiary_monthGrid__"] {
+          min-width: 0 !important;
+          width: 100% !important;
+          max-width: 100% !important;
+          grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+          box-sizing: border-box !important;
+        }
+
+        [class*="ClubDiary_calendarScroller__"]:has([class*="ClubDiary_monthGrid__"]) {
+          width: 100% !important;
+          max-width: 100% !important;
+          overflow-x: hidden !important;
+        }
+
+        [class*="ClubDiary_calendarScroller__"]:has([class*="ClubDiary_monthGrid__"]) [class*="ClubDiary_weekHeader__"] {
+          min-width: 0 !important;
+          width: 100% !important;
+          max-width: 100% !important;
+          grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+          box-sizing: border-box !important;
+        }
+
+        [class*="ClubDiary_monthDay__"],
+        [class*="ClubDiary_weekHeaderCell__"] {
+          min-width: 0 !important;
+          max-width: 100% !important;
+          box-sizing: border-box !important;
+          overflow: hidden;
         }
       }
     ` }} />
