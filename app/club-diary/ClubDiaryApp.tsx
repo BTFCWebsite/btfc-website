@@ -41,6 +41,7 @@ type Fixture = {
 type CalendarItem =
   | { kind: 'fixture'; fixture: Fixture }
   | { kind: 'diary'; event: DiaryEvent }
+type SelectedCalendarItem = { date: string; item: CalendarItem } | null
 
 const defaults: Record<TeamKey, { team: string; widgets: string[] }> = {
   first: { team: 'First XI', widgets: ['969980533'] },
@@ -180,6 +181,7 @@ export default function ClubDiaryApp() {
   const [filter, setFilter] = useState<Filter>('all')
   const [calendarView, setCalendarView] = useState<CalendarView>('month')
   const [anchorDate, setAnchorDate] = useState(today)
+  const [selectedItem, setSelectedItem] = useState<SelectedCalendarItem>(null)
   const [category, setCategory] = useState<Category>('unavailable')
   const [title, setTitle] = useState('')
   const [personName, setPersonName] = useState('')
@@ -364,6 +366,7 @@ export default function ClubDiaryApp() {
         return
       }
       setAdding(false)
+      setSelectedItem(null)
       resetForm()
       await refreshAll()
     } finally {
@@ -384,6 +387,8 @@ export default function ClubDiaryApp() {
       return
     }
     setEvents((current) => current.filter((item) => item._id !== event._id))
+    setSelectedItem(null)
+    setCalendarView('month')
   }
 
   async function shareInvite(event: DiaryEvent) {
@@ -432,26 +437,39 @@ export default function ClubDiaryApp() {
   }
 
   function navigate(direction: -1 | 1) {
+    setSelectedItem(null)
     if (calendarView === 'day') setAnchorDate(addDays(anchorDate, direction))
     else if (calendarView === 'week') setAnchorDate(addDays(anchorDate, direction * 7))
     else setAnchorDate(addMonths(anchorDate, direction))
   }
 
   function openDay(date: string) {
+    setSelectedItem(null)
     setAnchorDate(date)
     setCalendarView('day')
+  }
+
+  function openItem(date: string, item: CalendarItem) {
+    setSelectedItem({ date, item })
+    setAnchorDate(date)
+    setCalendarView('day')
+  }
+
+  function backToMonth() {
+    setSelectedItem(null)
+    setCalendarView('month')
   }
 
   function renderCalendarChip(item: CalendarItem, key: string, date: string) {
     if (item.kind === 'fixture') {
       const fixture = item.fixture
       const title = `${fixture.venue === 'Home' ? 'BTFC' : fixture.opponent} ${resultText(fixture)} ${fixture.venue === 'Home' ? fixture.opponent : 'BTFC'}`
-      return <button type="button" className={`${styles.calendarChip} ${fixtureChipStyle(fixture.team)}`} key={key} onClick={() => openDay(date)} title={`${fixtureLabel(fixture.team)} · ${title}`}>
+      return <button type="button" className={`${styles.calendarChip} ${fixtureChipStyle(fixture.team)}`} key={key} onClick={() => openItem(date, item)} title={`${fixtureLabel(fixture.team)} · ${title}`}>
         <strong>{title}</strong><span>{fixture.kickoff && fixture.kickoff !== 'TBC' ? fixture.kickoff : 'Time TBC'}</span>
       </button>
     }
     const event = item.event
-    return <button type="button" className={`${styles.calendarChip} ${eventChipStyle(event.category)}`} key={key} onClick={() => openDay(date)} title={`${labels[event.category]} · ${event.title}`}>
+    return <button type="button" className={`${styles.calendarChip} ${eventChipStyle(event.category)}`} key={key} onClick={() => openItem(date, item)} title={`${labels[event.category]} · ${event.title}`}>
       <strong>{event.title}</strong>{event.startTime && <span>{event.startTime}</span>}
     </button>
   }
@@ -560,28 +578,36 @@ export default function ClubDiaryApp() {
     <div className={styles.calendarControls}>
       <div className={styles.calendarNav}>
         <button className={styles.navButton} type="button" onClick={() => navigate(-1)} aria-label="Previous period">‹</button>
-        <button className={styles.todayButton} type="button" onClick={() => setAnchorDate(today)}>Today</button>
+        <button className={styles.todayButton} type="button" onClick={() => { setSelectedItem(null); setAnchorDate(today) }}>Today</button>
         <button className={styles.navButton} type="button" onClick={() => navigate(1)} aria-label="Next period">›</button>
         <div className={styles.calendarPeriod}>{periodLabel(calendarView, anchorDate)}</div>
       </div>
       <div className={styles.viewButtons} aria-label="Calendar view">
-        {(['day', 'week', 'month'] as CalendarView[]).map((view) => <button key={view} type="button" className={`${styles.viewButton} ${calendarView === view ? styles.viewActive : ''}`} onClick={() => setCalendarView(view)}>{view[0].toUpperCase() + view.slice(1)}</button>)}
+        {(['day', 'week', 'month'] as CalendarView[]).map((view) => <button key={view} type="button" className={`${styles.viewButton} ${calendarView === view ? styles.viewActive : ''}`} onClick={() => { setSelectedItem(null); setCalendarView(view) }}>{view[0].toUpperCase() + view.slice(1)}</button>)}
       </div>
     </div>
 
     <div className={styles.toolbar} aria-label="Diary filters">
-      {([['all','Everything'],['fixtures','Fixtures'],['availability','Availability'],['clubhouse','Clubhouse Events'],['workingParty','Working parties']] as [Filter,string][]).map(([value,label]) => <button key={value} type="button" className={`${styles.filterButton} ${filter === value ? styles.filterActive : ''}`} onClick={() => setFilter(value)}>{label}</button>)}
+      {([['all','Everything'],['fixtures','Fixtures'],['availability','Availability'],['clubhouse','Clubhouse Events'],['workingParty','Working parties']] as [Filter,string][]).map(([value,label]) => <button key={value} type="button" className={`${styles.filterButton} ${filter === value ? styles.filterActive : ''}`} onClick={() => { setSelectedItem(null); setFilter(value) }}>{label}</button>)}
     </div>
 
     {loading && <div className={styles.loading}>Updating diary and fixtures…</div>}
 
     {!loading && calendarView === 'day' && (() => {
       const dayItems = itemsForDate(anchorDate)
+      const selected = selectedItem?.date === anchorDate ? selectedItem.item : null
+      const visibleItems = selected ? [selected] : dayItems
       const unavailable = unavailableOn(anchorDate)
-      const homeFixture = dayItems.some((item) => item.kind === 'fixture' && item.fixture.venue === 'Home')
+      const homeFixture = visibleItems.some((item) => item.kind === 'fixture' && item.fixture.venue === 'Home')
       return <div className={styles.calendarPanel}><div className={styles.dayView}>
-        <div className={styles.dayViewHeader}><h2>{prettyDate(anchorDate)}</h2>{homeFixture && unavailable.length > 0 && <span className={styles.coverBadge}>Cover to check</span>}</div>
-        {dayItems.length === 0 ? <div className={styles.emptyCard}>Nothing in the diary for this day.</div> : dayItems.map((item, index) => renderDetailedItem(item, anchorDate, `${item.kind}-${index}`))}
+        <div className={styles.dayViewHeader}>
+          <h2>{prettyDate(anchorDate)}</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+            {homeFixture && unavailable.length > 0 && <span className={styles.coverBadge}>Cover to check</span>}
+            {selected && <button type="button" className={styles.secondaryButton} data-btfc-back-to-month="true" onClick={backToMonth}>← Back to month</button>}
+          </div>
+        </div>
+        {visibleItems.length === 0 ? <div className={styles.emptyCard}>Nothing in the diary for this day.</div> : visibleItems.map((item, index) => renderDetailedItem(item, anchorDate, `${item.kind}-${index}`))}
       </div></div>
     })()}
 
