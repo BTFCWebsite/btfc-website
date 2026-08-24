@@ -6,11 +6,17 @@ export default function ClubDiaryLogoutSync() {
   useEffect(() => {
     let loggingOut = false
 
+    const tidyAccessButtons = () => {
+      for (const button of Array.from(document.querySelectorAll<HTMLButtonElement>('button'))) {
+        if (button.textContent?.trim() === 'Switch access') button.style.display = 'none'
+      }
+    }
+
     const handleLogout = (event: MouseEvent) => {
       const target = event.target as HTMLElement | null
       const button = target?.closest('button')
       const label = button?.textContent?.trim()
-      if (label !== 'Log out' && label !== 'Switch access') return
+      if (label !== 'Log out') return
 
       event.preventDefault()
       event.stopPropagation()
@@ -22,8 +28,15 @@ export default function ClubDiaryLogoutSync() {
         .finally(() => window.location.replace('/club-diary'))
     }
 
+    tidyAccessButtons()
+    const observer = new MutationObserver(tidyAccessButtons)
+    observer.observe(document.body, { childList: true, subtree: true })
     document.addEventListener('click', handleLogout, true)
-    return () => document.removeEventListener('click', handleLogout, true)
+
+    return () => {
+      observer.disconnect()
+      document.removeEventListener('click', handleLogout, true)
+    }
   }, [])
 
   return null
