@@ -137,12 +137,11 @@ export default function ClubDiaryStickyHero() {
 
       if (mobile.matches) {
         if (shell && calendarControls) {
-          const heroHeight = Math.ceil(hero.getBoundingClientRect().height)
           const controlsHeight = Math.ceil(calendarControls.getBoundingClientRect().height)
-          // Hero and calendar controls are both fixed on phones. Reserve exactly
-          // their combined height once so the filter row and calendar begin below
-          // them in normal document flow, with no overlap or oversized blank band.
-          shell.style.paddingTop = `${heroHeight + controlsHeight + 8}px`
+          // The hero is fixed but must not be reserved again in the document
+          // flow. Reserve only the controls that are also removed from flow;
+          // this mirrors the desktop fix and removes the large opening gap.
+          shell.style.paddingTop = `${controlsHeight + 8}px`
         }
         if (toolbar) toolbar.style.top = ''
       } else {
