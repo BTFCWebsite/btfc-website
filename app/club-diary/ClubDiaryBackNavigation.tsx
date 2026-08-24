@@ -7,6 +7,41 @@ export default function ClubDiaryBackNavigation() {
     const desktop = window.matchMedia('(min-width: 901px)')
     let observer: MutationObserver | null = null
     let timer: ReturnType<typeof setTimeout> | null = null
+    let returnScrollY = 0
+
+    const scrollAfterRender = (top: number) => {
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          window.scrollTo({ top: Math.max(0, top), left: 0, behavior: 'auto' })
+        })
+      })
+    }
+
+    const onNavigationCapture = (event: MouseEvent) => {
+      const target = event.target instanceof Element ? event.target : null
+      if (!target) return
+
+      const backToMonth = target.closest('[data-btfc-back-to-month]')
+      if (backToMonth) {
+        scrollAfterRender(returnScrollY)
+        return
+      }
+
+      const calendarCell = target.closest('[class*="monthDay"], [class*="weekDay"]')
+      if (!calendarCell) return
+
+      const item = target.closest('[class*="calendarChip"]')
+      const dayNumber = target.closest('[class*="dayNumber"]')
+      if (!item && !dayNumber) return
+
+      // Month/Week can be much taller than an individual Day/detail view. If the
+      // browser keeps the old scrollY when React swaps to the shorter view, the
+      // detail ends up above the viewport and the page appears blank. Remember
+      // the month position for Back, then put the new detail at the top after
+      // React has committed the view change.
+      returnScrollY = window.scrollY
+      scrollAfterRender(0)
+    }
 
     const sync = () => {
       const backRow = document.querySelector<HTMLElement>('.clubDiaryBackRow')
@@ -76,10 +111,9 @@ export default function ClubDiaryBackNavigation() {
         }
       }
 
-      // A normal Day view gets a direct route back to Month. When an individual
-      // item is open, the existing Back to day control takes priority.
+      // A normal Day view gets a direct route back to Month. Individual-item
+      // detail already renders its own Back to month button in React.
       const dayHeader = document.querySelector<HTMLElement>('[class*="dayViewHeader"]')
-      const backToDay = dayHeader?.querySelector<HTMLElement>('[data-btfc-back-to-day]') || null
       let backToMonth = dayHeader?.querySelector<HTMLButtonElement>('[data-btfc-back-to-month]') || null
 
       if (dayHeader && !backToMonth) {
@@ -93,8 +127,6 @@ export default function ClubDiaryBackNavigation() {
           dayHeader.appendChild(backToMonth)
         }
       }
-
-      if (backToMonth) backToMonth.style.display = backToDay ? 'none' : ''
     }
 
     const queueSync = () => {
@@ -104,6 +136,7 @@ export default function ClubDiaryBackNavigation() {
 
     sync()
     desktop.addEventListener('change', sync)
+    document.addEventListener('click', onNavigationCapture, true)
     observer = new MutationObserver(queueSync)
     observer.observe(document.body, { childList: true, subtree: true })
 
@@ -111,6 +144,7 @@ export default function ClubDiaryBackNavigation() {
       if (timer) clearTimeout(timer)
       observer?.disconnect()
       desktop.removeEventListener('change', sync)
+      document.removeEventListener('click', onNavigationCapture, true)
       document.querySelector<HTMLElement>('.clubDiaryBackRow')?.style.removeProperty('display')
       document.querySelector<HTMLElement>('[data-btfc-hero-back]')?.remove()
       document.querySelector<HTMLElement>('[data-btfc-back-to-month]')?.remove()
