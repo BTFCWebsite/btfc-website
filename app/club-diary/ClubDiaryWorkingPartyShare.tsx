@@ -32,8 +32,8 @@ function inviteMessage(event: WorkingParty, url: string) {
   return lines.join('\n')
 }
 
-function buttonStyle(primary = false) {
-  return Object.assign(document.createElement('a').style, {
+function buttonStyle(primary = false): Partial<CSSStyleDeclaration> {
+  return {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -49,7 +49,7 @@ function buttonStyle(primary = false) {
     textDecoration: 'none',
     cursor: 'pointer',
     boxSizing: 'border-box',
-  })
+  }
 }
 
 export default function ClubDiaryWorkingPartyShare() {
