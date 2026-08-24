@@ -5,6 +5,7 @@ import ClubDiaryLogoutSync from './ClubDiaryLogoutSync'
 import ClubDiaryMonthDetails from './ClubDiaryMonthDetails'
 import ClubDiaryWorkingPartyShare from './ClubDiaryWorkingPartyShare'
 import ClubDiaryDeleteFeedback from './ClubDiaryDeleteFeedback'
+import ClubDiaryHeroControls from './ClubDiaryHeroControls'
 
 export const metadata: Metadata = {
   title: 'Club Diary | Brimscombe & Thrupp FC',
@@ -20,5 +21,6 @@ export default function ClubDiaryPage() {
     <ClubDiaryMonthDetails />
     <ClubDiaryWorkingPartyShare />
     <ClubDiaryDeleteFeedback />
+    <ClubDiaryHeroControls />
   </>
 }
