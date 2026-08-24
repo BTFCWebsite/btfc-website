@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic'
 
 function responseFor(role: DiaryRole, people: Awaited<ReturnType<typeof loadDiaryPeople>>) {
   const eligible = people
-    .filter((person) => role === 'member' || person.isAdmin)
+    .filter((person) => role === 'admin' ? person.isAdmin : !person.isAdmin)
     .map((person) => ({ id: person.id, name: person.name, hasPin: person.hasPin }))
 
   return NextResponse.json({
