@@ -16,6 +16,7 @@ type Invite = {
   counts?: { yes: number; maybe: number; no: number }
   error?: string
 }
+type PersonOption = { id: string; name: string }
 
 function prettyDate(value = '') {
   const date = new Date(`${value}T12:00:00`)
@@ -27,6 +28,9 @@ export default function WorkingPartyRsvpPage() {
   const params = useParams<{ code: string }>()
   const code = useMemo(() => String(params?.code || ''), [params])
   const [invite, setInvite] = useState<Invite | null>(null)
+  const [people, setPeople] = useState<PersonOption[]>([])
+  const [namesLoading, setNamesLoading] = useState(true)
+  const [namesError, setNamesError] = useState('')
   const [name, setName] = useState('')
   const [choice, setChoice] = useState<ResponseValue | ''>('')
   const [saving, setSaving] = useState(false)
@@ -36,6 +40,7 @@ export default function WorkingPartyRsvpPage() {
   useEffect(() => {
     if (!code) return
     void loadInvite()
+    void loadNames()
   }, [code])
 
   async function loadInvite() {
@@ -49,10 +54,49 @@ export default function WorkingPartyRsvpPage() {
     setInvite(data)
   }
 
+  async function loadNames() {
+    setNamesLoading(true)
+    setNamesError('')
+    try {
+      const [standardResponse, adminResponse] = await Promise.all([
+        fetch('/api/club-diary/people/options?role=member', { cache: 'no-store' }),
+        fetch('/api/club-diary/people/options?role=admin', { cache: 'no-store' }),
+      ])
+      const [standardData, adminData] = await Promise.all([
+        standardResponse.json().catch(() => ({})),
+        adminResponse.json().catch(() => ({})),
+      ])
+      if (!standardResponse.ok || !adminResponse.ok) {
+        setPeople([])
+        setNamesError('Unable to load the club names. Please try again shortly.')
+        return
+      }
+
+      const combined = [
+        ...(Array.isArray(standardData?.people) ? standardData.people : []),
+        ...(Array.isArray(adminData?.people) ? adminData.people : []),
+      ] as PersonOption[]
+      const unique = combined
+        .filter((person) => person?.name)
+        .filter((person, index, all) => all.findIndex((other) => other.name.trim().toLowerCase() === person.name.trim().toLowerCase()) === index)
+        .sort((a, b) => a.name.localeCompare(b.name, 'en-GB'))
+      setPeople(unique)
+    } catch {
+      setPeople([])
+      setNamesError('Unable to load the club names. Please try again shortly.')
+    } finally {
+      setNamesLoading(false)
+    }
+  }
+
   async function submit(event: FormEvent) {
     event.preventDefault()
     setError('')
     setSaved(false)
+    if (!name) {
+      setError('Please select your name.')
+      return
+    }
     if (!choice) {
       setError('Please choose Going, Maybe or Can’t make it.')
       return
@@ -109,10 +153,14 @@ export default function WorkingPartyRsvpPage() {
 
       <form onSubmit={submit} style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: 24, boxShadow: '0 5px 18px rgba(4,27,95,.06)' }}>
         <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 27, color: '#2D2D2D', margin: '0 0 6px' }}>Can you help?</h2>
-        <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 12, color: '#6B7280', lineHeight: 1.6, margin: '0 0 18px' }}>Just add your name and tap one option. No login or club PIN is needed.</p>
+        <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 12, color: '#6B7280', lineHeight: 1.6, margin: '0 0 18px' }}>Select your name and tap one option. No login or club PIN is needed.</p>
 
         <label htmlFor="rsvp-name" style={{ display: 'block', fontFamily: "'Montserrat', sans-serif", fontSize: 11, fontWeight: 800, color: '#374151', marginBottom: 6 }}>Your name</label>
-        <input id="rsvp-name" value={name} onChange={(e) => setName(e.target.value)} required maxLength={100} autoComplete="name" style={{ width: '100%', boxSizing: 'border-box', minHeight: 46, padding: '10px 12px', border: '1px solid #CBD5E1', borderRadius: 7, fontFamily: "'Montserrat', sans-serif", fontSize: 15, marginBottom: 16 }} />
+        <select id="rsvp-name" value={name} onChange={(e) => setName(e.target.value)} required disabled={namesLoading || people.length === 0} style={{ width: '100%', boxSizing: 'border-box', minHeight: 46, padding: '10px 12px', border: '1px solid #CBD5E1', borderRadius: 7, background: '#fff', fontFamily: "'Montserrat', sans-serif", fontSize: 15, marginBottom: 16 }}>
+          <option value="">{namesLoading ? 'Loading names…' : 'Select your name'}</option>
+          {people.map((person) => <option key={person.id} value={person.name}>{person.name}</option>)}
+        </select>
+        {namesError && <div style={{ background: '#FFF7ED', border: '1px solid #FED7AA', color: '#9A3412', borderRadius: 7, padding: '10px 12px', fontFamily: "'Montserrat', sans-serif", fontSize: 12, margin: '-4px 0 16px' }}>{namesError}</div>}
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0,1fr))', gap: 8, marginBottom: 16 }}>
           {([
@@ -127,7 +175,7 @@ export default function WorkingPartyRsvpPage() {
         {error && <div style={{ background: '#FFF1F2', border: '1px solid #FECDD3', color: '#9F1239', borderRadius: 7, padding: '10px 12px', fontFamily: "'Montserrat', sans-serif", fontSize: 12, marginBottom: 12 }}>{error}</div>}
         {saved && <div style={{ background: '#ECFDF5', border: '1px solid #A7F3D0', color: '#065F46', borderRadius: 7, padding: '10px 12px', fontFamily: "'Montserrat', sans-serif", fontSize: 12, marginBottom: 12 }}>Thanks — your response has been saved. You can come back to this link and change it later.</div>}
 
-        <button type="submit" disabled={saving} style={{ width: '100%', minHeight: 48, border: 0, borderRadius: 7, background: '#1149D8', color: '#fff', fontFamily: "'Barlow Condensed', sans-serif", fontSize: 18, fontWeight: 800, cursor: saving ? 'default' : 'pointer', opacity: saving ? .7 : 1 }}>{saving ? 'Saving…' : 'Send my response'}</button>
+        <button type="submit" disabled={saving || namesLoading || people.length === 0} style={{ width: '100%', minHeight: 48, border: 0, borderRadius: 7, background: '#1149D8', color: '#fff', fontFamily: "'Barlow Condensed', sans-serif", fontSize: 18, fontWeight: 800, cursor: saving || namesLoading || people.length === 0 ? 'default' : 'pointer', opacity: saving || namesLoading || people.length === 0 ? .7 : 1 }}>{saving ? 'Saving…' : 'Send my response'}</button>
 
         <div style={{ marginTop: 18, borderTop: '1px solid #EEF2F7', paddingTop: 14, fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: '#6B7280', lineHeight: 1.6 }}>
           <strong style={{ color: '#374151' }}>{counts.yes} going</strong>{event.targetHelpers ? ` / ${event.targetHelpers} helpers wanted` : ''} · {counts.maybe} maybe
