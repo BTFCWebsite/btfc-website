@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import ClubDiaryPreGate from './ClubDiaryPreGate'
 import ClubDiarySecurityTools from './ClubDiarySecurityTools'
 import ClubDiaryLogoutSync from './ClubDiaryLogoutSync'
+import ClubDiaryMonthDetails from './ClubDiaryMonthDetails'
 
 export const metadata: Metadata = {
   title: 'Club Diary | Brimscombe & Thrupp FC',
@@ -14,5 +15,6 @@ export default function ClubDiaryPage() {
     <ClubDiaryPreGate />
     <ClubDiarySecurityTools />
     <ClubDiaryLogoutSync />
+    <ClubDiaryMonthDetails />
   </>
 }
