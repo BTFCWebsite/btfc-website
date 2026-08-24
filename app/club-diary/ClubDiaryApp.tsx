@@ -456,6 +456,14 @@ export default function ClubDiaryApp() {
     </button>
   }
 
+  function renderUnavailableSummary(date: string, names: string[]) {
+    if (!names.length) return null
+    const count = names.length
+    return <button type="button" className={`${styles.calendarChip} ${styles.chipUnavailable}`} onClick={() => openDay(date)} title={`Unavailable: ${names.join(', ')}`}>
+      <strong>Unavailable</strong><span>{count} {count === 1 ? 'person' : 'people'}</span>
+    </button>
+  }
+
   function renderDetailedItem(item: CalendarItem, date: string, key: string) {
     const unavailable = unavailableOn(date)
     if (item.kind === 'fixture') {
@@ -595,11 +603,17 @@ export default function ClubDiaryApp() {
       <div className={styles.monthGrid}>{monthDates.map((date) => {
         const dayItems = itemsForDate(date)
         const inMonth = dateFromIso(date).getMonth() === anchorMonth
-        const visibleItems = dayItems.slice(0, 4)
+        const showUnavailable = filter === 'all' || filter === 'availability'
+        const unavailableNames = showUnavailable ? unavailableOn(date) : []
+        const otherItems = dayItems.filter((item) => !(item.kind === 'diary' && item.event.category === 'unavailable'))
+        const maxRows = 4
+        const visibleItems = otherItems.slice(0, Math.max(0, maxRows - (unavailableNames.length ? 1 : 0)))
+        const hiddenOtherCount = Math.max(0, otherItems.length - visibleItems.length)
         return <div className={`${styles.monthDay} ${!inMonth ? styles.outsideMonth : ''}`} key={date}>
           <div className={styles.dayNumberRow}><button type="button" className={`${styles.dayNumber} ${date === today ? styles.todayNumber : ''}`} onClick={() => openDay(date)}>{dateFromIso(date).getDate()}</button></div>
+          {renderUnavailableSummary(date, unavailableNames)}
           {visibleItems.map((item, index) => renderCalendarChip(item, `${date}-${item.kind}-${index}`, date))}
-          {dayItems.length > visibleItems.length && <button type="button" className={styles.moreItems} onClick={() => openDay(date)}>+ {dayItems.length - visibleItems.length} more</button>}
+          {hiddenOtherCount > 0 && <button type="button" className={styles.moreItems} onClick={() => openDay(date)}>+ {hiddenOtherCount} more</button>}
         </div>
       })}</div>
     </div></div>}
