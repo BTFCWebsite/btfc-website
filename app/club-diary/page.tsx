@@ -3,6 +3,7 @@ import ClubDiaryPreGate from './ClubDiaryPreGate'
 import ClubDiarySecurityTools from './ClubDiarySecurityTools'
 import ClubDiaryLogoutSync from './ClubDiaryLogoutSync'
 import ClubDiaryMonthDetails from './ClubDiaryMonthDetails'
+import ClubDiarySingleItemDetail from './ClubDiarySingleItemDetail'
 import ClubDiaryWorkingPartyShare from './ClubDiaryWorkingPartyShare'
 import ClubDiaryDeleteFeedback from './ClubDiaryDeleteFeedback'
 import ClubDiaryHeroControls from './ClubDiaryHeroControls'
@@ -20,6 +21,7 @@ export default function ClubDiaryPage() {
     <ClubDiarySecurityTools />
     <ClubDiaryLogoutSync />
     <ClubDiaryMonthDetails />
+    <ClubDiarySingleItemDetail />
     <ClubDiaryWorkingPartyShare />
     <ClubDiaryDeleteFeedback />
     <ClubDiaryHeroControls />
