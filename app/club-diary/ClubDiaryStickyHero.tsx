@@ -43,15 +43,9 @@ export default function ClubDiaryStickyHero() {
 
     const resetToolbar = () => {
       if (!toolbar) return
-      toolbar.style.position = ''
-      toolbar.style.top = ''
-      toolbar.style.zIndex = ''
-      toolbar.style.background = ''
-      toolbar.style.marginTop = ''
-      toolbar.style.marginBottom = ''
-      toolbar.style.paddingTop = ''
-      toolbar.style.paddingBottom = ''
-      toolbar.style.boxShadow = ''
+      for (const property of ['position', 'top', 'right', 'bottom', 'left', 'inset', 'z-index', 'transform', 'background', 'margin-top', 'margin-bottom', 'padding-top', 'padding-bottom', 'box-shadow']) {
+        toolbar.style.removeProperty(property)
+      }
     }
 
     const ensureStickyAncestors = () => {
@@ -93,9 +87,19 @@ export default function ClubDiaryStickyHero() {
       toolbar.style.paddingBottom = '7px'
 
       if (mobile.matches) {
-        toolbar.style.position = 'relative'
-        toolbar.style.top = ''
-        toolbar.style.zIndex = ''
+        // The filter/category strip must stay in its actual DOM position between
+        // the calendar controls and the calendar. Use !important here because
+        // older enhancement code and Safari can otherwise leave a sticky/fixed
+        // position behind after a re-render, which reserves a blank gap and then
+        // paints the filters over the calendar.
+        toolbar.style.setProperty('position', 'static', 'important')
+        toolbar.style.setProperty('top', 'auto', 'important')
+        toolbar.style.setProperty('right', 'auto', 'important')
+        toolbar.style.setProperty('bottom', 'auto', 'important')
+        toolbar.style.setProperty('left', 'auto', 'important')
+        toolbar.style.setProperty('inset', 'auto', 'important')
+        toolbar.style.setProperty('z-index', 'auto', 'important')
+        toolbar.style.setProperty('transform', 'none', 'important')
         toolbar.style.boxShadow = ''
       } else {
         toolbar.style.position = 'sticky'
@@ -135,7 +139,7 @@ export default function ClubDiaryStickyHero() {
 
       if (mobile.matches) {
         // Both sticky elements remain in normal flow, so no manual spacer is
-        // needed and the category row/calendar cannot slide underneath them.
+        // needed. The categories remain static directly below these controls.
         hero.style.position = 'sticky'
         hero.style.top = '0px'
         hero.style.left = ''
@@ -175,6 +179,7 @@ export default function ClubDiaryStickyHero() {
       ensureStickyAncestors()
       if (mobile.matches) {
         calendarControls.style.top = `${Math.ceil(hero.getBoundingClientRect().height)}px`
+        styleToolbar()
       } else if (hero.style.position === 'fixed') {
         positionDesktop()
       }
@@ -198,9 +203,12 @@ export default function ClubDiaryStickyHero() {
     observer = new MutationObserver(() => {
       if (!hero || !document.body.contains(hero) || !calendarControls || !document.body.contains(calendarControls)) {
         queueApply()
-      } else {
-        ensureStickyAncestors()
+        return
       }
+      ensureStickyAncestors()
+      // Reassert the mobile toolbar flow after React/calendar mutations.
+      if (!toolbar || !document.body.contains(toolbar)) toolbar = document.querySelector<HTMLElement>('[class*="toolbar"]')
+      styleToolbar()
     })
     observer.observe(document.body, { childList: true, subtree: true })
 
