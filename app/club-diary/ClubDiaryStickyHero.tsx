@@ -72,14 +72,25 @@ export default function ClubDiaryStickyHero() {
       }
 
       if (toolbar) {
-        toolbar.style.position = 'sticky'
-        toolbar.style.zIndex = '235'
         toolbar.style.background = '#f2f4f7'
         toolbar.style.marginTop = '0'
         toolbar.style.marginBottom = '10px'
         toolbar.style.paddingTop = '6px'
         toolbar.style.paddingBottom = '7px'
-        toolbar.style.boxShadow = '0 7px 12px rgba(16,24,40,.035)'
+
+        if (mobile.matches) {
+          // On phones the category/filter row should remain part of the normal
+          // document flow. Keeping it sticky creates a tall fixed stack that
+          // covers the top rows of the calendar.
+          toolbar.style.position = 'relative'
+          toolbar.style.top = ''
+          toolbar.style.zIndex = ''
+          toolbar.style.boxShadow = ''
+        } else {
+          toolbar.style.position = 'sticky'
+          toolbar.style.zIndex = '235'
+          toolbar.style.boxShadow = '0 7px 12px rgba(16,24,40,.035)'
+        }
       }
     }
 
@@ -93,8 +104,12 @@ export default function ClubDiaryStickyHero() {
       if (calendarControls) calendarControls.style.top = `${heroBottom}px`
 
       if (toolbar) {
-        const controlsHeight = calendarControls?.getBoundingClientRect().height || 0
-        toolbar.style.top = `${heroBottom + Math.ceil(controlsHeight)}px`
+        if (mobile.matches) {
+          toolbar.style.top = ''
+        } else {
+          const controlsHeight = calendarControls?.getBoundingClientRect().height || 0
+          toolbar.style.top = `${heroBottom + Math.ceil(controlsHeight)}px`
+        }
       }
     }
 
@@ -151,9 +166,8 @@ export default function ClubDiaryStickyHero() {
         hero.style.borderRadius = '18px'
       }
 
-      // Do not reserve a second hero-height spacer. The sticky control rows
-      // immediately below the fixed hero keep the diary content correctly
-      // positioned on both desktop and mobile without a blank opening band.
+      // Do not reserve a second hero-height spacer. The sticky calendar
+      // controls sit directly beneath the fixed hero without a blank band.
       findStickyRows()
       positionStickyRows()
     }
