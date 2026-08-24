@@ -78,6 +78,11 @@ export default function ClubDiaryStickyHero() {
       toolbar = document.querySelector<HTMLElement>('[class*="toolbar"]')
     }
 
+    const mobileToolbarTop = () => {
+      if (!hero || !calendarControls) return 0
+      return Math.ceil(hero.getBoundingClientRect().height + calendarControls.getBoundingClientRect().height)
+    }
+
     const styleToolbar = () => {
       if (!toolbar) return
       toolbar.style.background = '#f2f4f7'
@@ -87,20 +92,19 @@ export default function ClubDiaryStickyHero() {
       toolbar.style.paddingBottom = '7px'
 
       if (mobile.matches) {
-        // The filter/category strip must stay in its actual DOM position between
-        // the calendar controls and the calendar. Use !important here because
-        // older enhancement code and Safari can otherwise leave a sticky/fixed
-        // position behind after a re-render, which reserves a blank gap and then
-        // paints the filters over the calendar.
-        toolbar.style.setProperty('position', 'static', 'important')
-        toolbar.style.setProperty('top', 'auto', 'important')
+        // Keep the category/filter strip as the third item in the mobile sticky
+        // stack: hero, calendar controls, then categories. The top value is
+        // calculated from the live heights so it still works when Safari wraps
+        // the controls onto two rows or the text size changes.
+        toolbar.style.setProperty('position', 'sticky', 'important')
+        toolbar.style.setProperty('top', `${mobileToolbarTop()}px`, 'important')
         toolbar.style.setProperty('right', 'auto', 'important')
         toolbar.style.setProperty('bottom', 'auto', 'important')
         toolbar.style.setProperty('left', 'auto', 'important')
-        toolbar.style.setProperty('inset', 'auto', 'important')
-        toolbar.style.setProperty('z-index', 'auto', 'important')
+        toolbar.style.removeProperty('inset')
+        toolbar.style.setProperty('z-index', '230', 'important')
         toolbar.style.setProperty('transform', 'none', 'important')
-        toolbar.style.boxShadow = ''
+        toolbar.style.boxShadow = '0 8px 14px rgba(16,24,40,.08)'
       } else {
         toolbar.style.position = 'sticky'
         toolbar.style.zIndex = '235'
@@ -138,8 +142,8 @@ export default function ClubDiaryStickyHero() {
       calendarControls.style.boxSizing = 'border-box'
 
       if (mobile.matches) {
-        // Both sticky elements remain in normal flow, so no manual spacer is
-        // needed. The categories remain static directly below these controls.
+        // All three mobile header rows stay in normal document flow while also
+        // sticking to the top, so the calendar never slides underneath them.
         hero.style.position = 'sticky'
         hero.style.top = '0px'
         hero.style.left = ''
@@ -206,7 +210,6 @@ export default function ClubDiaryStickyHero() {
         return
       }
       ensureStickyAncestors()
-      // Reassert the mobile toolbar flow after React/calendar mutations.
       if (!toolbar || !document.body.contains(toolbar)) toolbar = document.querySelector<HTMLElement>('[class*="toolbar"]')
       styleToolbar()
     })
