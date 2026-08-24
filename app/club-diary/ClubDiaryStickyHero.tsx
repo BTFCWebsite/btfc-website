@@ -52,9 +52,6 @@ export default function ClubDiaryStickyHero() {
       if (!mobile.matches) return
       const shell = hero?.closest<HTMLElement>('[class*="shell"]') || null
       const page = shell?.closest<HTMLElement>('[class*="page"]') || null
-      // overflow-x:hidden creates a scroll container on Safari and prevents
-      // sticky descendants from sticking to the viewport. clip prevents side
-      // overflow without becoming a scrolling ancestor.
       document.documentElement.style.overflowX = 'clip'
       document.body.style.overflowX = 'clip'
       if (page) page.style.overflowX = 'clip'
@@ -78,11 +75,6 @@ export default function ClubDiaryStickyHero() {
       toolbar = document.querySelector<HTMLElement>('[class*="toolbar"]')
     }
 
-    const mobileToolbarTop = () => {
-      if (!hero || !calendarControls) return 0
-      return Math.ceil(hero.getBoundingClientRect().height + calendarControls.getBoundingClientRect().height)
-    }
-
     const styleToolbar = () => {
       if (!toolbar) return
       toolbar.style.background = '#f2f4f7'
@@ -92,19 +84,18 @@ export default function ClubDiaryStickyHero() {
       toolbar.style.paddingBottom = '7px'
 
       if (mobile.matches) {
-        // Keep the category/filter strip as the third item in the mobile sticky
-        // stack: hero, calendar controls, then categories. The top value is
-        // calculated from the live heights so it still works when Safari wraps
-        // the controls onto two rows or the text size changes.
+        // Mobile uses one small sticky element only: the category/filter strip.
+        // The large Club Diary hero and calendar navigation scroll away normally,
+        // leaving almost the full screen available for the calendar.
         toolbar.style.setProperty('position', 'sticky', 'important')
-        toolbar.style.setProperty('top', `${mobileToolbarTop()}px`, 'important')
+        toolbar.style.setProperty('top', '0px', 'important')
         toolbar.style.setProperty('right', 'auto', 'important')
         toolbar.style.setProperty('bottom', 'auto', 'important')
         toolbar.style.setProperty('left', 'auto', 'important')
-        toolbar.style.removeProperty('inset')
-        toolbar.style.setProperty('z-index', '230', 'important')
+        toolbar.style.setProperty('inset', 'auto', 'important')
+        toolbar.style.setProperty('z-index', '300', 'important')
         toolbar.style.setProperty('transform', 'none', 'important')
-        toolbar.style.boxShadow = '0 8px 14px rgba(16,24,40,.08)'
+        toolbar.style.boxShadow = '0 7px 14px rgba(16,24,40,.10)'
       } else {
         toolbar.style.position = 'sticky'
         toolbar.style.zIndex = '235'
@@ -131,6 +122,14 @@ export default function ClubDiaryStickyHero() {
       resetToolbar()
       ensureStickyAncestors()
 
+      if (mobile.matches) {
+        // Deliberately do NOT make the hero or calendar controls sticky on mobile.
+        // Stacking those large sections consumed most of the iPhone viewport and
+        // could cover the filter strip. Only the compact filters remain sticky.
+        styleToolbar()
+        return
+      }
+
       hero.style.zIndex = '250'
       hero.style.boxSizing = 'border-box'
       hero.style.boxShadow = '0 12px 30px rgba(10,35,78,.30)'
@@ -141,40 +140,20 @@ export default function ClubDiaryStickyHero() {
       calendarControls.style.paddingBottom = '7px'
       calendarControls.style.boxSizing = 'border-box'
 
-      if (mobile.matches) {
-        // All three mobile header rows stay in normal document flow while also
-        // sticking to the top, so the calendar never slides underneath them.
-        hero.style.position = 'sticky'
-        hero.style.top = '0px'
-        hero.style.left = ''
-        hero.style.width = '100%'
-        hero.style.maxWidth = '100%'
-        hero.style.borderRadius = '0 0 16px 16px'
+      const rect = hero.getBoundingClientRect()
+      hero.style.position = 'fixed'
+      hero.style.left = `${rect.left}px`
+      hero.style.width = `${rect.width}px`
+      hero.style.maxWidth = `${rect.width}px`
+      hero.style.borderRadius = '18px'
 
-        calendarControls.style.position = 'sticky'
-        calendarControls.style.top = `${Math.ceil(hero.getBoundingClientRect().height)}px`
-        calendarControls.style.left = ''
-        calendarControls.style.width = '100%'
-        calendarControls.style.maxWidth = '100%'
-        calendarControls.style.margin = '0'
-        calendarControls.style.boxShadow = '0 8px 14px rgba(16,24,40,.08)'
-      } else {
-        const rect = hero.getBoundingClientRect()
-        hero.style.position = 'fixed'
-        hero.style.left = `${rect.left}px`
-        hero.style.width = `${rect.width}px`
-        hero.style.maxWidth = `${rect.width}px`
-        hero.style.borderRadius = '18px'
-
-        calendarControls.style.position = 'sticky'
-        calendarControls.style.left = ''
-        calendarControls.style.width = ''
-        calendarControls.style.maxWidth = ''
-        calendarControls.style.margin = ''
-        calendarControls.style.boxShadow = '0 5px 10px rgba(16,24,40,.035)'
-        positionDesktop()
-      }
-
+      calendarControls.style.position = 'sticky'
+      calendarControls.style.left = ''
+      calendarControls.style.width = ''
+      calendarControls.style.maxWidth = ''
+      calendarControls.style.margin = ''
+      calendarControls.style.boxShadow = '0 5px 10px rgba(16,24,40,.035)'
+      positionDesktop()
       styleToolbar()
     }
 
@@ -182,7 +161,6 @@ export default function ClubDiaryStickyHero() {
       if (!hero || !calendarControls) return
       ensureStickyAncestors()
       if (mobile.matches) {
-        calendarControls.style.top = `${Math.ceil(hero.getBoundingClientRect().height)}px`
         styleToolbar()
       } else if (hero.style.position === 'fixed') {
         positionDesktop()
