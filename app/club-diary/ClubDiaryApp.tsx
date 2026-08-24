@@ -50,7 +50,7 @@ const defaults: Record<TeamKey, { team: string; widgets: string[] }> = {
 
 const labels: Record<Category, string> = {
   unavailable: 'Holiday / unavailable',
-  clubhouse: 'Clubhouse booking',
+  clubhouse: 'Clubhouse Event',
   workingParty: 'Working party',
   event: 'Club event',
   meeting: 'Meeting',
@@ -117,12 +117,9 @@ function periodLabel(view: CalendarView, anchor: string) {
   const date = dateFromIso(anchor)
   if (view === 'day') return date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
   if (view === 'month') return date.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })
-
   const start = dateFromIso(mondayOf(anchor))
   const end = dateFromIso(addDays(isoFromDate(start), 6))
-  if (start.getMonth() === end.getMonth()) {
-    return `${start.getDate()}–${end.getDate()} ${end.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}`
-  }
+  if (start.getMonth() === end.getMonth()) return `${start.getDate()}–${end.getDate()} ${end.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}`
   return `${start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} – ${end.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`
 }
 
@@ -234,16 +231,6 @@ export default function ClubDiaryApp() {
     setAuth('ready')
   }
 
-  async function switchAccess() {
-    await fetch('/api/club-diary/auth', { method: 'DELETE' }).catch(() => null)
-    setRole(null)
-    setMemberName('')
-    setPin('')
-    setLoginName('')
-    setAuthError('')
-    setAuth('login')
-  }
-
   async function loadFixtureData() {
     try {
       const [feeds, manual] = await Promise.all([getMatchFeeds(), getFixtures()])
@@ -252,21 +239,18 @@ export default function ClubDiaryApp() {
         reserves: { ...defaults.reserves, widgets: [...defaults.reserves.widgets] },
         u17s: { ...defaults.u17s, widgets: [...defaults.u17s.widgets] },
       }
-
       for (const feed of feeds || []) {
         const key = teamKey(String(feed?.team || ''))
         if (!key || !feed?.snippet || key === 'reserves') continue
         const widget = String(feed.snippet).match(/\blrcode\s*=\s*['\"](\d+)['\"]/i)?.[1]
         if (widget) configs[key].widgets = [widget]
       }
-
       const live = await Promise.all((Object.keys(configs) as TeamKey[]).map(async (key) => {
         const config = configs[key]
         if (!config.widgets.length) return [] as Fixture[]
         const settled = await Promise.allSettled(config.widgets.map((widget) => loadFullTimeWidgetMatches(widget, config.team, 15000)))
         return settled.flatMap((item) => item.status === 'fulfilled' ? item.value : []) as Fixture[]
       }))
-
       const manualFixtures = (manual || []).map((item: any) => ({
         _id: String(item?._id || ''),
         date: String(item?.date || ''),
@@ -279,7 +263,6 @@ export default function ClubDiaryApp() {
         btfcScore: item?.btfcScore,
         opponentScore: item?.opponentScore,
       })) as Fixture[]
-
       const combined = [...manualFixtures, ...live.flat()]
         .filter((item) => item.date && item.opponent)
         .filter((item, index, all) => all.findIndex((other) =>
@@ -290,7 +273,6 @@ export default function ClubDiaryApp() {
           )
         ) === index)
         .sort((a, b) => a.date.localeCompare(b.date))
-
       setFixtures(combined)
     } catch (error) {
       console.error('Club Diary fixture load failed', error)
@@ -390,7 +372,7 @@ export default function ClubDiaryApp() {
   }
 
   async function removeEvent(event: DiaryEvent) {
-    if (!event.canEdit || !window.confirm('Remove this diary entry?')) return
+    if (!event.canEdit || !window.confirm('Delete this diary entry?')) return
     const response = await fetch('/api/club-diary', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -398,10 +380,10 @@ export default function ClubDiaryApp() {
     })
     const data = await response.json().catch(() => ({}))
     if (!response.ok) {
-      window.alert(data?.error || 'Unable to remove this diary entry.')
+      window.alert(data?.error || 'Unable to delete this diary entry.')
       return
     }
-    await refreshAll()
+    setEvents((current) => current.filter((item) => item._id !== event._id))
   }
 
   async function shareInvite(event: DiaryEvent) {
@@ -442,7 +424,6 @@ export default function ClubDiaryApp() {
       .filter(eventMatchesFilter)
       .filter((event) => event.startDate <= date && (event.endDate || event.startDate) >= date)
       .map((event) => ({ kind: 'diary', event }))
-
     return [...fixtureItems, ...diaryItems].sort((a, b) => {
       const aTime = a.kind === 'fixture' ? (a.fixture.kickoff || '') : (a.event.startTime || '')
       const bTime = b.kind === 'fixture' ? (b.fixture.kickoff || '') : (b.event.startTime || '')
@@ -461,20 +442,18 @@ export default function ClubDiaryApp() {
     setCalendarView('day')
   }
 
-  function renderCalendarChip(item: CalendarItem, key: string) {
+  function renderCalendarChip(item: CalendarItem, key: string, date: string) {
     if (item.kind === 'fixture') {
       const fixture = item.fixture
       const title = `${fixture.venue === 'Home' ? 'BTFC' : fixture.opponent} ${resultText(fixture)} ${fixture.venue === 'Home' ? fixture.opponent : 'BTFC'}`
-      return <div className={`${styles.calendarChip} ${fixtureChipStyle(fixture.team)}`} key={key} title={`${fixtureLabel(fixture.team)} · ${title}`}>
+      return <button type="button" className={`${styles.calendarChip} ${fixtureChipStyle(fixture.team)}`} key={key} onClick={() => openDay(date)} title={`${fixtureLabel(fixture.team)} · ${title}`}>
         <strong>{title}</strong><span>{fixture.kickoff && fixture.kickoff !== 'TBC' ? fixture.kickoff : 'Time TBC'}</span>
-      </div>
+      </button>
     }
-
     const event = item.event
-    const content = <><strong>{event.title}</strong>{event.startTime && <span>{event.startTime}</span>}</>
-    return event.canEdit
-      ? <button type="button" className={`${styles.calendarChip} ${eventChipStyle(event.category)}`} key={key} onClick={() => startEdit(event)} title={`${labels[event.category]} · ${event.title}`}>{content}</button>
-      : <div className={`${styles.calendarChip} ${eventChipStyle(event.category)}`} key={key} title={`${labels[event.category]} · ${event.title}`}>{content}</div>
+    return <button type="button" className={`${styles.calendarChip} ${eventChipStyle(event.category)}`} key={key} onClick={() => openDay(date)} title={`${labels[event.category]} · ${event.title}`}>
+      <strong>{event.title}</strong>{event.startTime && <span>{event.startTime}</span>}
+    </button>
   }
 
   function renderDetailedItem(item: CalendarItem, date: string, key: string) {
@@ -488,12 +467,14 @@ export default function ClubDiaryApp() {
         {unavailable.length > 0 && <div className={styles.warning}>{unavailable.length >= 2 ? '⚠ Staffing check: ' : 'Unavailable: '}{unavailable.join(', ')}</div>}
       </article>
     }
-
     const diaryEvent = item.event
     const yes = (diaryEvent.rsvps || []).filter((rsvp) => rsvp.response === 'yes')
     const maybe = (diaryEvent.rsvps || []).filter((rsvp) => rsvp.response === 'maybe')
     return <article className={`${styles.card} ${styles[diaryEvent.category]}`} key={key}>
-      <div className={styles.cardTop}><div><p className={styles.kicker}>{labels[diaryEvent.category]}</p><h3 className={styles.cardTitle}>{diaryEvent.title}</h3></div>{diaryEvent.canEdit && <div style={{ display: 'flex', gap: 8 }}><button className={styles.secondaryButton} type="button" onClick={() => startEdit(diaryEvent)}>Edit</button><button className={styles.dangerButton} type="button" onClick={() => void removeEvent(diaryEvent)}>Remove</button></div>}</div>
+      <div className={styles.cardTop}>
+        <div><p className={styles.kicker}>{labels[diaryEvent.category]}</p><h3 className={styles.cardTitle}>{diaryEvent.title}</h3></div>
+        {diaryEvent.canEdit && <div style={{ display: 'flex', gap: 8 }}><button className={styles.secondaryButton} type="button" onClick={() => startEdit(diaryEvent)}>Edit</button><button className={styles.dangerButton} type="button" onClick={() => void removeEvent(diaryEvent)}>Delete</button></div>}
+      </div>
       <p className={styles.meta}>{diaryEvent.startTime ? `${diaryEvent.startTime} · ` : ''}{diaryEvent.endDate && diaryEvent.endDate !== diaryEvent.startDate ? `Until ${prettyDate(diaryEvent.endDate)}` : ''}{diaryEvent.notes ? `${diaryEvent.endDate && diaryEvent.endDate !== diaryEvent.startDate ? ' · ' : ''}${diaryEvent.notes}` : ''}</p>
       {diaryEvent.category === 'workingParty' && <div className={styles.rsvpBox}>
         <div className={styles.rsvpLine}><div><strong>{yes.length} confirmed</strong>{diaryEvent.targetHelpers ? ` / ${diaryEvent.targetHelpers} wanted` : ''}{maybe.length ? ` · ${maybe.length} maybe` : ''}</div>{role === 'admin' && <button className={styles.shareButton} type="button" onClick={() => void shareInvite(diaryEvent)}>Share invite</button>}</div>
@@ -514,12 +495,11 @@ export default function ClubDiaryApp() {
     return Array.from({ length: 42 }, (_, index) => addDays(gridStart, index))
   }, [anchorDate])
 
-  if (auth === 'checking') return <div className={styles.page}><div className={styles.loading}>Opening Club Diary…</div></div>
+  if (auth === 'checking') return null
 
   if (auth === 'setup') {
     return <div className={styles.page}><div className={styles.shell}><div className={styles.loginWrap}><div className={styles.loginCard}>
-      <h1>BTFC Club Diary</h1>
-      <p>The diary is installed. The general PIN, admin PIN and secure server settings still need to be added in Vercel before it can be opened.</p>
+      <h1>BTFC Club Diary</h1><p>The diary is installed. The secure server settings still need to be added in Vercel before it can be opened.</p>
     </div></div></div></div>
   }
 
@@ -529,11 +509,11 @@ export default function ClubDiaryApp() {
         <h1>BTFC Club Diary</h1>
         <p>{loginMode === 'member' ? 'Add and manage your own availability.' : 'Manage the full club diary.'}</p>
         <div style={{ display: 'flex', gap: 8, marginBottom: 18 }}>
-          <button type="button" className={`${styles.filterButton} ${loginMode === 'member' ? styles.filterActive : ''}`} onClick={() => { setLoginMode('member'); setAuthError('') }}>General access</button>
-          <button type="button" className={`${styles.filterButton} ${loginMode === 'admin' ? styles.filterActive : ''}`} onClick={() => { setLoginMode('admin'); setAuthError('') }}>Admin</button>
+          <button type="button" className={`${styles.filterButton} ${loginMode === 'member' ? styles.filterActive : ''}`} onClick={() => { setLoginMode('member'); setAuthError('') }}>Standard login</button>
+          <button type="button" className={`${styles.filterButton} ${loginMode === 'admin' ? styles.filterActive : ''}`} onClick={() => { setLoginMode('admin'); setAuthError('') }}>Admin login</button>
         </div>
         {loginMode === 'member' && <div className={styles.field}><label htmlFor="loginName">Your name</label><input id="loginName" value={loginName} onChange={(e) => setLoginName(e.target.value)} autoComplete="name" required /></div>}
-        <div className={styles.field}><label htmlFor="clubPin">{loginMode === 'admin' ? 'Admin PIN' : 'General access PIN'}</label><input id="clubPin" className={styles.pinInput} value={pin} onChange={(e) => setPin(e.target.value)} inputMode="numeric" autoComplete="off" required /></div>
+        <div className={styles.field}><label htmlFor="clubPin">Personal PIN</label><input id="clubPin" className={styles.pinInput} value={pin} onChange={(e) => setPin(e.target.value)} inputMode="numeric" autoComplete="off" required /></div>
         <button className={styles.primaryButton} type="submit" style={{ width: '100%' }}>Open Diary</button>
         {authError && <div className={styles.error}>{authError}</div>}
       </form>
@@ -546,7 +526,6 @@ export default function ClubDiaryApp() {
     <section className={styles.hero}><div className={styles.heroTop}>
       <div><h1 className={styles.title}>Club Diary</h1><p className={styles.subtitle}>{role === 'admin' ? 'Admin access · fixtures are read-only.' : `${memberName} · personal availability access.`}</p></div>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-        <button className={styles.secondaryButton} type="button" onClick={() => void switchAccess()}>Switch access</button>
         <button className={styles.addButton} type="button" disabled={!writeConfigured} onClick={startAdd}>{role === 'admin' ? '+ Add' : '+ Add availability'}</button>
       </div>
     </div></section>
@@ -556,9 +535,7 @@ export default function ClubDiaryApp() {
     {adding && <form className={styles.panel} onSubmit={saveEvent}>
       <h2>{editingId ? 'Edit diary entry' : role === 'admin' ? 'Add to Club Diary' : 'Add my availability'}</h2>
       <div className={styles.formGrid}>
-        {role === 'admin' ? <div className={`${styles.field} ${styles.full}`}><label htmlFor="category">What are you adding?</label>
-          <select id="category" value={category} onChange={(e) => setCategory(e.target.value as Category)}>{Object.entries(labels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>
-        </div> : <div className={`${styles.field} ${styles.full}`}><label>Entry type</label><input value="My holiday / unavailable" readOnly /></div>}
+        {role === 'admin' ? <div className={`${styles.field} ${styles.full}`}><label htmlFor="category">What are you adding?</label><select id="category" value={category} onChange={(e) => setCategory(e.target.value as Category)}>{Object.entries(labels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></div> : <div className={`${styles.field} ${styles.full}`}><label>Entry type</label><input value="My holiday / unavailable" readOnly /></div>}
         {category === 'unavailable'
           ? <div className={`${styles.field} ${styles.full}`}><label htmlFor="person">Who is unavailable?</label><input id="person" value={role === 'member' ? memberName : personName} onChange={(e) => setPersonName(e.target.value)} readOnly={role === 'member'} placeholder="e.g. Paul Day" required /></div>
           : <div className={`${styles.field} ${styles.full}`}><label htmlFor="title">What is it?</label><input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={category === 'workingParty' ? 'Club Working Party' : 'e.g. 50th Birthday Party'} /></div>}
@@ -585,7 +562,7 @@ export default function ClubDiaryApp() {
     </div>
 
     <div className={styles.toolbar} aria-label="Diary filters">
-      {([['all','Everything'],['fixtures','Fixtures'],['availability','Availability'],['clubhouse','Clubhouse'],['workingParty','Working parties']] as [Filter,string][]).map(([value,label]) => <button key={value} type="button" className={`${styles.filterButton} ${filter === value ? styles.filterActive : ''}`} onClick={() => setFilter(value)}>{label}</button>)}
+      {([['all','Everything'],['fixtures','Fixtures'],['availability','Availability'],['clubhouse','Clubhouse Events'],['workingParty','Working parties']] as [Filter,string][]).map(([value,label]) => <button key={value} type="button" className={`${styles.filterButton} ${filter === value ? styles.filterActive : ''}`} onClick={() => setFilter(value)}>{label}</button>)}
     </div>
 
     {loading && <div className={styles.loading}>Updating diary and fixtures…</div>}
@@ -608,7 +585,7 @@ export default function ClubDiaryApp() {
         const homeFixture = dayItems.some((item) => item.kind === 'fixture' && item.fixture.venue === 'Home')
         return <div className={`${styles.weekDay} ${dayIndex >= 5 ? styles.weekend : ''}`} key={date}>
           <div className={styles.dayNumberRow}><button type="button" className={`${styles.dayNumber} ${date === today ? styles.todayNumber : ''}`} onClick={() => openDay(date)}>{dateFromIso(date).getDate()}</button>{homeFixture && unavailable.length > 0 && <span className={styles.coverBadge}>Cover</span>}</div>
-          {dayItems.map((item, index) => renderCalendarChip(item, `${date}-${item.kind}-${index}`))}
+          {dayItems.map((item, index) => renderCalendarChip(item, `${date}-${item.kind}-${index}`, date))}
         </div>
       })}</div>
     </div></div>}
@@ -621,7 +598,7 @@ export default function ClubDiaryApp() {
         const visibleItems = dayItems.slice(0, 4)
         return <div className={`${styles.monthDay} ${!inMonth ? styles.outsideMonth : ''}`} key={date}>
           <div className={styles.dayNumberRow}><button type="button" className={`${styles.dayNumber} ${date === today ? styles.todayNumber : ''}`} onClick={() => openDay(date)}>{dateFromIso(date).getDate()}</button></div>
-          {visibleItems.map((item, index) => renderCalendarChip(item, `${date}-${item.kind}-${index}`))}
+          {visibleItems.map((item, index) => renderCalendarChip(item, `${date}-${item.kind}-${index}`, date))}
           {dayItems.length > visibleItems.length && <button type="button" className={styles.moreItems} onClick={() => openDay(date)}>+ {dayItems.length - visibleItems.length} more</button>}
         </div>
       })}</div>
