@@ -19,12 +19,6 @@ export default function ClubDiaryMonthDetails() {
   useEffect(() => {
     const media = window.matchMedia('(max-width: 760px)')
 
-    const openDayForCell = (cell: HTMLElement | null) => {
-      const dayButton = cell?.querySelector<HTMLButtonElement>('[class*="dayNumber"]')
-      if (!dayButton) return
-      dayButton.click()
-    }
-
     const enhance = () => {
       const monthDays = Array.from(document.querySelectorAll<HTMLElement>('[class*="monthDay"]'))
       const firstCell = monthDays[0]
@@ -121,6 +115,7 @@ export default function ClubDiaryMonthDetails() {
         monthGrid.style.boxSizing = media.matches ? 'border-box' : ''
         monthGrid.style.gridTemplateColumns = media.matches ? 'repeat(7, minmax(0, 1fr))' : ''
       }
+
       if (weekHeader) {
         weekHeader.style.minWidth = media.matches ? '0' : ''
         weekHeader.style.width = media.matches ? '100%' : ''
@@ -136,6 +131,7 @@ export default function ClubDiaryMonthDetails() {
           headerCell.style.overflow = media.matches ? 'hidden' : ''
         }
       }
+
       if (calendarScroller) {
         calendarScroller.style.width = media.matches ? '100%' : ''
         calendarScroller.style.maxWidth = media.matches ? '100%' : ''
@@ -144,15 +140,15 @@ export default function ClubDiaryMonthDetails() {
         calendarScroller.style.overflowX = media.matches ? 'hidden' : ''
         if (media.matches && calendarScroller.scrollLeft !== 0) calendarScroller.scrollLeft = 0
       }
+
       if (calendarPanel) {
         calendarPanel.style.width = media.matches ? '100%' : ''
         calendarPanel.style.maxWidth = media.matches ? '100%' : ''
         calendarPanel.style.minWidth = media.matches ? '0' : ''
         calendarPanel.style.boxSizing = media.matches ? 'border-box' : ''
       }
-      if (media.matches && window.scrollX !== 0) {
-        window.scrollTo({ left: 0, top: window.scrollY, behavior: 'auto' })
-      }
+
+      if (media.matches && window.scrollX !== 0) window.scrollTo({ left: 0, top: window.scrollY, behavior: 'auto' })
 
       for (const cell of monthDays) {
         cell.style.minWidth = media.matches ? '0' : ''
@@ -208,7 +204,6 @@ export default function ClubDiaryMonthDetails() {
             chip.style.touchAction = ''
             chip.style.backgroundColor = ''
             chip.style.boxShadow = ''
-
             if (title) {
               title.style.display = '-webkit-box'
               title.style.webkitBoxOrient = 'vertical'
@@ -234,27 +229,6 @@ export default function ClubDiaryMonthDetails() {
 
           const detail = chip.querySelector<HTMLElement>('[data-month-details]')
           if (detail) detail.style.display = media.matches ? 'none' : 'block'
-
-          if (chip.tagName !== 'BUTTON') {
-            chip.setAttribute('role', 'button')
-            chip.setAttribute('tabindex', '0')
-          }
-
-          if (chip.dataset.btfcMonthOpen !== 'true') {
-            chip.dataset.btfcMonthOpen = 'true'
-            chip.addEventListener('click', (event) => {
-              event.preventDefault()
-              event.stopPropagation()
-              event.stopImmediatePropagation()
-              openDayForCell(chip.closest<HTMLElement>('[class*="monthDay"]'))
-            })
-            chip.addEventListener('keydown', (event) => {
-              if (event.key !== 'Enter' && event.key !== ' ') return
-              event.preventDefault()
-              event.stopPropagation()
-              openDayForCell(chip.closest<HTMLElement>('[class*="monthDay"]'))
-            })
-          }
         }
 
         const more = cell.querySelector<HTMLElement>('[class*="moreItems"]')
@@ -265,16 +239,6 @@ export default function ClubDiaryMonthDetails() {
           more.style.padding = media.matches ? '0' : ''
           more.style.minHeight = media.matches ? '0' : ''
           more.style.lineHeight = media.matches ? '1.1' : ''
-        }
-
-        if (cell.dataset.btfcMonthCellOpen !== 'true') {
-          cell.dataset.btfcMonthCellOpen = 'true'
-          cell.addEventListener('click', (event) => {
-            if (!media.matches) return
-            const target = event.target instanceof Element ? event.target : null
-            if (target?.closest('[class*="calendarChip"]') || target?.closest('[class*="dayNumber"]') || target?.closest('[class*="moreItems"]')) return
-            openDayForCell(cell)
-          })
         }
       }
     }
