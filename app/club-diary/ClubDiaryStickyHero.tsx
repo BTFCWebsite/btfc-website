@@ -7,7 +7,7 @@ export default function ClubDiaryStickyHero() {
     const mobile = window.matchMedia('(max-width: 900px)')
     let hero: HTMLElement | null = null
     let calendarControls: HTMLElement | null = null
-    let spacer: HTMLDivElement | null = null
+    let toolbar: HTMLElement | null = null
     let observer: MutationObserver | null = null
     let resizeObserver: ResizeObserver | null = null
     let timer: ReturnType<typeof setTimeout> | null = null
@@ -23,6 +23,19 @@ export default function ClubDiaryStickyHero() {
       calendarControls.style.boxShadow = ''
     }
 
+    const clearToolbar = () => {
+      if (!toolbar) return
+      toolbar.style.position = ''
+      toolbar.style.top = ''
+      toolbar.style.zIndex = ''
+      toolbar.style.background = ''
+      toolbar.style.marginTop = ''
+      toolbar.style.marginBottom = ''
+      toolbar.style.paddingTop = ''
+      toolbar.style.paddingBottom = ''
+      toolbar.style.boxShadow = ''
+    }
+
     const clearFixed = () => {
       if (!hero) return
       hero.style.position = ''
@@ -34,7 +47,6 @@ export default function ClubDiaryStickyHero() {
       hero.style.zIndex = ''
       hero.style.boxShadow = ''
       hero.style.borderRadius = ''
-      if (spacer) spacer.style.height = '0px'
     }
 
     const visibleSiteHeaderBottom = () => {
@@ -46,30 +58,44 @@ export default function ClubDiaryStickyHero() {
       return Math.max(0, Math.min(rect.bottom, window.innerHeight))
     }
 
-    const findCalendarControls = () => {
+    const findStickyRows = () => {
       calendarControls = document.querySelector<HTMLElement>('[class*="calendarControls"]')
-      if (!calendarControls) return
-      calendarControls.style.position = 'sticky'
-      calendarControls.style.zIndex = '240'
-      calendarControls.style.background = '#f2f4f7'
-      calendarControls.style.paddingTop = '8px'
-      calendarControls.style.paddingBottom = '7px'
-      calendarControls.style.boxShadow = '0 8px 14px rgba(16,24,40,.04)'
+      toolbar = document.querySelector<HTMLElement>('[class*="toolbar"]')
+
+      if (calendarControls) {
+        calendarControls.style.position = 'sticky'
+        calendarControls.style.zIndex = '240'
+        calendarControls.style.background = '#f2f4f7'
+        calendarControls.style.paddingTop = '8px'
+        calendarControls.style.paddingBottom = '7px'
+        calendarControls.style.boxShadow = '0 5px 10px rgba(16,24,40,.035)'
+      }
+
+      if (toolbar) {
+        toolbar.style.position = 'sticky'
+        toolbar.style.zIndex = '235'
+        toolbar.style.background = '#f2f4f7'
+        toolbar.style.marginTop = '0'
+        toolbar.style.marginBottom = '10px'
+        toolbar.style.paddingTop = '6px'
+        toolbar.style.paddingBottom = '7px'
+        toolbar.style.boxShadow = '0 7px 12px rgba(16,24,40,.035)'
+      }
     }
 
-    const positionCalendarControls = () => {
-      if (!calendarControls || !document.body.contains(calendarControls)) findCalendarControls()
-      if (!calendarControls || !hero || hero.style.position !== 'fixed') return
-      calendarControls.style.top = `${Math.ceil(hero.getBoundingClientRect().bottom + 4)}px`
-    }
+    const positionStickyRows = () => {
+      if (!calendarControls || !document.body.contains(calendarControls) || !toolbar || !document.body.contains(toolbar)) {
+        findStickyRows()
+      }
+      if (!hero || hero.style.position !== 'fixed') return
 
-    const updateSpacer = () => {
-      if (!hero || !spacer || hero.style.position !== 'fixed') return
-      // On mobile the site header is not reserving useful space beneath the fixed
-      // Club Diary hero, so keep a spacer. On desktop the normal site header is
-      // already in the document flow; reserving the hero again creates the large
-      // blank opening gap.
-      spacer.style.height = mobile.matches ? `${hero.getBoundingClientRect().height}px` : '0px'
+      const heroBottom = Math.ceil(hero.getBoundingClientRect().bottom)
+      if (calendarControls) calendarControls.style.top = `${heroBottom}px`
+
+      if (toolbar) {
+        const controlsHeight = calendarControls?.getBoundingClientRect().height || 0
+        toolbar.style.top = `${heroBottom + Math.ceil(controlsHeight)}px`
+      }
     }
 
     const findHero = () => {
@@ -78,36 +104,25 @@ export default function ClubDiaryStickyHero() {
       ) as HTMLElement | null
 
       if (nextHero === hero) {
-        if (!calendarControls || !document.body.contains(calendarControls)) findCalendarControls()
+        findStickyRows()
         return
       }
 
       resizeObserver?.disconnect()
       resizeObserver = null
-      if (spacer?.parentElement) spacer.remove()
-      spacer = null
       hero = nextHero
 
       if (!hero) return
 
-      spacer = document.createElement('div')
-      spacer.dataset.btfcHeroSpacer = 'true'
-      spacer.style.height = '0px'
-      spacer.style.width = '100%'
-      hero.parentElement?.insertBefore(spacer, hero)
-      findCalendarControls()
-
-      resizeObserver = new ResizeObserver(() => {
-        updateSpacer()
-        positionCalendarControls()
-      })
+      findStickyRows()
+      resizeObserver = new ResizeObserver(() => positionStickyRows())
       resizeObserver.observe(hero)
     }
 
     const positionFixedHero = () => {
       if (!hero || hero.style.position !== 'fixed') return
       hero.style.top = `${visibleSiteHeaderBottom()}px`
-      positionCalendarControls()
+      positionStickyRows()
     }
 
     const apply = () => {
@@ -136,9 +151,11 @@ export default function ClubDiaryStickyHero() {
         hero.style.borderRadius = '18px'
       }
 
-      updateSpacer()
-      findCalendarControls()
-      positionCalendarControls()
+      // Do not reserve a second hero-height spacer. The sticky control rows
+      // immediately below the fixed hero keep the diary content correctly
+      // positioned on both desktop and mobile without a blank opening band.
+      findStickyRows()
+      positionStickyRows()
     }
 
     const queueApply = () => {
@@ -158,9 +175,9 @@ export default function ClubDiaryStickyHero() {
         queueApply()
         return
       }
-      if (!calendarControls || !document.body.contains(calendarControls)) {
-        findCalendarControls()
-        positionCalendarControls()
+      if (!calendarControls || !document.body.contains(calendarControls) || !toolbar || !document.body.contains(toolbar)) {
+        findStickyRows()
+        positionStickyRows()
       }
     })
     observer.observe(document.body, { childList: true, subtree: true })
@@ -172,9 +189,9 @@ export default function ClubDiaryStickyHero() {
       mobile.removeEventListener('change', queueApply)
       window.removeEventListener('resize', queueApply)
       window.removeEventListener('scroll', positionFixedHero)
+      clearToolbar()
       clearCalendarControls()
       clearFixed()
-      spacer?.remove()
     }
   }, [])
 
