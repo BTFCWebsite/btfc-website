@@ -21,12 +21,21 @@ export default function ClubDiarySingleItemDetail() {
         article.style.display = ''
         delete article.dataset.btfcSingleHidden
       }
+      document.querySelector<HTMLElement>('[data-btfc-back-to-month]')?.remove()
       document.querySelector<HTMLElement>('[data-btfc-back-to-day]')?.remove()
     }
 
     const clearSelection = () => {
       selected = null
       restoreDay()
+    }
+
+    const returnToMonth = () => {
+      clearSelection()
+      const monthButton = Array.from(document.querySelectorAll<HTMLButtonElement>('button')).find((button) =>
+        button.closest('[class*="viewButtons"]') && button.textContent?.trim() === 'Month'
+      )
+      monthButton?.click()
     }
 
     const applySelection = () => {
@@ -62,11 +71,11 @@ export default function ClubDiarySingleItemDetail() {
       }
 
       const header = dayView.querySelector<HTMLElement>('[class*="dayViewHeader"]')
-      if (header && !header.querySelector('[data-btfc-back-to-day]')) {
+      if (header && !header.querySelector('[data-btfc-back-to-month]')) {
         const back = document.createElement('button')
         back.type = 'button'
-        back.dataset.btfcBackToDay = 'true'
-        back.textContent = '← Back to day'
+        back.dataset.btfcBackToMonth = 'true'
+        back.textContent = '← Back to month'
         Object.assign(back.style, {
           border: '1px solid #d0d5dd',
           borderRadius: '10px',
@@ -80,7 +89,7 @@ export default function ClubDiarySingleItemDetail() {
           cursor: 'pointer',
           whiteSpace: 'nowrap',
         })
-        back.addEventListener('click', clearSelection)
+        back.addEventListener('click', returnToMonth)
         header.appendChild(back)
       }
     }
