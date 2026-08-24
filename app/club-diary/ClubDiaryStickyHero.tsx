@@ -63,6 +63,15 @@ export default function ClubDiaryStickyHero() {
       calendarControls.style.top = `${Math.ceil(hero.getBoundingClientRect().bottom + 4)}px`
     }
 
+    const updateSpacer = () => {
+      if (!hero || !spacer || hero.style.position !== 'fixed') return
+      // On mobile the site header is not reserving useful space beneath the fixed
+      // Club Diary hero, so keep a spacer. On desktop the normal site header is
+      // already in the document flow; reserving the hero again creates the large
+      // blank opening gap.
+      spacer.style.height = mobile.matches ? `${hero.getBoundingClientRect().height}px` : '0px'
+    }
+
     const findHero = () => {
       const nextHero = Array.from(document.querySelectorAll('section')).find((section) =>
         section.querySelector('h1')?.textContent?.trim() === 'Club Diary'
@@ -89,10 +98,8 @@ export default function ClubDiaryStickyHero() {
       findCalendarControls()
 
       resizeObserver = new ResizeObserver(() => {
-        if (hero && spacer && hero.style.position === 'fixed') {
-          spacer.style.height = `${hero.getBoundingClientRect().height}px`
-          positionCalendarControls()
-        }
+        updateSpacer()
+        positionCalendarControls()
       })
       resizeObserver.observe(hero)
     }
@@ -109,7 +116,6 @@ export default function ClubDiaryStickyHero() {
 
       clearFixed()
       const rect = hero.getBoundingClientRect()
-      const height = rect.height
       const top = visibleSiteHeaderBottom()
 
       hero.style.position = 'fixed'
@@ -130,7 +136,7 @@ export default function ClubDiaryStickyHero() {
         hero.style.borderRadius = '18px'
       }
 
-      if (spacer) spacer.style.height = `${height}px`
+      updateSpacer()
       findCalendarControls()
       positionCalendarControls()
     }
