@@ -8,6 +8,7 @@ import ClubDiaryWorkingPartyShare from './ClubDiaryWorkingPartyShare'
 import ClubDiaryDeleteFeedback from './ClubDiaryDeleteFeedback'
 import ClubDiaryHeroControls from './ClubDiaryHeroControls'
 import ClubDiaryStickyHero from './ClubDiaryStickyHero'
+import ClubDiaryBackNavigation from './ClubDiaryBackNavigation'
 
 export const metadata: Metadata = {
   title: 'Club Diary | Brimscombe & Thrupp FC',
@@ -26,5 +27,6 @@ export default function ClubDiaryPage() {
     <ClubDiaryDeleteFeedback />
     <ClubDiaryHeroControls />
     <ClubDiaryStickyHero />
+    <ClubDiaryBackNavigation />
   </>
 }
