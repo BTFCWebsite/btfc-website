@@ -6,6 +6,12 @@ export default function ClubDiaryMonthDetails() {
   useEffect(() => {
     const media = window.matchMedia('(max-width: 760px)')
 
+    const openDayForCell = (cell: HTMLElement | null) => {
+      const dayButton = cell?.querySelector<HTMLButtonElement>('[class*="dayNumber"]')
+      if (!dayButton) return
+      dayButton.click()
+    }
+
     const enhance = () => {
       const monthDays = Array.from(document.querySelectorAll<HTMLElement>('[class*="monthDay"]'))
       const firstCell = monthDays[0]
@@ -79,14 +85,15 @@ export default function ClubDiaryMonthDetails() {
             chip.style.width = '100%'
             chip.style.maxWidth = '100%'
             chip.style.boxSizing = 'border-box'
-            chip.style.height = '6px'
-            chip.style.minHeight = '6px'
-            chip.style.margin = '0 0 3px'
+            chip.style.height = '8px'
+            chip.style.minHeight = '8px'
+            chip.style.margin = '0 0 4px'
             chip.style.padding = '0'
             chip.style.borderLeftWidth = '0'
             chip.style.borderRadius = '999px'
             chip.style.overflow = 'hidden'
             chip.style.cursor = 'pointer'
+            chip.style.touchAction = 'manipulation'
             if (title) title.style.display = 'none'
             for (const span of spans) span.style.display = 'none'
           } else {
@@ -101,6 +108,7 @@ export default function ClubDiaryMonthDetails() {
             chip.style.borderRadius = ''
             chip.style.overflow = ''
             chip.style.cursor = 'pointer'
+            chip.style.touchAction = ''
 
             if (title) {
               title.style.display = '-webkit-box'
@@ -132,6 +140,22 @@ export default function ClubDiaryMonthDetails() {
             chip.setAttribute('role', 'button')
             chip.setAttribute('tabindex', '0')
           }
+
+          if (chip.dataset.btfcMonthOpen !== 'true') {
+            chip.dataset.btfcMonthOpen = 'true'
+            chip.addEventListener('click', (event) => {
+              event.preventDefault()
+              event.stopPropagation()
+              event.stopImmediatePropagation()
+              openDayForCell(chip.closest<HTMLElement>('[class*="monthDay"]'))
+            })
+            chip.addEventListener('keydown', (event) => {
+              if (event.key !== 'Enter' && event.key !== ' ') return
+              event.preventDefault()
+              event.stopPropagation()
+              openDayForCell(chip.closest<HTMLElement>('[class*="monthDay"]'))
+            })
+          }
         }
 
         const more = cell.querySelector<HTMLElement>('[class*="moreItems"]')
@@ -143,65 +167,29 @@ export default function ClubDiaryMonthDetails() {
           more.style.minHeight = media.matches ? '0' : ''
           more.style.lineHeight = media.matches ? '1.1' : ''
         }
+
+        if (cell.dataset.btfcMonthCellOpen !== 'true') {
+          cell.dataset.btfcMonthCellOpen = 'true'
+          cell.addEventListener('click', (event) => {
+            if (!media.matches) return
+            const target = event.target instanceof Element ? event.target : null
+            if (target?.closest('[class*="calendarChip"]') || target?.closest('[class*="dayNumber"]') || target?.closest('[class*="moreItems"]')) return
+            openDayForCell(cell)
+          })
+        }
       }
-    }
-
-    const dayButtonFor = (element: Element | null) => {
-      const cell = element?.closest<HTMLElement>('[class*="monthDay"]')
-      if (!cell) return null
-      return cell.querySelector<HTMLButtonElement>('[class*="dayNumber"]')
-    }
-
-    const openDayFromChip = (target: EventTarget | null) => {
-      const element = target instanceof Element ? target : null
-      const chip = element?.closest<HTMLElement>('[class*="monthDay"] [class*="calendarChip"]')
-      if (!chip) return false
-      const dayButton = dayButtonFor(chip)
-      if (!dayButton) return false
-      dayButton.click()
-      return true
-    }
-
-    const openDayFromCell = (target: EventTarget | null) => {
-      if (!media.matches) return false
-      const element = target instanceof Element ? target : null
-      const cell = element?.closest<HTMLElement>('[class*="monthDay"]')
-      if (!cell) return false
-      const dayButton = dayButtonFor(cell)
-      if (!dayButton || element === dayButton || element?.closest('[class*="dayNumber"]')) return false
-      dayButton.click()
-      return true
-    }
-
-    const handleClick = (event: MouseEvent) => {
-      if (!openDayFromChip(event.target) && !openDayFromCell(event.target)) return
-      event.preventDefault()
-      event.stopPropagation()
-      event.stopImmediatePropagation()
-    }
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== 'Enter' && event.key !== ' ') return
-      if (!openDayFromChip(event.target)) return
-      event.preventDefault()
-      event.stopPropagation()
-      event.stopImmediatePropagation()
     }
 
     enhance()
     const observer = new MutationObserver(() => enhance())
     observer.observe(document.body, { childList: true, subtree: true })
     media.addEventListener('change', enhance)
-    document.addEventListener('click', handleClick, true)
-    document.addEventListener('keydown', handleKeyDown, true)
 
     return () => {
       document.documentElement.style.overflowX = ''
       document.body.style.overflowX = ''
       observer.disconnect()
       media.removeEventListener('change', enhance)
-      document.removeEventListener('click', handleClick, true)
-      document.removeEventListener('keydown', handleKeyDown, true)
     }
   }, [])
 
