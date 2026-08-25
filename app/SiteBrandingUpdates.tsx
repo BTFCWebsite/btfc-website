@@ -28,6 +28,8 @@ type SiteSettings = {
   sponsorTicker?: string[]
 }
 
+const BTFC_FACEBOOK_URL = 'https://www.facebook.com/p/Brimscombe-and-Thrupp-FC-61571541905144/'
+
 const defaults = {
   clubName: 'Brimscombe & Thrupp FC',
   clubNickname: 'The Lilywhites',
@@ -38,7 +40,7 @@ const defaults = {
   postcode: 'GL5 2SH',
   contactEmail: 'info@brimscombeandthruppfc.co.uk',
   contactPhone: '07814 854108',
-  facebookUrl: 'https://www.facebook.com/BrimscombeandThruppFC/',
+  facebookUrl: BTFC_FACEBOOK_URL,
   instagramUrl: 'https://www.instagram.com/brimscombeandthruppfc/',
   xUrl: 'https://x.com/Btfcthemeadow',
   openingHours: 'Mon–Fri 9am–5pm',
@@ -118,7 +120,7 @@ function updateNode(root: ParentNode, settings: SiteSettings, replacements: Arra
 
     if (element instanceof HTMLAnchorElement) {
       if (element.href.includes('x.com/Btfcthemeadow') && settings.xUrl) element.href = settings.xUrl
-      if (element.href.includes('facebook.com/BrimscombeandThruppFC') && settings.facebookUrl) element.href = settings.facebookUrl
+      if (element.href.includes('facebook.com/')) element.href = BTFC_FACEBOOK_URL
       if (element.href.includes('instagram.com/brimscombeandthruppfc') && settings.instagramUrl) element.href = settings.instagramUrl
     }
   })
