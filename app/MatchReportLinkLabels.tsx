@@ -57,12 +57,13 @@ export default function MatchReportLinkLabels() {
           text === 'Match Details →' ||
           text === 'Match Report' ||
           text === 'Match Report →'
+        const isHomepageLatestResult = link.getAttribute('aria-label') === 'View latest match report'
 
         if (text === 'Full-Time details' || text === 'Match Details') link.textContent = 'Match Report'
         if (text === 'Full-Time details →' || text === 'Match Details →') link.textContent = 'Match Report →'
 
         const localReport = reportLinks.get(normaliseUrl(link.href))
-        if (isFixtureDetailsLink && localReport) {
+        if ((isFixtureDetailsLink || isHomepageLatestResult) && localReport) {
           link.href = localReport
           link.removeAttribute('target')
           link.removeAttribute('rel')
@@ -73,7 +74,12 @@ export default function MatchReportLinkLabels() {
     updateLinks()
     loadReports()
     const observer = new MutationObserver(updateLinks)
-    observer.observe(document.body, { childList: true, subtree: true })
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['href'],
+    })
 
     return () => {
       cancelled = true
