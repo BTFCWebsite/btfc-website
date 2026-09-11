@@ -34,7 +34,6 @@ const FALLBACK_NEXT = {
 }
 
 const FALLBACK_SETTINGS = {
-  leaguePosition: '17th',
   seasonYear: '2026/27',
   seasonTicketAdult: '—',
   seasonTicketConcession: '—',
@@ -44,7 +43,6 @@ const FALLBACK_SETTINGS = {
 export default async function HomePage() {
   let lastResult = FALLBACK_LAST
   let nextFixture = FALLBACK_NEXT
-  let leaguePosition = FALLBACK_SETTINGS.leaguePosition
   let seasonYear = FALLBACK_SETTINGS.seasonYear
   let seasonTicketAdult = FALLBACK_SETTINGS.seasonTicketAdult
   let seasonTicketConcession = FALLBACK_SETTINGS.seasonTicketConcession
@@ -56,7 +54,7 @@ export default async function HomePage() {
         next: { revalidate: 300 },
       }).then(response => response.ok ? response.json() : { matches: [] }),
       client.fetch(
-        `*[_type == "siteSettings"][0] { leaguePosition, seasonYear, seasonTicketAdult, seasonTicketConcession, seasonTicketIntro }`,
+        `*[_type == "siteSettings"][0] { seasonYear, seasonTicketAdult, seasonTicketConcession, seasonTicketIntro }`,
         {},
         { next: { revalidate: 300 } }
       ),
@@ -72,7 +70,6 @@ export default async function HomePage() {
 
     if (played) lastResult = played
     if (upcoming) nextFixture = upcoming
-    if (settings?.leaguePosition) leaguePosition = settings.leaguePosition
     if (settings?.seasonYear) seasonYear = settings.seasonYear
     if (settings?.seasonTicketAdult) seasonTicketAdult = settings.seasonTicketAdult
     if (settings?.seasonTicketConcession) seasonTicketConcession = settings.seasonTicketConcession
@@ -212,7 +209,7 @@ export default async function HomePage() {
           </div>
           <div className="stats-strip" style={{ background: '#1149D8', display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
             {[
-              { value: <LeaguePosition fallback={leaguePosition || '17th'} />, label: 'League Position' },
+              { value: <LeaguePosition />, label: 'League Position' },
               { value: 'Hellenic', label: 'Division One' },
               { value: seasonYear || '2026/27', label: 'Season' },
               { value: 'Est. 1886', label: 'Founded' },
