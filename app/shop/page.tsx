@@ -1,6 +1,23 @@
 export const revalidate = 300
 
-const SENIOR_HOME_URL = 'https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-championship-viii-home-shirt-snr'
+const MATCH_SHIRTS = {
+  juniorHome: {
+    url: 'https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-championship-viii-home-shirt-jnr',
+    fallbackName: 'Championship VIII Home Shirt JNR',
+  },
+  seniorHome: {
+    url: 'https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-championship-viii-home-shirt-snr',
+    fallbackName: 'Championship VIII Home Shirt SNR',
+  },
+  juniorAway: {
+    url: 'https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-championship-viii-away-shirt-jnr',
+    fallbackName: 'Championship VIII Away Shirt JNR',
+  },
+  seniorAway: {
+    url: 'https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-championship-viii-away-shirt-snr',
+    fallbackName: 'Championship VIII Away Shirt SNR',
+  },
+} as const
 
 type ShopProduct = {
   name: string
@@ -28,16 +45,16 @@ function formatPrice(value: unknown) {
   return Number.isFinite(pennies) && pennies > 0 ? `£${(pennies / 100).toFixed(2)}` : undefined
 }
 
-async function getSeniorHomeShirt(): Promise<ShopProduct> {
+async function getBatemansProduct(url: string, fallbackName: string): Promise<ShopProduct> {
   const fallback: ShopProduct = {
-    name: 'Championship VIII Home Shirt SNR',
+    name: fallbackName,
     price: 'View price',
     brand: 'Joma',
-    url: SENIOR_HOME_URL,
+    url,
   }
 
   try {
-    const response = await fetch(`${SENIOR_HOME_URL}.js`, {
+    const response = await fetch(`${url}.js`, {
       next: { revalidate: 300 },
       headers: { Accept: 'application/json' },
     })
@@ -58,7 +75,7 @@ async function getSeniorHomeShirt(): Promise<ShopProduct> {
   }
 
   try {
-    const response = await fetch(SENIOR_HOME_URL, { next: { revalidate: 300 } })
+    const response = await fetch(url, { next: { revalidate: 300 } })
     if (!response.ok) return fallback
 
     const html = await response.text()
@@ -80,17 +97,22 @@ async function getSeniorHomeShirt(): Promise<ShopProduct> {
 
 export default async function ShopPage() {
   const collectionUrl = 'https://www.batemanssports.co.uk/collections/club-shops-football-brimscombe-thrupp-fc'
-  const seniorHomeShirt = await getSeniorHomeShirt()
+  const [juniorHomeShirt, seniorHomeShirt, juniorAwayShirt, seniorAwayShirt] = await Promise.all([
+    getBatemansProduct(MATCH_SHIRTS.juniorHome.url, MATCH_SHIRTS.juniorHome.fallbackName),
+    getBatemansProduct(MATCH_SHIRTS.seniorHome.url, MATCH_SHIRTS.seniorHome.fallbackName),
+    getBatemansProduct(MATCH_SHIRTS.juniorAway.url, MATCH_SHIRTS.juniorAway.fallbackName),
+    getBatemansProduct(MATCH_SHIRTS.seniorAway.url, MATCH_SHIRTS.seniorAway.fallbackName),
+  ])
 
   const categories: ShopCategory[] = [
     {
       title: 'Matchday Kit',
       icon: '⚽',
       products: [
-        { name: 'Tiger VI Home Shirt JNR', price: '£26.00', brand: 'Joma', url: 'https://www.batemanssports.co.uk/products/brimscombe-thrupp-fc-tiger-vi-hom-shirt-jnr', image: 'https://www.batemanssports.co.uk/cdn/shop/files/Brimscombe_ThruppFCTigerVIHomeShirtwithbadge.png?v=1754309278&width=533' },
+        juniorHomeShirt,
         seniorHomeShirt,
-        { name: 'Senior Toletum V Away Shirt', price: '£28.00', brand: 'Joma', url: 'https://www.batemanssports.co.uk/products/joma-brimscombe-thrupp-fc-senior-toletum-v-away-shirt-green-green-019961', image: 'https://www.batemanssports.co.uk/cdn/shop/files/1722687260_019961_GREEN_1.jpg?v=1730903654&width=533' },
-        { name: 'Championship VII Bermuda Shorts', price: '£21.50', brand: 'Joma', url: 'https://www.batemanssports.co.uk/products/joma-brimscombe-thrupp-fc-championship-vii-bermuda-shorts-navy-white-navy-white-020075', image: 'https://www.batemanssports.co.uk/cdn/shop/files/1726776503_020075_NAVY-WHITE_2.jpg?v=1730904155&width=533' },
+        juniorAwayShirt,
+        seniorAwayShirt,
       ],
     },
     {
