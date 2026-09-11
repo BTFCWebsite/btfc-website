@@ -1,12 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getMatchFeeds } from './lib/sanity.client'
+import { loadFullTimeWidgetTable, type FullTimeLeagueRow } from './lib/fulltime.browser'
 
-type LeagueRow = {
-  position: number
-  team: string
-}
+const FIRST_TEAM_TABLE_WIDGET = '251176067'
 
 function ordinal(position: number) {
   const remainder = position % 100
@@ -18,33 +15,27 @@ function ordinal(position: number) {
   return `${position}th`
 }
 
-export default function LeaguePosition({ fallback }: { fallback: string }) {
-  const [position, setPosition] = useState(fallback)
+function isBtfc(row: FullTimeLeagueRow) {
+  const team = row.team.toLowerCase()
+  return team.includes('brimscombe') && team.includes('thrupp')
+}
+
+export default function LeaguePosition({ fallback: _fallback }: { fallback?: string }) {
+  const [position, setPosition] = useState('—')
 
   useEffect(() => {
     let active = true
 
     async function refreshPosition() {
       try {
-        const feeds = await getMatchFeeds()
-        const firstTeamFeed = (feeds || []).find((feed: any) => {
-          const team = String(feed?.team || '').toLowerCase().replace(/[^a-z0-9]/g, '')
-          return team.includes('first') && feed?.snippet
-        })
-        const division = firstTeamFeed?.snippet?.match(/[?&]divisionseason=(\d+)/i)?.[1]
-        if (!division) return
+        // Use exactly the same First XI Full-Time table source as the Matches page.
+        const table = await loadFullTimeWidgetTable(FIRST_TEAM_TABLE_WIDGET, 18000)
+        const row = table.find(isBtfc)
 
-        const response = await fetch(`/api/full-time?kind=table&division=${division}&team=First+XI`)
-        if (!response.ok) return
-
-        const data = await response.json()
-        const row = (data.table as LeagueRow[] | undefined)?.find(({ team }) =>
-          team.toLowerCase().includes('brimscombe') && team.toLowerCase().includes('thrupp')
-        )
-
-        if (active && row?.position > 0) setPosition(ordinal(row.position))
+        if (active) setPosition(row?.position > 0 ? ordinal(row.position) : '—')
       } catch {
-        // Keep the published Sanity value when Full-Time is temporarily unavailable.
+        // Never fall back to the manually published Sanity league position.
+        if (active) setPosition('—')
       }
     }
 
