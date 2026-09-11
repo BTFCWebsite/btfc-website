@@ -109,10 +109,10 @@ export default async function ShopPage() {
       title: 'Matchday Kit',
       icon: '⚽',
       products: [
-        juniorHomeShirt,
         seniorHomeShirt,
-        juniorAwayShirt,
         seniorAwayShirt,
+        juniorHomeShirt,
+        juniorAwayShirt,
       ],
     },
     {
