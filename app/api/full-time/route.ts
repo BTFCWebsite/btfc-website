@@ -69,16 +69,20 @@ function parseMatches(script: string, team: string) {
 
     const competition = textFromHtml(cells[0])
     const homeTeam = textFromHtml(cells[1])
-    const homeScore = textFromHtml(cells[2])
+    const homeScore = textFromHtml(cells[2]).match(/^(\d+)/)?.[1] || ''
     const separator = textFromHtml(cells[3])
-    const awayScore = textFromHtml(cells[4])
+    const awayScore = textFromHtml(cells[4]).match(/^(\d+)/)?.[1] || ''
     const awayTeam = textFromHtml(cells[5])
     const location = textFromHtml(cells[6])
+    const rowText = textFromHtml(row[2])
+    const penaltyMatch = rowText.match(/\b(?:pens?|penalties)\s*[:.]?\s*(\d+)\s*[-–]\s*(\d+)\b/i)
+    const homePenaltyScore = penaltyMatch ? Number(penaltyMatch[1]) : undefined
+    const awayPenaltyScore = penaltyMatch ? Number(penaltyMatch[2]) : undefined
     const isHome = isBtfcTeam(homeTeam)
     const isAway = isBtfcTeam(awayTeam)
     if (!isHome && !isAway) continue
 
-    const played = separator === '-' && /^\d+$/.test(homeScore) && /^\d+$/.test(awayScore)
+    const played = (separator === '-' || separator === '–') && /^\d+$/.test(homeScore) && /^\d+$/.test(awayScore)
     const sourceUrl = hrefFromHtml(cells[0]) || hrefFromHtml(cells[1])
     const sourceId = sourceUrl?.match(/[?&]id=(\d+)/)?.[1]
 
@@ -92,6 +96,8 @@ function parseMatches(script: string, team: string) {
       kickoff: parsedDate.kickoff,
       btfcScore: played ? Number(isHome ? homeScore : awayScore) : undefined,
       opponentScore: played ? Number(isHome ? awayScore : homeScore) : undefined,
+      btfcPenaltyScore: penaltyMatch ? Number(isHome ? homePenaltyScore : awayPenaltyScore) : undefined,
+      opponentPenaltyScore: penaltyMatch ? Number(isHome ? awayPenaltyScore : homePenaltyScore) : undefined,
       played,
       location,
       sourceUrl,
