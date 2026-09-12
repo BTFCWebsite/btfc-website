@@ -20,6 +20,8 @@ const FALLBACK_LAST = {
   opponent: 'Bromyard Town',
   btfcScore: 2,
   opponentScore: 4,
+  btfcPenaltyScore: undefined as number | undefined,
+  opponentPenaltyScore: undefined as number | undefined,
   date: '2026-08-08',
   competition: 'HL1',
   sourceUrl: undefined as string | undefined,
@@ -79,6 +81,10 @@ export default async function HomePage() {
   }
 
   const lastScore = `${lastResult.btfcScore ?? 0}–${lastResult.opponentScore ?? 0}`
+  const knownYateleyPenaltyWin = lastResult.date === '2026-09-12' && String(lastResult.opponent || '').toLowerCase().includes('yateley united')
+  const penaltyScore = lastResult.btfcPenaltyScore != null && lastResult.opponentPenaltyScore != null
+    ? `${lastResult.btfcPenaltyScore}-${lastResult.opponentPenaltyScore}`
+    : knownYateleyPenaltyWin ? '5-4' : null
   const latestResultHref = lastResult.sourceUrl || '/fixtures'
   const longestFixtureTitleLength = Math.max(
     `BTFC ${lastScore} ${lastResult.opponent}`.length,
@@ -183,7 +189,7 @@ export default async function HomePage() {
                 BTFC <span style={{ color: '#EF4444' }}>{lastScore}</span> {lastResult.opponent}
               </div>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: 'rgba(255,255,255,.4)', marginTop: 7, lineHeight: 1.35, overflowWrap: 'anywhere' }}>
-                {lastResult.date ? formatDate(lastResult.date) : ''} · {lastResult.competition}
+                {lastResult.date ? formatDate(lastResult.date) : ''} · {lastResult.competition}{penaltyScore ? ` · (Pens ${penaltyScore})` : ''}
               </div>
             </a>
             <Link href="/matchday" aria-label="View Matchday information for the next fixture" style={{ ...fixtureCardBase, background: 'rgba(17,73,216,.3)', borderLeft: '4px solid #1149D8', textDecoration: 'none' }}>
