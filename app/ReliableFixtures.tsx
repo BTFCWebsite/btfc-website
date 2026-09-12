@@ -37,7 +37,7 @@ const UNDER17_OPENING_TABLE: LeagueRow[] = [
   { position: 3, team: 'Kempsey Colts U17 Falcons', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
   { position: 4, team: 'Leckhampton Rovers Youth U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
   { position: 5, team: 'Longlevens Youth U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
-  { position: 6, team: 'Perdiswell Colts U17 Tigers', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
+  { position: 6, team: 'Perdiswell Colts U17 Falcons', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
   { position: 7, team: 'Prestbury Phantoms Youth U17 Jets', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
   { position: 8, team: 'Southside Star Youth U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
   { position: 9, team: 'Stonehouse Town Youth U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
@@ -83,16 +83,22 @@ function resultFor(fixture: Fixture) {
   if (!fixture.played) return '—'
   const btfc = fixture.btfcScore ?? '-'
   const opponent = fixture.opponentScore ?? '-'
-  const regulation = fixture.venue === 'Home' ? `${btfc}-${opponent}` : `${opponent}-${btfc}`
+  return fixture.venue === 'Home' ? `${btfc}-${opponent}` : `${opponent}-${btfc}`
+}
+
+function penaltyNote(fixture: Fixture) {
+  if (!fixture.played) return null
 
   if (fixture.btfcPenaltyScore != null && fixture.opponentPenaltyScore != null) {
-    const penalties = fixture.venue === 'Home'
-      ? `${fixture.btfcPenaltyScore}-${fixture.opponentPenaltyScore}`
-      : `${fixture.opponentPenaltyScore}-${fixture.btfcPenaltyScore}`
-    return `${regulation} (${penalties} pens)`
+    if (fixture.btfcPenaltyScore > fixture.opponentPenaltyScore) {
+      return `Won ${fixture.btfcPenaltyScore}-${fixture.opponentPenaltyScore} on pens`
+    }
+    if (fixture.btfcPenaltyScore < fixture.opponentPenaltyScore) {
+      return `Lost ${fixture.btfcPenaltyScore}-${fixture.opponentPenaltyScore} on pens`
+    }
   }
 
-  return isKnownBtfcPenaltyWin(fixture) ? `${regulation} (won pens)` : regulation
+  return isKnownBtfcPenaltyWin(fixture) ? 'Won on penalties' : null
 }
 
 function formFor(fixture: Fixture) {
@@ -350,13 +356,15 @@ function MobileMonth({ month, fixtures }: { month: string; fixtures: Fixture[] }
 
 function MobileCard({ fixture }: { fixture: Fixture }) {
   const form = formFor(fixture)
+  const penalty = penaltyNote(fixture)
   const colour = form === 'W' ? '#22C55E' : form === 'L' ? '#EF4444' : '#F59E0B'
+  const penaltyColour = form === 'W' ? '#16A34A' : form === 'L' ? '#DC2626' : '#6B7280'
   const info = dateInfo(fixture.date)
-  return <article style={{ background: '#fff', border: '1px solid #DCE3F1', borderLeft: '5px solid #1149D8', borderRadius: 8, padding: 16, boxShadow: '0 5px 16px rgba(4,27,95,.06)' }}><div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}><div><div style={{ color: '#6B7280', fontFamily: "'Montserrat',sans-serif", fontSize: 10, fontWeight: 700, textTransform: 'uppercase' }}>{info.day} · {fixture.kickoff || 'TBC'} · {fixture.venue}</div><h3 style={{ margin: '6px 0 3px', color: '#041B5F', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 22, fontWeight: 800 }}>{fixture.opponent}</h3><div style={{ color: '#6B7280', fontFamily: "'Montserrat',sans-serif", fontSize: 11 }}>{fixture.competition || 'Competition TBC'}</div></div><div style={{ flexShrink: 0, textAlign: 'center' }}><div style={{ color: '#041B5F', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 25, fontWeight: 800 }}>{resultFor(fixture)}</div>{form && <span style={{ display: 'inline-flex', width: 28, height: 28, marginTop: 7, alignItems: 'center', justifyContent: 'center', background: colour, color: '#fff', borderRadius: 4, fontWeight: 800 }}>{form}</span>}</div></div>{fixture.played && fixture.sourceUrl && <a href={fixture.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: 13, color: '#1149D8', fontFamily: "'Montserrat',sans-serif", fontSize: 11, fontWeight: 800, textDecoration: 'none', textTransform: 'uppercase' }}>Match Details →</a>}</article>
+  return <article style={{ background: '#fff', border: '1px solid #DCE3F1', borderLeft: '5px solid #1149D8', borderRadius: 8, padding: 16, boxShadow: '0 5px 16px rgba(4,27,95,.06)' }}><div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}><div><div style={{ color: '#6B7280', fontFamily: "'Montserrat',sans-serif", fontSize: 10, fontWeight: 700, textTransform: 'uppercase' }}>{info.day} · {fixture.kickoff || 'TBC'} · {fixture.venue}</div><h3 style={{ margin: '6px 0 3px', color: '#041B5F', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 22, fontWeight: 800 }}>{fixture.opponent}</h3><div style={{ color: '#6B7280', fontFamily: "'Montserrat',sans-serif", fontSize: 11 }}>{fixture.competition || 'Competition TBC'}</div></div><div style={{ flexShrink: 0, textAlign: 'center' }}><div style={{ color: '#041B5F', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 25, fontWeight: 800 }}>{resultFor(fixture)}</div>{penalty && <div style={{ marginTop: 2, color: penaltyColour, fontFamily: "'Montserrat',sans-serif", fontSize: 9, fontWeight: 800, lineHeight: 1.2, whiteSpace: 'nowrap' }}>{penalty}</div>}{form && <span style={{ display: 'inline-flex', width: 28, height: 28, marginTop: penalty ? 5 : 7, alignItems: 'center', justifyContent: 'center', background: colour, color: '#fff', borderRadius: 4, fontWeight: 800 }}>{form}</span>}</div></div>{fixture.played && fixture.sourceUrl && <a href={fixture.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: 13, color: '#1149D8', fontFamily: "'Montserrat',sans-serif", fontSize: 11, fontWeight: 800, textDecoration: 'none', textTransform: 'uppercase' }}>Match Details →</a>}</article>
 }
 
 function DesktopRows({ month, fixtures }: { month: string; fixtures: Fixture[] }) {
-  return <><tr><th colSpan={8} style={{ padding: '13px 14px', textAlign: 'left', background: '#EEF3FC', color: '#041B5F', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 17, fontWeight: 800, textTransform: 'uppercase' }}>{month}</th></tr>{fixtures.map((fixture) => { const form = formFor(fixture); const colour = form === 'W' ? '#22C55E' : form === 'L' ? '#EF4444' : '#F59E0B'; const info = dateInfo(fixture.date); return <tr key={fixture._id} style={{ borderBottom: '1px solid #E5E7EB' }}><td style={cell}>{info.day}</td><td style={cell}>{fixture.kickoff || 'TBC'}</td><td style={cell}>{fixture.venue}</td><td style={{ ...cell, fontWeight: 700, color: '#041B5F' }}>{fixture.opponent}</td><td style={cell}>{fixture.competition || 'TBC'}</td><td style={{ ...cell, fontWeight: 800 }}>{resultFor(fixture)}</td><td style={cell}>{form ? <span style={{ display: 'inline-flex', width: 32, height: 32, alignItems: 'center', justifyContent: 'center', background: colour, color: '#fff', borderRadius: 4, fontWeight: 800 }}>{form}</span> : '—'}</td><td style={cell}>{fixture.played && fixture.sourceUrl ? <a href={fixture.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#1149D8', fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}>Match Details</a> : '—'}</td></tr> })}</>
+  return <><tr><th colSpan={8} style={{ padding: '13px 14px', textAlign: 'left', background: '#EEF3FC', color: '#041B5F', fontFamily: "'Barlow Condensed',sans-serif", fontSize: 17, fontWeight: 800, textTransform: 'uppercase' }}>{month}</th></tr>{fixtures.map((fixture) => { const form = formFor(fixture); const penalty = penaltyNote(fixture); const colour = form === 'W' ? '#22C55E' : form === 'L' ? '#EF4444' : '#F59E0B'; const penaltyColour = form === 'W' ? '#16A34A' : form === 'L' ? '#DC2626' : '#6B7280'; const info = dateInfo(fixture.date); return <tr key={fixture._id} style={{ borderBottom: '1px solid #E5E7EB' }}><td style={cell}>{info.day}</td><td style={cell}>{fixture.kickoff || 'TBC'}</td><td style={cell}>{fixture.venue}</td><td style={{ ...cell, fontWeight: 700, color: '#041B5F' }}>{fixture.opponent}</td><td style={cell}>{fixture.competition || 'TBC'}</td><td style={{ ...cell, fontWeight: 800 }}><div>{resultFor(fixture)}</div>{penalty && <div style={{ marginTop: 2, fontSize: 10, fontWeight: 700, color: penaltyColour, whiteSpace: 'nowrap' }}>{penalty}</div>}</td><td style={cell}>{form ? <span style={{ display: 'inline-flex', width: 32, height: 32, alignItems: 'center', justifyContent: 'center', background: colour, color: '#fff', borderRadius: 4, fontWeight: 800 }}>{form}</span> : '—'}</td><td style={cell}>{fixture.played && fixture.sourceUrl ? <a href={fixture.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#1149D8', fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}>Match Details</a> : '—'}</td></tr> })}</>
 }
 
 function LeagueTable({ rows }: { rows: LeagueRow[] }) {
