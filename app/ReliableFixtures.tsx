@@ -37,7 +37,7 @@ const UNDER17_OPENING_TABLE: LeagueRow[] = [
   { position: 3, team: 'Kempsey Colts U17 Falcons', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
   { position: 4, team: 'Leckhampton Rovers Youth U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
   { position: 5, team: 'Longlevens Youth U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
-  { position: 6, team: 'Perdiswell Colts U17 Falcons', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
+  { position: 6, team: 'Perdiswell Colts U17 Tigers', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
   { position: 7, team: 'Prestbury Phantoms Youth U17 Jets', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
   { position: 8, team: 'Southside Star Youth U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
   { position: 9, team: 'Stonehouse Town Youth U17', played: 0, won: 0, drawn: 0, lost: 0, goalDifference: 0, points: 0 },
