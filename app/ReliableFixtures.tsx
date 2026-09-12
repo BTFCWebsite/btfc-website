@@ -71,17 +71,39 @@ function dateInfo(date: string) {
   }
 }
 
+function isKnownBtfcPenaltyWin(fixture: Fixture) {
+  return fixture.date === '2026-09-12'
+    && normalise(fixture.opponent).includes('yateleyunited')
+    && fixture.btfcScore != null
+    && fixture.opponentScore != null
+    && fixture.btfcScore === fixture.opponentScore
+}
+
 function resultFor(fixture: Fixture) {
   if (!fixture.played) return '—'
   const btfc = fixture.btfcScore ?? '-'
   const opponent = fixture.opponentScore ?? '-'
-  return fixture.venue === 'Home' ? `${btfc}-${opponent}` : `${opponent}-${btfc}`
+  const regulation = fixture.venue === 'Home' ? `${btfc}-${opponent}` : `${opponent}-${btfc}`
+
+  if (fixture.btfcPenaltyScore != null && fixture.opponentPenaltyScore != null) {
+    const penalties = fixture.venue === 'Home'
+      ? `${fixture.btfcPenaltyScore}-${fixture.opponentPenaltyScore}`
+      : `${fixture.opponentPenaltyScore}-${fixture.btfcPenaltyScore}`
+    return `${regulation} (${penalties} pens)`
+  }
+
+  return isKnownBtfcPenaltyWin(fixture) ? `${regulation} (won pens)` : regulation
 }
 
 function formFor(fixture: Fixture) {
   if (!fixture.played || fixture.btfcScore == null || fixture.opponentScore == null) return null
   if (fixture.btfcScore > fixture.opponentScore) return 'W'
   if (fixture.btfcScore < fixture.opponentScore) return 'L'
+  if (fixture.btfcPenaltyScore != null && fixture.opponentPenaltyScore != null) {
+    if (fixture.btfcPenaltyScore > fixture.opponentPenaltyScore) return 'W'
+    if (fixture.btfcPenaltyScore < fixture.opponentPenaltyScore) return 'L'
+  }
+  if (isKnownBtfcPenaltyWin(fixture)) return 'W'
   return 'D'
 }
 
