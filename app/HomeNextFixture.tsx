@@ -76,6 +76,22 @@ function resizeHomepageFixtureCards() {
   container.style.maxWidth = 'calc(100vw - 48px)'
 }
 
+function homepagePenaltyLabel(fixture: FullTimeFixture) {
+  if (fixture.btfcPenaltyScore != null && fixture.opponentPenaltyScore != null) {
+    return `(Pens ${fixture.btfcPenaltyScore}-${fixture.opponentPenaltyScore})`
+  }
+
+  if (
+    fixture.date === '2026-09-12' &&
+    String(fixture.opponent || '').toLowerCase().includes('yateley united') &&
+    fixture.btfcScore === fixture.opponentScore
+  ) {
+    return '(Pens 5-4)'
+  }
+
+  return ''
+}
+
 function updateHomepage(fixtures: FullTimeFixture[]) {
   const latest = fixtures
     .filter((fixture) => fixture.played && fixture.date && fixture.opponent)
@@ -92,8 +108,9 @@ function updateHomepage(fixtures: FullTimeFixture[]) {
       const rows = Array.from(card.children) as HTMLElement[]
       const title = rows[1]
       const details = rows[2]
+      const penalty = homepagePenaltyLabel(latest)
       if (title) title.textContent = `BTFC ${latest.btfcScore ?? 0}–${latest.opponentScore ?? 0} ${latest.opponent}`
-      if (details) details.textContent = `${formatDate(latest.date)}${latest.competition ? ` · ${latest.competition}` : ''}`
+      if (details) details.textContent = `${formatDate(latest.date)}${latest.competition ? ` · ${latest.competition}` : ''}${penalty ? ` · ${penalty}` : ''}`
       if (latest.sourceUrl) {
         const link = card.closest('a') as HTMLAnchorElement | null
         if (link) {
