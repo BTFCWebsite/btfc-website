@@ -8,6 +8,8 @@ export type FullTimeFixture = {
   kickoff: string
   btfcScore?: number
   opponentScore?: number
+  btfcPenaltyScore?: number
+  opponentPenaltyScore?: number
   played: boolean
   location?: string
   sourceUrl?: string
@@ -87,6 +89,10 @@ function parseWidgetFixtures(doc: Document, team: string): FullTimeFixture[] {
     if (!currentDate || cells.length < 5) continue
 
     const values = cells.map((cell) => cleanText(cell.textContent))
+    const rowText = cleanText(row.textContent)
+    const penaltyMatch = rowText.match(/\b(?:pens?|penalties)\s*[:.]?\s*(\d+)\s*[-–]\s*(\d+)\b/i)
+    const homePenaltyScore = penaltyMatch ? Number(penaltyMatch[1]) : undefined
+    const awayPenaltyScore = penaltyMatch ? Number(penaltyMatch[2]) : undefined
     const competition = values[0]
     let homeTeam = ''
     let awayTeam = ''
@@ -97,9 +103,9 @@ function parseWidgetFixtures(doc: Document, team: string): FullTimeFixture[] {
 
     if (cells.length >= 7) {
       homeTeam = values[1]
-      homeScore = values[2]
+      homeScore = values[2].match(/^(\d+)/)?.[1] || ''
       const separator = values[3].toLowerCase()
-      awayScore = values[4]
+      awayScore = values[4].match(/^(\d+)/)?.[1] || ''
       awayTeam = values[5]
       location = values[6] || location
       played = (separator === '-' || separator === '–') && /^\d+$/.test(homeScore) && /^\d+$/.test(awayScore)
@@ -134,6 +140,8 @@ function parseWidgetFixtures(doc: Document, team: string): FullTimeFixture[] {
       kickoff: currentDate.kickoff,
       btfcScore: played ? Number(isHome ? homeScore : awayScore) : undefined,
       opponentScore: played ? Number(isHome ? awayScore : homeScore) : undefined,
+      btfcPenaltyScore: penaltyMatch ? Number(isHome ? homePenaltyScore : awayPenaltyScore) : undefined,
+      opponentPenaltyScore: penaltyMatch ? Number(isHome ? awayPenaltyScore : homePenaltyScore) : undefined,
       played,
       location,
       sourceUrl,
@@ -334,7 +342,6 @@ async function loadMatchesFromApi(widgetCode: string, team: string) {
 async function loadTableFromApi(widgetCode: string) {
   const config = TABLE_API[widgetCode]
   if (!config) return null
-
   const params = new URLSearchParams({
     kind: 'table',
     division: config.division,
