@@ -25,7 +25,7 @@ const playersQuery = `*[_type == "player" && active == true] | order(order asc, 
   "sponsorLogoUrl": sponsorLogo.asset->url
 }`
 const staffQuery = `*[_type == "teamStaff" && active == true] | order(order asc, name asc) {
-  _id, name, role, team, active, order, "imageUrl": image.asset->url
+  _id, name, role, team, active, order, "imageUrl": coalesce(photo.asset->url, image.asset->url), bio
 }`
 
 const queries: Record<string, string> = {
