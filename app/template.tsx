@@ -6,6 +6,7 @@ import ProgrammeLinks from './ProgrammeLinks'
 import MatchReportLinkLabels from './MatchReportLinkLabels'
 import MatchdayMobileTileWidth from './MatchdayMobileTileWidth'
 import ContactsMobileTileWidth from './ContactsMobileTileWidth'
+import ClubOfficialPhotos from './ClubOfficialPhotos'
 import SponsorTickerSync from './SponsorTickerSync'
 import SiteSeo from './SiteSeo'
 import LeagueTableMobileScrollCue from './LeagueTableMobileScrollCue'
@@ -74,6 +75,7 @@ export default function Template({ children }: { children: ReactNode }) {
       <MatchReportLinkLabels />
       <MatchdayMobileTileWidth />
       <ContactsMobileTileWidth />
+      <ClubOfficialPhotos />
       <SponsorTickerSync />
       <LeagueTableMobileScrollCue />
       <MatchdayProgrammeHeroButton />
