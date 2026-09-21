@@ -22,8 +22,23 @@ async function fetchContent<T>(type: string, params?: Record<string, string>): P
   return response.json()
 }
 
+// Editorial announcement published in code while the regular news feed remains in Sanity.
+// Remove this item if the story is subsequently added to Sanity, to avoid a duplicate.
+const HELLENIC_LEAGUE_ANNOUNCEMENT = {
+  _id: 'announcement-hellenic-league-new-website-2026',
+  title: 'Hellenic League launches new website',
+  category: 'Announcements',
+  date: '2026-09-21',
+  summary: 'The league has a new official website. Please update your bookmarks and use the new address for league news, fixtures, results and tables.',
+  slug: 'hellenic-league-new-website',
+  showUntil: '2026-11-01',
+}
+
 export async function getSiteSettings() { return fetchContent<any>('settings') }
-export async function getNewsArticles() { return fetchContent<any[]>('news') }
+export async function getNewsArticles() {
+  const news = await fetchContent<any[]>('news')
+  return [HELLENIC_LEAGUE_ANNOUNCEMENT, ...(Array.isArray(news) ? news.filter(item => item.slug !== HELLENIC_LEAGUE_ANNOUNCEMENT.slug) : [])]
+}
 export async function getFixtures() { return fetchContent<any[]>('fixtures') }
 export async function getMatchFeeds() { return fetchContent<any[]>('matchFeeds') }
 export async function getMatchdayProgrammes() { return fetchContent<any[]>('programmes') }
