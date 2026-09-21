@@ -12,6 +12,7 @@ import LeagueTableMobileScrollCue from './LeagueTableMobileScrollCue'
 import MatchdayProgrammeHeroButton from './MatchdayProgrammeHeroButton'
 import ClubDiaryClubLink from './ClubDiaryClubLink'
 import ClubDiaryWording from './ClubDiaryWording'
+import HellenicLeagueFooter from './HellenicLeagueFooter'
 
 // Deployment marker: restored stable version from 1 August 2026.
 export default function Template({ children }: { children: ReactNode }) {
@@ -79,6 +80,7 @@ export default function Template({ children }: { children: ReactNode }) {
       <MatchdayProgrammeHeroButton />
       <ClubDiaryClubLink />
       <ClubDiaryWording />
+      <HellenicLeagueFooter />
     </>
   )
 }
