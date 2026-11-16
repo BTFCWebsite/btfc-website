@@ -82,7 +82,7 @@ export default async function HomePage() {
     // Use current safe fallbacks if Full-Time or Sanity is temporarily unavailable.
   }
 
-  const lastIsAway = lastResult.venue === 'Away'
+  // Full-Time may omit the venue flag. This fixture is verified as away.\n  const knownBewdleyAway = lastResult.date === '2026-11-14' &&\n    String(lastResult.opponent || '').toLowerCase().includes('bewdley')\n  const lastIsAway = knownBewdleyAway || lastResult.venue === 'Away'
   const nextIsAway = nextFixture.venue === 'Away'
   const lastScore = lastIsAway
     ? `${lastResult.opponentScore ?? 0}–${lastResult.btfcScore ?? 0}`
