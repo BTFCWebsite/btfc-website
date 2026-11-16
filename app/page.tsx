@@ -86,6 +86,26 @@ export default async function HomePage() {
   const knownBewdleyAway = lastResult.date === '2026-11-14' &&
     String(lastResult.opponent || '').toLowerCase().includes('bewdley')
   const lastIsAway = knownBewdleyAway || lastResult.venue === 'Away'
+  // Find the published Lily White match report by opponent and fixture date.
+  // Do not assume a slug or send supporters to the general fixtures page.
+  let latestReportHref = '/news'
+  try {
+    const reports = await client.fetch(
+      `*[_type == "newsArticle" && category == "Match Report" && defined(slug.current) && date >= $from && date < $to] {
+        title, summary, "slug": slug.current
+      }`,
+      { from: lastResult.date, to: new Date(new Date(lastResult.date + 'T12:00:00').getTime() + 86400000).toISOString().slice(0, 10) },
+      { cache: 'no-store' }
+    )
+    const opponent = String(lastResult.opponent || '').toLowerCase()
+    const matchingReport = (reports || []).find((article: any) =>
+      String(article.title || '').toLowerCase().includes(opponent) ||
+      String(article.summary || '').toLowerCase().includes(opponent)
+    )
+    if (matchingReport?.slug) latestReportHref = '/news/' + encodeURIComponent(matchingReport.slug)
+  } catch {
+    // Keep the news listing as a safe destination when Sanity is unavailable.
+  }
   const nextIsAway = nextFixture.venue === 'Away'
   const lastScore = lastIsAway
     ? `${lastResult.opponentScore ?? 0}–${lastResult.btfcScore ?? 0}`
@@ -198,7 +218,7 @@ export default async function HomePage() {
           </div>
 
           <div className="hero-cards" style={{ display: 'flex', gap: 16, flexWrap: 'nowrap', justifyContent: 'center', alignItems: 'stretch', width: '100%', maxWidth: fixtureCardsMaxWidth }}>
-            <Link href="/fixtures" aria-label="View the latest BTFC result" style={{ ...fixtureCardBase, background: 'rgba(255,255,255,.06)', borderLeft: '4px solid #EF4444', textDecoration: 'none' }}>
+            <Link href={latestReportHref} aria-label="Read Lily White’s latest match report" style={{ ...fixtureCardBase, background: 'rgba(255,255,255,.06)', borderLeft: '4px solid #EF4444', textDecoration: 'none' }}>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: 'rgba(255,255,255,.5)', letterSpacing: '.16em', textTransform: 'uppercase', marginBottom: 6 }}>Latest Result <span style={{ opacity: .65, fontSize: 8 }}>v466-fix2</span></div>
               <div style={fixtureTitle}>
                 {String(lastResult.date).startsWith('2026-11-14')
