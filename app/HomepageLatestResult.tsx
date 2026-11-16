@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { loadFullTimeWidgetMatches, type FullTimeFixture } from './lib/fulltime.browser'
 
-type Result = Pick<FullTimeFixture, 'date' | 'opponent' | 'venue' | 'btfcScore' | 'opponentScore' | 'competition' | 'sourceUrl'>
+type Result = Omit<Pick<FullTimeFixture, 'date' | 'opponent' | 'venue' | 'btfcScore' | 'opponentScore' | 'competition' | 'sourceUrl'>, 'venue'> & { venue: string }
 
 export default function HomepageLatestResult({ initial, style, titleStyle }: {
   initial: Result
