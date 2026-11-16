@@ -1,7 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { loadFullTimeWidgetMatches, type FullTimeFixture } from './lib/fulltime.browser'
+import type { FullTimeFixture } from './lib/fulltime.browser'
 
 type Result = Omit<Pick<FullTimeFixture, 'date' | 'opponent' | 'venue' | 'btfcScore' | 'opponentScore' | 'competition' | 'sourceUrl'>, 'venue'> & { venue: string }
 
@@ -10,22 +9,8 @@ export default function HomepageLatestResult({ initial, style, titleStyle }: {
   style: React.CSSProperties
   titleStyle: React.CSSProperties
 }) {
-  const [result, setResult] = useState<Result>(initial)
-  useEffect(() => {
-    let active = true
-    loadFullTimeWidgetMatches('969980533', 'First XI', 18000)
-      .then(matches => {
-        const latest = matches
-          .filter(match => match.played && match.date && match.opponent)
-          .sort((a, b) => b.date.localeCompare(a.date))[0]
-        // Never overwrite the verified initial fixture with another rendering
-        // of the same date. Only advance to a genuinely later played match.
-        if (!active || !latest || latest.date <= initial.date) return
-        setResult(latest)
-      })
-      .catch(() => {})
-    return () => { active = false }
-  }, [initial.date])
+  // Display the verified server result without a second client-side overwrite.
+  const result = initial
   const away = result.venue === 'Away' ||
     (result.date === '2026-11-14' && result.opponent.toLowerCase().includes('bewdley'))
   const score = away
