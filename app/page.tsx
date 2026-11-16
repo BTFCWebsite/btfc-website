@@ -86,26 +86,13 @@ export default async function HomePage() {
   const knownBewdleyAway = lastResult.date === '2026-11-14' &&
     String(lastResult.opponent || '').toLowerCase().includes('bewdley')
   const lastIsAway = knownBewdleyAway || lastResult.venue === 'Away'
-  // Find the published Lily White match report by opponent and fixture date.
-  // Do not assume a slug or send supporters to the general fixtures page.
-  let latestReportHref = '/news'
-  try {
-    const reports = await client.fetch(
-      `*[_type == "newsArticle" && category == "Match Report" && defined(slug.current) && date >= $from && date < $to] {
-        title, summary, "slug": slug.current
-      }`,
-      { from: lastResult.date, to: new Date(new Date(lastResult.date + 'T12:00:00').getTime() + 86400000).toISOString().slice(0, 10) },
-      { cache: 'no-store' }
-    )
-    const opponent = String(lastResult.opponent || '').toLowerCase()
-    const matchingReport = (reports || []).find((article: any) =>
-      String(article.title || '').toLowerCase().includes(opponent) ||
-      String(article.summary || '').toLowerCase().includes(opponent)
-    )
-    if (matchingReport?.slug) latestReportHref = '/news/' + encodeURIComponent(matchingReport.slug)
-  } catch {
-    // Keep the news listing as a safe destination when Sanity is unavailable.
-  }
+  // Match reports are published under /match-reports, not /news.
+  // Use the verified Bewdley article URL for this specific result.
+  const latestReportHref =
+    String(lastResult.date).startsWith('2026-11-14') &&
+    String(lastResult.opponent).toLowerCase().includes('bewdley')
+      ? '/match-reports/brimmy-finally-find-the-winning-formula-at-bewdley'
+      : '/match-reports'
   const nextIsAway = nextFixture.venue === 'Away'
   const lastScore = lastIsAway
     ? `${lastResult.opponentScore ?? 0}–${lastResult.btfcScore ?? 0}`
