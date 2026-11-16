@@ -17,21 +17,21 @@ function formatDate(dateStr: string) {
 
 const FALLBACK_LAST = {
   _id: '',
-  opponent: 'Bromyard Town',
-  venue: 'Home',
-  btfcScore: 2,
-  opponentScore: 4,
+  opponent: 'Bewdley Town',
+  venue: 'Away',
+  btfcScore: 3,
+  opponentScore: 2,
   btfcPenaltyScore: undefined as number | undefined,
   opponentPenaltyScore: undefined as number | undefined,
-  date: '2026-08-08',
-  competition: 'HL1',
+  date: '2026-11-14',
+  competition: 'Hellenic League Division One',
   sourceUrl: undefined as string | undefined,
 }
 
 const FALLBACK_NEXT = {
-  opponent: 'Cheltenham Saracens',
+  opponent: 'Fixture details unavailable',
   venue: 'Home',
-  date: '2026-08-15' as string | null,
+  date: null as string | null,
   competition: 'Hellenic League Division One',
   kickoff: '15:00',
   sourceUrl: undefined as string | undefined,
