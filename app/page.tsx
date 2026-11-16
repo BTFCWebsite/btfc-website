@@ -1,4 +1,4 @@
-export const revalidate = 300
+export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
 import { client } from './lib/sanity.client'
@@ -55,7 +55,7 @@ export default async function HomePage() {
   try {
     const [fullTimeResponse, settings] = await Promise.all([
       fetch('https://www.brimscombeandthruppfc.co.uk/api/full-time?team=First%20XI&widget=969980533&division=320568525&kind=matches', {
-        next: { revalidate: 300 },
+        cache: 'no-store',
       }).then(response => response.ok ? response.json() : { matches: [] }),
       client.fetch(
         `*[_type == "siteSettings"][0] { seasonYear, seasonTicketAdult, seasonTicketConcession, seasonTicketIntro }`,
