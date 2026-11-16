@@ -18,6 +18,7 @@ function formatDate(dateStr: string) {
 const FALLBACK_LAST = {
   _id: '',
   opponent: 'Bromyard Town',
+  venue: 'Home',
   btfcScore: 2,
   opponentScore: 4,
   btfcPenaltyScore: undefined as number | undefined,
@@ -29,6 +30,7 @@ const FALLBACK_LAST = {
 
 const FALLBACK_NEXT = {
   opponent: 'Cheltenham Saracens',
+  venue: 'Home',
   date: '2026-08-15' as string | null,
   competition: 'Hellenic League Division One',
   kickoff: '15:00',
@@ -80,15 +82,25 @@ export default async function HomePage() {
     // Use current safe fallbacks if Full-Time or Sanity is temporarily unavailable.
   }
 
-  const lastScore = `${lastResult.btfcScore ?? 0}–${lastResult.opponentScore ?? 0}`
+  const lastIsAway = lastResult.venue === 'Away'
+  const nextIsAway = nextFixture.venue === 'Away'
+  const lastScore = lastIsAway
+    ? `${lastResult.opponentScore ?? 0}–${lastResult.btfcScore ?? 0}`
+    : `${lastResult.btfcScore ?? 0}–${lastResult.opponentScore ?? 0}`
+  const lastResultTitle = lastIsAway
+    ? `${lastResult.opponent} ${lastScore} BTFC`
+    : `BTFC ${lastScore} ${lastResult.opponent}`
+  const nextFixtureTitle = nextIsAway
+    ? `${nextFixture.opponent} vs BTFC`
+    : `BTFC vs ${nextFixture.opponent}`
   const knownYateleyPenaltyWin = lastResult.date === '2026-09-12' && String(lastResult.opponent || '').toLowerCase().includes('yateley united')
   const penaltyScore = lastResult.btfcPenaltyScore != null && lastResult.opponentPenaltyScore != null
     ? `${lastResult.btfcPenaltyScore}-${lastResult.opponentPenaltyScore}`
     : knownYateleyPenaltyWin ? '5-4' : null
   const latestResultHref = lastResult.sourceUrl || '/fixtures'
   const longestFixtureTitleLength = Math.max(
-    `BTFC ${lastScore} ${lastResult.opponent}`.length,
-    `BTFC vs ${nextFixture.opponent}`.length
+    lastResultTitle.length,
+    nextFixtureTitle.length
   )
   const fixtureCardsMaxWidth = Math.min(
     1100,
@@ -186,7 +198,7 @@ export default async function HomePage() {
             <a href={latestResultHref} target={lastResult.sourceUrl ? '_blank' : undefined} rel={lastResult.sourceUrl ? 'noopener noreferrer' : undefined} aria-label="View latest match report" style={{ ...fixtureCardBase, background: 'rgba(255,255,255,.06)', borderLeft: '4px solid #EF4444', textDecoration: 'none' }}>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: 'rgba(255,255,255,.5)', letterSpacing: '.16em', textTransform: 'uppercase', marginBottom: 6 }}>Latest Result</div>
               <div style={fixtureTitle}>
-                BTFC <span style={{ color: '#EF4444' }}>{lastScore}</span> {lastResult.opponent}
+                {lastIsAway ? <>{lastResult.opponent} <span style={{ color: '#EF4444' }}>{lastScore}</span> BTFC</> : <>BTFC <span style={{ color: '#EF4444' }}>{lastScore}</span> {lastResult.opponent}</>}
               </div>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: 'rgba(255,255,255,.4)', marginTop: 7, lineHeight: 1.35, overflowWrap: 'anywhere' }}>
                 {lastResult.date ? formatDate(lastResult.date) : ''} · {lastResult.competition}{penaltyScore ? ` · (Pens ${penaltyScore})` : ''}
@@ -194,7 +206,7 @@ export default async function HomePage() {
             </a>
             <Link href="/matchday" aria-label="View Matchday information for the next fixture" style={{ ...fixtureCardBase, background: 'rgba(17,73,216,.3)', borderLeft: '4px solid #1149D8', textDecoration: 'none' }}>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: 'rgba(255,255,255,.5)', letterSpacing: '.16em', textTransform: 'uppercase', marginBottom: 6 }}>Next Fixture</div>
-              <div style={fixtureTitle}>BTFC vs {nextFixture.opponent}</div>
+              <div style={fixtureTitle}>{nextFixtureTitle}</div>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: 'rgba(255,255,255,.4)', marginTop: 7, lineHeight: 1.35, overflowWrap: 'anywhere' }}>
                 {nextFixture.date ? `${formatDate(nextFixture.date)}${nextFixture.kickoff ? ` · ${nextFixture.kickoff}` : ''}` : nextFixture.competition}
               </div>
