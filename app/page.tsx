@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { client } from './lib/sanity.client'
 import NewsSection from './NewsSection'
 import LeaguePosition from './LeaguePosition'
+import HomepageLatestResult from './HomepageLatestResult'
 
 const SPONSORS = [
   { name: 'Brackenfern Advisory Limited', role: 'Ground & First Team Sponsor', logo: '/sponsors/brackenfern-logo.png' },
@@ -198,15 +199,7 @@ export default async function HomePage() {
           </div>
 
           <div className="hero-cards" style={{ display: 'flex', gap: 16, flexWrap: 'nowrap', justifyContent: 'center', alignItems: 'stretch', width: '100%', maxWidth: fixtureCardsMaxWidth }}>
-            <a href={latestResultHref} target={lastResult.sourceUrl ? '_blank' : undefined} rel={lastResult.sourceUrl ? 'noopener noreferrer' : undefined} aria-label="View latest match report" style={{ ...fixtureCardBase, background: 'rgba(255,255,255,.06)', borderLeft: '4px solid #EF4444', textDecoration: 'none' }}>
-              <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: 'rgba(255,255,255,.5)', letterSpacing: '.16em', textTransform: 'uppercase', marginBottom: 6 }}>Latest Result</div>
-              <div style={fixtureTitle}>
-                {lastIsAway ? <>{lastResult.opponent} <span style={{ color: '#EF4444' }}>{lastScore}</span> BTFC</> : <>BTFC <span style={{ color: '#EF4444' }}>{lastScore}</span> {lastResult.opponent}</>}
-              </div>
-              <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: 'rgba(255,255,255,.4)', marginTop: 7, lineHeight: 1.35, overflowWrap: 'anywhere' }}>
-                {lastResult.date ? formatDate(lastResult.date) : ''} · {lastResult.competition}{penaltyScore ? ` · (Pens ${penaltyScore})` : ''}
-              </div>
-            </a>
+            <HomepageLatestResult initial={lastResult} style={{ ...fixtureCardBase, background: 'rgba(255,255,255,.06)', borderLeft: '4px solid #EF4444', textDecoration: 'none' }} titleStyle={fixtureTitle} />
             <Link href="/matchday" aria-label="View Matchday information for the next fixture" style={{ ...fixtureCardBase, background: 'rgba(17,73,216,.3)', borderLeft: '4px solid #1149D8', textDecoration: 'none' }}>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: 'rgba(255,255,255,.5)', letterSpacing: '.16em', textTransform: 'uppercase', marginBottom: 6 }}>Next Fixture</div>
               <div style={fixtureTitle}>{nextFixtureTitle}</div>
