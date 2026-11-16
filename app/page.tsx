@@ -54,7 +54,7 @@ export default async function HomePage() {
 
   try {
     const [fullTimeResponse, settings] = await Promise.all([
-      fetch('https://btfc-website.vercel.app/api/full-time?team=First%20XI&widget=969980533&division=320568525&kind=matches', {
+      fetch('https://www.brimscombeandthruppfc.co.uk/api/full-time?team=First%20XI&widget=969980533&division=320568525&kind=matches', {
         next: { revalidate: 300 },
       }).then(response => response.ok ? response.json() : { matches: [] }),
       client.fetch(
