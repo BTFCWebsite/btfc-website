@@ -73,7 +73,7 @@ export default async function HomePage() {
       .filter((match: any) => match?.played !== true && match?.date && match?.opponent)
       .sort((a: any, b: any) => String(a.date).localeCompare(String(b.date)))[0]
 
-    if (played) lastResult = played
+    if (played && String(played.date) > FALLBACK_LAST.date) lastResult = played
     if (upcoming) nextFixture = upcoming
     if (settings?.seasonYear) seasonYear = settings.seasonYear
     if (settings?.seasonTicketAdult) seasonTicketAdult = settings.seasonTicketAdult
