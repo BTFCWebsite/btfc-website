@@ -18,13 +18,9 @@ export default function HomepageLatestResult({ initial, style, titleStyle }: {
         const latest = matches
           .filter(match => match.played && match.date && match.opponent)
           .sort((a, b) => b.date.localeCompare(a.date))[0]
-        if (!active || !latest || latest.date < initial.date) return
-        // Keep the independently verified result when the live widget returns
-        // conflicting home/away metadata for the same fixture.
-        const sameFixture = latest.date === initial.date &&
-          latest.opponent.toLowerCase().replace(/[^a-z0-9]/g, '') ===
-          initial.opponent.toLowerCase().replace(/[^a-z0-9]/g, '')
-        if (sameFixture && initial.venue === 'Away' && latest.venue !== 'Away') return
+        // Never overwrite the verified initial fixture with another rendering
+        // of the same date. Only advance to a genuinely later played match.
+        if (!active || !latest || latest.date <= initial.date) return
         setResult(latest)
       })
       .catch(() => {})
