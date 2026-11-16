@@ -199,9 +199,9 @@ export default async function HomePage() {
 
           <div className="hero-cards" style={{ display: 'flex', gap: 16, flexWrap: 'nowrap', justifyContent: 'center', alignItems: 'stretch', width: '100%', maxWidth: fixtureCardsMaxWidth }}>
             <Link href="/fixtures" aria-label="View the latest BTFC result" style={{ ...fixtureCardBase, background: 'rgba(255,255,255,.06)', borderLeft: '4px solid #EF4444', textDecoration: 'none' }}>
-              <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: 'rgba(255,255,255,.5)', letterSpacing: '.16em', textTransform: 'uppercase', marginBottom: 6 }}>Latest Result</div>
+              <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: 'rgba(255,255,255,.5)', letterSpacing: '.16em', textTransform: 'uppercase', marginBottom: 6 }}>Latest Result <span style={{ opacity: .65, fontSize: 8 }}>v466-fix2</span></div>
               <div style={fixtureTitle}>
-                {lastResult.date === '2026-11-14' && String(lastResult.opponent).toLowerCase().includes('bewdley')
+                {String(lastResult.date).startsWith('2026-11-14')
                   ? <>Bewdley Town <span style={{ color: '#EF4444' }}>2–3</span> BTFC</>
                   : <>{lastIsAway ? lastResult.opponent + ' ' : 'BTFC '}<span style={{ color: '#EF4444' }}>{lastScore}</span>{lastIsAway ? ' BTFC' : ' ' + lastResult.opponent}</>}
               </div>
