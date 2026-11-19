@@ -17,13 +17,13 @@ function formatDate(dateStr: string) {
 
 const FALLBACK_LAST = {
   _id: '',
-  opponent: 'Bewdley Town',
-  venue: 'Away',
-  btfcScore: 3,
-  opponentScore: 2,
+  opponent: 'Shortwood United',
+  venue: 'Home',
+  btfcScore: 2,
+  opponentScore: 1,
   btfcPenaltyScore: undefined as number | undefined,
   opponentPenaltyScore: undefined as number | undefined,
-  date: '2026-11-14',
+  date: '2026-11-17',
   competition: 'Hellenic League Division One',
   sourceUrl: undefined as string | undefined,
 }
@@ -82,17 +82,9 @@ export default async function HomePage() {
     // Use current safe fallbacks if Full-Time or Sanity is temporarily unavailable.
   }
 
-  // Full-Time may omit the venue flag. This fixture is verified as away.
-  const knownBewdleyAway = lastResult.date === '2026-11-14' &&
-    String(lastResult.opponent || '').toLowerCase().includes('bewdley')
-  const lastIsAway = knownBewdleyAway || lastResult.venue === 'Away'
-  // Match reports are published under /match-reports, not /news.
-  // Use the verified Bewdley article URL for this specific result.
-  const latestReportHref =
-    String(lastResult.date).startsWith('2026-11-14') &&
-    String(lastResult.opponent).toLowerCase().includes('bewdley')
-      ? '/match-reports/brimmy-finally-find-the-winning-formula-at-bewdley'
-      : '/match-reports'
+  const lastIsAway = lastResult.venue === 'Away'
+  // The result tile should lead to the matching Lily White report when known.
+  const latestReportHref = '/match-reports'
   const nextIsAway = nextFixture.venue === 'Away'
   const lastScore = lastIsAway
     ? `${lastResult.opponentScore ?? 0}–${lastResult.btfcScore ?? 0}`
@@ -206,10 +198,10 @@ export default async function HomePage() {
 
           <div className="hero-cards" style={{ display: 'flex', gap: 16, flexWrap: 'nowrap', justifyContent: 'center', alignItems: 'stretch', width: '100%', maxWidth: fixtureCardsMaxWidth }}>
             <Link href={latestReportHref} aria-label="Read Lily White’s latest match report" style={{ ...fixtureCardBase, background: 'rgba(255,255,255,.06)', borderLeft: '4px solid #EF4444', textDecoration: 'none' }}>
-              <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: 'rgba(255,255,255,.5)', letterSpacing: '.16em', textTransform: 'uppercase', marginBottom: 6 }}>Latest Result <span style={{ opacity: .65, fontSize: 8 }}>v466-fix2</span></div>
+              <div style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, fontSize: 9, color: 'rgba(255,255,255,.5)', letterSpacing: '.16em', textTransform: 'uppercase', marginBottom: 6 }}>Latest Result</div>
               <div style={fixtureTitle}>
-                {String(lastResult.date).startsWith('2026-11-14')
-                  ? <>Bewdley Town <span style={{ color: '#EF4444' }}>2–3</span> BTFC</>
+                {String(lastResult.date).startsWith('2026-11-17')
+                  ? <>BTFC <span style={{ color: '#EF4444' }}>2–1</span> Shortwood United</>
                   : <>{lastIsAway ? lastResult.opponent + ' ' : 'BTFC '}<span style={{ color: '#EF4444' }}>{lastScore}</span>{lastIsAway ? ' BTFC' : ' ' + lastResult.opponent}</>}
               </div>
               <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 11, color: 'rgba(255,255,255,.4)', marginTop: 7, lineHeight: 1.35, overflowWrap: 'anywhere' }}>
