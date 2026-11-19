@@ -84,7 +84,28 @@ export default async function HomePage() {
 
   const lastIsAway = lastResult.venue === 'Away'
   // The result tile should lead to the matching Lily White report when known.
-  const latestReportHref = '/match-reports'
+  let latestReportHref = '/match-reports'
+  try {
+    const reports = await client.fetch(
+      `*[_type == "matchReport" && published == true && defined(slug.current)] | order(_updatedAt desc)[0...80] {
+        headline, matchData, "slug": slug.current
+      }`,
+      {},
+      { cache: 'no-store' }
+    )
+    const matched = (reports || []).find((report: any) => {
+      try {
+        const match = JSON.parse(report.matchData || '{}')
+        return String(match.date || '') === String(lastResult.date) &&
+          String(match.opponent || '').toLowerCase().includes(String(lastResult.opponent || '').toLowerCase())
+      } catch {
+        return false
+      }
+    })
+    if (matched?.slug) latestReportHref = '/match-reports/' + encodeURIComponent(matched.slug)
+  } catch {
+    // The match reports index remains available when Sanity cannot be reached.
+  }
   const nextIsAway = nextFixture.venue === 'Away'
   const lastScore = lastIsAway
     ? `${lastResult.opponentScore ?? 0}–${lastResult.btfcScore ?? 0}`
